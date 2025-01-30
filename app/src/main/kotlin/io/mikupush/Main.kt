@@ -19,7 +19,7 @@ val appDataDir = if (SystemUtils.IS_OS_WINDOWS) {
 fun main(args: Array<String>) {
     MainApplication()
         .subcommands(
-            DesktopApplicationCommand(),
+            UICommand(),
             UploadRequestCommand()
         )
         .main(args)

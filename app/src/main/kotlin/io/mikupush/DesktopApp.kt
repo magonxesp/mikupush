@@ -5,20 +5,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.*
 import com.github.ajalt.clikt.core.CliktCommand
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
-import java.awt.Image
-import java.awt.SystemTray
-import java.awt.Toolkit
-import java.awt.TrayIcon
-import java.awt.TrayIcon.MessageType
 
 private val logger = LoggerFactory.getLogger("Main")
 
-class DesktopApplicationCommand : CliktCommand(name = "ui") {
+class UICommand : CliktCommand(name = "ui") {
     private fun launchUI() = application {
         trayIcon()
     }
