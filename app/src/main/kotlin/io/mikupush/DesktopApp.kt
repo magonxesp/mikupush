@@ -1,7 +1,12 @@
 package io.mikupush
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.window.*
 import com.github.ajalt.clikt.core.CliktCommand
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
@@ -14,9 +19,8 @@ import java.awt.TrayIcon.MessageType
 private val logger = LoggerFactory.getLogger("Main")
 
 class DesktopApplicationCommand : CliktCommand(name = "ui") {
-    private fun launchUI() = runBlocking {
-        val trayIcon = showTrayIcon()
-        launch(Dispatchers.Default) { trayIcon.listenToNotifications() }
+    private fun launchUI() = application {
+        trayIcon()
     }
 
     override fun run() {
@@ -25,22 +29,29 @@ class DesktopApplicationCommand : CliktCommand(name = "ui") {
     }
 }
 
-fun showTrayIcon(): TrayIcon {
-    val tray = SystemTray.getSystemTray()
-    val image: Image = Toolkit.getDefaultToolkit().createImage(object {}::class.java.getResource("/icon.png"))
+@Composable
+fun ApplicationScope.trayIcon() {
+    val trayState = rememberTrayState()
 
-    val trayIcon = TrayIcon(image, "Tray Demo").apply {
-        isImageAutoSize = true
-        toolTip = "System tray icon demo"
+    LaunchedEffect(trayState) {
+        trayState.listenToNotifications(notificationFlow)
     }
 
-    tray.add(trayIcon)
-    return trayIcon
+    Tray(
+        icon = painterResource("/icon.png"),
+        state = trayState,
+        menu = {
+            Item(
+                text = "Exit",
+                onClick = ::exitApplication
+            )
+        }
+    )
 }
 
-suspend fun TrayIcon.listenToNotifications() {
+suspend fun TrayState.listenToNotifications(notificationFlow: SharedFlow<Notification>) {
     notificationFlow.collect { notification ->
         logger.debug("Incoming notification {}", notification)
-        displayMessage(notification.title, notification.message, MessageType.INFO)
+        sendNotification(notification.toTrayNotification())
     }
 }
