@@ -11,7 +11,6 @@ import io.ktor.utils.io.*
 import org.apache.tika.Tika
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.util.*
 
 private val logger = LoggerFactory.getLogger("Routing")
 
@@ -48,8 +47,10 @@ fun Application.configureRouting() {
 
             call.respondBytes(contentType = ContentType.parse(contentType), bytes = file.readBytes())
         }
-        post("/upload") {
-            val fileId = UUID.randomUUID().toString()
+        post("/upload/{fileId}") {
+            val fileId = call.parameters["fileId"]
+            require(!fileId.isNullOrBlank()) { "File id is required" }
+
             val file = File("data/$fileId").apply {
                 if (!parentFile.exists()) {
                     parentFile.mkdirs()
@@ -59,7 +60,7 @@ fun Application.configureRouting() {
             val channel = call.receiveChannel()
             channel.counted().totalBytesRead
             channel.copyAndClose(file.writeChannel())
-            call.respondText(fileId)
+            call.respond(HttpStatusCode.Created)
         }
     }
 }
