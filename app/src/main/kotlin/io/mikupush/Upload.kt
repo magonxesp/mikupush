@@ -18,6 +18,11 @@ private val logger = LoggerFactory.getLogger("Upload")
 suspend fun upload(filePath: String) {
     val file = File(filePath)
 
+    notificationFlow.emit(Notification(
+        title = "Uploading file",
+        message = "Uploading file ${file.name} please wait"
+    ))
+
     if (!file.exists()) {
         error("File $filePath not exists")
     }
