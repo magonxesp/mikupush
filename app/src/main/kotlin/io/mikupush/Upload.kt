@@ -7,7 +7,7 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.*
@@ -28,9 +28,16 @@ suspend fun upload(filePath: String) {
     }
 
     val uuid = UUID.randomUUID().toString()
+
     backendHttpClient.use { client ->
-        client.post("/upload/$uuid") {
-            setBody(file.readBytes())
+        val reader = file.inputStream().buffered(100 * 1000)
+        val buffer = ByteArray(100 * 1000) // 100kb
+
+        while (reader.read(buffer) != -1) {
+            logger.debug("sending new chunk to file $uuid")
+            client.post("/upload/$uuid/chunk") {
+                setBody(buffer)
+            }
         }
     }
 
@@ -60,7 +67,12 @@ class UploadRequestCommand : CliktCommand(name = "upload") {
 
 fun Routing.uploadFileRequestRoute() {
     post("/upload") {
-        upload(call.receiveText())
-        call.respond(HttpStatusCode.OK)
+        val filePath = call.receiveText()
+
+        CoroutineScope(Job() + Dispatchers.IO).launch {
+            upload(filePath)
+        }
+
+        call.respond(HttpStatusCode.Accepted)
     }
 }

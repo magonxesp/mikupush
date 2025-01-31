@@ -8,6 +8,9 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.cio.*
 import io.ktor.utils.io.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.apache.tika.Tika
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -61,6 +64,17 @@ fun Application.configureRouting() {
             channel.counted().totalBytesRead
             channel.copyAndClose(file.writeChannel())
             call.respond(HttpStatusCode.Created)
+        }
+        post("/upload/{fileId}/chunk") {
+            val fileId = call.parameters["fileId"]
+            require(!fileId.isNullOrBlank()) { "File id is required" }
+
+            startChunkAppenderWorkers()
+
+            val chunk = call.receive<ByteArray>()
+            chunkChannel.send(ChunkAppendRequest(id = fileId, chunk = chunk))
+
+            call.respond(HttpStatusCode.Accepted)
         }
     }
 }
