@@ -33,6 +33,14 @@ fun Application.configureRouting() {
         }
     }
     routing {
+        get("/favicon.ico") {
+            val content = object {}::class.java.getResource("/icon.ico")!!.readBytes()
+
+            call.respondBytes(
+                contentType = ContentType.Image.XIcon,
+                bytes = content
+            )
+        }
         get("/{fileId}") {
             val fileId = call.parameters["fileId"]
             require(!fileId.isNullOrBlank()) { "File id is required" }
