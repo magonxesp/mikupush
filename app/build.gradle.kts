@@ -42,11 +42,17 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "mikupush"
+            packageName = "MikuPush"
             packageVersion = "1.0.0"
+            copyright = "© 2025 MikuPush. All rights reserved."
+            vendor = "MagonxESP"
+            licenseFile = rootProject.file("LICENSE")
+            includeAllModules = true
 
             windows {
                 iconFile.set(project.file("src/main/resources/icon.ico"))
+                console = true
+                dirChooser = true
             }
         }
     }
