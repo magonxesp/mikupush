@@ -25,10 +25,20 @@ import kotlinx.coroutines.flow.*
 import org.slf4j.LoggerFactory
 import java.awt.MouseInfo
 import java.awt.Toolkit
+import java.util.UUID
 import kotlin.random.Random
 
 
 private val logger = LoggerFactory.getLogger("Main")
+
+data class UploadState(
+    val fileId: String,
+    val fileName: String,
+    val fileMimeType: String,
+    val fileSizeBytes: Long,
+    val progress: Float = 0f,
+    val bytesUploadedRate: Long = 0,
+)
 
 class UICommand : CliktCommand(name = "ui") {
     private fun launchUI() = application {
@@ -141,21 +151,29 @@ fun UploadsList(items: List<StateFlow<UploadState>>) {
         itemsIndexed(items) { index, item ->
             UploadingListItem(item)
 
-            if (index < items.size) {
-                Divider(modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp))
+            if (index < items.size - 1) {
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 15.dp)
+                )
             }
         }
     }
 }
 
-data class UploadState(
-    val fileId: String,
-    val fileName: String,
-    val fileMimeType: String,
-    val fileSizeBytes: Long,
-    val progress: Float = 0f,
-    val bytesUploadedRate: Long = 0,
-)
+@Preview
+@Composable
+fun UploadsListPreview() {
+    UploadsList(items = (0..5).map {
+        MutableStateFlow(UploadState(
+            fileId = UUID.randomUUID().toString(),
+            fileName = "alya.jpeg",
+            fileMimeType = "image/jpeg",
+            fileSizeBytes = 1024,
+        ))
+    })
+}
 
 @Composable
 fun UploadingListItem(stateFlow: StateFlow<UploadState>) {
@@ -248,7 +266,7 @@ fun UploadProgress(
     ) {
         FileIcon(
             mimeType = fileMimeType,
-            modifier = Modifier.height(60.dp)
+            modifier = Modifier.height(45.dp)
                 .padding(end = 13.dp)
         )
         Column(modifier = Modifier.weight(1f)) {

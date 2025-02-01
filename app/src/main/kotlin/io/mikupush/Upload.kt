@@ -30,10 +30,10 @@ suspend fun upload(filePath: String) {
     uploadsInProgress.add(filePath)
     val file = File(filePath)
 
-    notificationFlow.emit(Notification(
+    notify(
         title = "Uploading file",
         message = "Uploading file ${file.name} please wait"
-    ))
+    )
 
     if (!file.exists()) {
         error("File $filePath not exists")
@@ -43,20 +43,28 @@ suspend fun upload(filePath: String) {
     val uploadState = file.createUploadState(uuid)
 
     uploadState.addToUploadsList()
-    backendHttpClient.use { client ->
-        client.post("/upload/$uuid") {
-            setBody(StreamUpload(uuid, file, uploadState))
+    try {
+        backendHttpClient.use { client ->
+            client.post("/upload/$uuid") {
+                setBody(StreamUpload(uuid, file, uploadState))
+            }
         }
+
+        copyToClipboard("$baseUrl/$uuid")
+        notify(
+            title = "The file ${file.name} has been uploaded",
+            message = "The link is copied to the clipboard"
+        )
+    } catch (exception: Exception) {
+        logger.warn("failed to upload file ${file.path}", exception)
+        notifyError(
+            title = "Failed uploading ${file.name}",
+            message = "An error occurred uploading the file, try again later"
+        )
     }
 
     uploadState.removeFromUploadsList()
-    copyToClipboard("$baseUrl/$uuid")
     uploadsInProgress.remove(filePath)
-
-    notificationFlow.emit(Notification(
-        title = "File uploaded :D",
-        message = "The file url copied to clipboard"
-    ))
 }
 
 class StreamUpload(
