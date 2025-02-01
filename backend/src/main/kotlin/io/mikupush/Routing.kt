@@ -61,6 +61,7 @@ fun Application.configureRouting() {
         post("/upload/{fileId}") {
             val fileId = call.parameters["fileId"]
             require(!fileId.isNullOrBlank()) { "File id is required" }
+            logger.debug("Writing file $fileId")
 
             val file = File("data/$fileId").apply {
                 if (!parentFile.exists()) {
@@ -69,8 +70,9 @@ fun Application.configureRouting() {
             }
 
             val channel = call.receiveChannel()
-            channel.counted().totalBytesRead
             channel.copyAndClose(file.writeChannel())
+            logger.debug("File $fileId wrote")
+
             call.respond(HttpStatusCode.Created)
         }
         post("/upload/{fileId}/chunk") {

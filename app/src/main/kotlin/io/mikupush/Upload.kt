@@ -3,8 +3,11 @@ package io.mikupush
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import io.ktor.client.request.*
+import io.ktor.http.content.*
+import io.ktor.utils.io.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import org.apache.tika.Tika
 import org.slf4j.LoggerFactory
@@ -37,35 +40,14 @@ suspend fun upload(filePath: String) {
 
     val uuid = UUID.randomUUID().toString()
     val uploadState = file.createUploadState(uuid)
-    val lastUploadedBytes = AtomicLong(0)
-    val totalUploadedBytes = AtomicLong(0)
-
-    val timer = fixedRateTimer(uuid, period = 1000) {
-        val speedRate = totalUploadedBytes.get() - lastUploadedBytes.get()
-        logger.debug("Speed rate for file $uuid is $speedRate B/s")
-        lastUploadedBytes.set(totalUploadedBytes.get())
-        uploadState.notifyBytesUploadedRate(speedRate)
-    }
 
     uploadState.addToUploadsList()
     backendHttpClient.use { client ->
-        val reader = file.inputStream().buffered(100 * 1000)
-        val buffer = ByteArray(100 * 1000) // 100kb
-
-        while (reader.read(buffer) != -1) {
-            logger.debug("sending new chunk to file $uuid")
-            client.post("/upload/$uuid/chunk") {
-                setBody(buffer)
-            }
-
-            totalUploadedBytes.set(totalUploadedBytes.get() + buffer.size)
-            val progress = totalUploadedBytes.get() / file.length().toFloat()
-            logger.debug("updating upload progress of file $uuid: $progress")
-            uploadState.updateProgress(progress)
+        client.post("/upload/$uuid") {
+            setBody(StreamUpload(uuid, file, uploadState))
         }
     }
 
-    timer.cancel()
     uploadState.removeFromUploadsList()
     copyToClipboard("$baseUrl/$uuid")
     uploadsInProgress.remove(filePath)
@@ -74,6 +56,39 @@ suspend fun upload(filePath: String) {
         title = "File uploaded :D",
         message = "The file url copied to clipboard"
     ))
+}
+
+class StreamUpload(
+    private val fileId: String,
+    private val file: File,
+    private val uploadState: MutableStateFlow<UploadState>
+) : OutgoingContent.WriteChannelContent() {
+    override suspend fun writeTo(channel: ByteWriteChannel) {
+        val lastUploadedBytes = AtomicLong(0)
+        val totalUploadedBytes = AtomicLong(0)
+
+        val timer = fixedRateTimer(fileId, period = 500) {
+            val speedRate = totalUploadedBytes.get() - lastUploadedBytes.get()
+            logger.debug("Speed rate for file $fileId is $speedRate B/s")
+            lastUploadedBytes.set(totalUploadedBytes.get())
+            uploadState.notifyBytesUploadedRate(speedRate)
+        }
+
+        val reader = file.inputStream().buffered(100 * 1000)
+        val buffer = ByteArray(100 * 1000) // 100kb
+
+        while (reader.read(buffer) != -1) {
+            logger.debug("sending new chunk to file $fileId")
+            channel.writeByteArray(buffer)
+
+            totalUploadedBytes.set(totalUploadedBytes.get() + buffer.size)
+            val progress = totalUploadedBytes.get() / file.length().toFloat()
+            logger.debug("updating upload progress of file $fileId: $progress")
+            uploadState.updateProgress(progress)
+        }
+
+        timer.cancel()
+    }
 }
 
 fun MutableStateFlow<UploadState>.updateProgress(progress: Float) {
