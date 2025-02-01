@@ -5,9 +5,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -55,6 +58,7 @@ fun StateFlow<UploadState>.removeFromUploadsList() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UploadsWindow(
     show: Boolean = false,
@@ -69,9 +73,38 @@ fun UploadsWindow(
         resizable = false,
         title = uploadsWindowTitle
     ) {
-        val state = uploads.collectAsState()
-        UploadsList(state.value)
+
+        var tab by remember { mutableStateOf(0) }
+        val tabTitles = listOf("Uploads", "Uploaded")
+
+        Column {
+            PrimaryTabRow(selectedTabIndex = tab) {
+                tabTitles.forEachIndexed { index, title ->
+                    Tab(
+                        selected = tab == index,
+                        onClick = { tab = index },
+                        text = { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) }
+                    )
+                }
+            }
+
+            when (tab) {
+                0 -> UploadsTab()
+                1 -> UploadedTab()
+            }
+        }
     }
+}
+
+@Composable
+fun UploadsTab() {
+    val state = uploads.collectAsState()
+    UploadsList(state.value)
+}
+
+@Composable
+fun UploadedTab() {
+
 }
 
 @Composable
@@ -100,9 +133,17 @@ fun ApplicationScope.trayIcon() {
 
 @Composable
 fun UploadsList(items: List<StateFlow<UploadState>>) {
-    LazyColumn(modifier = Modifier.fillMaxWidth()) {
-        items(items) { item ->
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(15.dp)
+    ) {
+        itemsIndexed(items) { index, item ->
             UploadingListItem(item)
+
+            if (index < items.size) {
+                Divider(modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp))
+            }
         }
     }
 }

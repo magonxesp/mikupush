@@ -2,6 +2,7 @@ package io.mikupush
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.multiple
 import io.ktor.client.request.*
 import io.ktor.http.content.*
 import io.ktor.utils.io.*
@@ -115,11 +116,13 @@ fun File.createUploadState(fileId: String): MutableStateFlow<UploadState> {
 }
 
 class UploadRequestCommand : CliktCommand(name = "upload") {
-    private val filePath: String by argument()
+    private val filePaths: List<String> by argument().multiple()
 
     override fun run() {
-        logger.debug("Requesting file upload for $filePath")
-        emitMessage(filePath)
+        for (filePath in filePaths) {
+            logger.debug("Requesting file upload for $filePath")
+            emitMessage(filePath)
+        }
     }
 }
 
