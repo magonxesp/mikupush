@@ -3,14 +3,16 @@ package io.mikupush
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import io.ktor.client.request.*
-import io.ktor.http.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
+import org.apache.tika.Tika
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.*
+import java.util.concurrent.atomic.AtomicLong
+import kotlin.concurrent.fixedRateTimer
+import kotlin.concurrent.thread
 
 
 private val logger = LoggerFactory.getLogger("Upload")
@@ -28,7 +30,18 @@ suspend fun upload(filePath: String) {
     }
 
     val uuid = UUID.randomUUID().toString()
+    val uploadState = file.createUploadState(uuid)
+    val lastUploadedBytes = AtomicLong(0)
+    val totalUploadedBytes = AtomicLong(0)
 
+    val timer = fixedRateTimer(uuid, period = 1000) {
+        val speedRate = totalUploadedBytes.get() - lastUploadedBytes.get()
+        logger.debug("Speed rate for file $uuid is $speedRate B/s")
+        lastUploadedBytes.set(totalUploadedBytes.get())
+        uploadState.notifyBytesUploadedRate(speedRate)
+    }
+
+    uploadState.addToUploadsList()
     backendHttpClient.use { client ->
         val reader = file.inputStream().buffered(100 * 1000)
         val buffer = ByteArray(100 * 1000) // 100kb
@@ -38,9 +51,16 @@ suspend fun upload(filePath: String) {
             client.post("/upload/$uuid/chunk") {
                 setBody(buffer)
             }
+
+            totalUploadedBytes.set(totalUploadedBytes.get() + buffer.size)
+            val progress = totalUploadedBytes.get() / file.length().toFloat()
+            logger.debug("updating upload progress of file $uuid: $progress")
+            uploadState.updateProgress(progress)
         }
     }
 
+    timer.cancel()
+    uploadState.removeFromUploadsList()
     copyToClipboard("$baseUrl/$uuid")
 
     notificationFlow.emit(Notification(
@@ -49,30 +69,49 @@ suspend fun upload(filePath: String) {
     ))
 }
 
-class UploadRequestCommand : CliktCommand(name = "upload") {
-    val filePath: String by argument()
-
-    override fun run() {
-        runBlocking {
-            logger.debug("Requesting file upload for $filePath")
-
-            localHttpClient.use { client ->
-                client.post("/upload") {
-                    setBody(filePath)
-                }
-            }
-        }
+fun MutableStateFlow<UploadState>.updateProgress(progress: Float) {
+    update { state ->
+        state.copy(progress = progress)
     }
 }
 
-fun Routing.uploadFileRequestRoute() {
-    post("/upload") {
-        val filePath = call.receiveText()
-
-        CoroutineScope(Job() + Dispatchers.IO).launch {
-            upload(filePath)
-        }
-
-        call.respond(HttpStatusCode.Accepted)
+fun MutableStateFlow<UploadState>.notifyBytesUploadedRate(bytes: Long) {
+    update { state ->
+        state.copy(bytesUploadedRate = bytes)
     }
+}
+
+fun File.createUploadState(fileId: String): MutableStateFlow<UploadState> {
+    val upload = UploadState(
+        fileId = fileId,
+        fileName = name,
+        fileMimeType = Tika().detect(this),
+        fileSizeBytes = length(),
+    )
+
+    return MutableStateFlow(upload)
+}
+
+class UploadRequestCommand : CliktCommand(name = "upload") {
+    private val filePath: String by argument()
+
+    override fun run() {
+        logger.debug("Requesting file upload for $filePath")
+        emitMessage(filePath)
+    }
+}
+
+fun listenToUploadsRequests() {
+    val job = CoroutineScope(Job()).launch {
+        logger.debug("start listening to upload requests")
+
+        messageFlow.collect { filePath ->
+            logger.debug("Incoming upload request: $filePath")
+            launch(Dispatchers.IO) { upload(filePath) }
+        }
+    }
+
+    Runtime.getRuntime().addShutdownHook(thread(start = false) {
+        job.cancel()
+    })
 }

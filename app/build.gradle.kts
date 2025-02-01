@@ -23,14 +23,11 @@ dependencies {
     // (in a separate module for demo project and in testMain).
     // With compose.desktop.common you will also lose @Preview functionality
     implementation(compose.desktop.currentOs)
-    implementation("io.ktor:ktor-server-core:$ktor_version")
-    implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
-    implementation("io.ktor:ktor-server-host-common:$ktor_version")
-    implementation("io.ktor:ktor-server-status-pages:$ktor_version")
-    implementation("io.ktor:ktor-server-netty:$ktor_version")
+    implementation("com.kohlschutter.junixsocket:junixsocket-core:2.9.0")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
+    implementation("org.apache.tika:tika-core:3.0.0")
     implementation("org.apache.commons:commons-lang3:3.17.0")
     implementation("com.github.ajalt.clikt:clikt:5.0.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")

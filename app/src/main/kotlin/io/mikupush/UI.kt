@@ -1,20 +1,28 @@
 package io.mikupush
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import com.github.ajalt.clikt.core.CliktCommand
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.*
 import org.slf4j.LoggerFactory
-import java.awt.Dimension
 import java.awt.MouseInfo
 import java.awt.Toolkit
+import kotlin.random.Random
 
 
 private val logger = LoggerFactory.getLogger("Main")
@@ -27,8 +35,23 @@ class UICommand : CliktCommand(name = "ui") {
     }
 
     override fun run() {
-        startHttpServer()
+        listenToMessages()
+        listenToUploadsRequests()
         launchUI()
+    }
+}
+
+val uploads = MutableStateFlow(listOf<StateFlow<UploadState>>())
+
+fun StateFlow<UploadState>.addToUploadsList() {
+    uploads.update { state ->
+        listOf(this) + state
+    }
+}
+
+fun StateFlow<UploadState>.removeFromUploadsList() {
+    uploads.update { state ->
+        state.filter { item -> item.value.fileId != value.fileId }
     }
 }
 
@@ -46,9 +69,8 @@ fun UploadsWindow(
         resizable = false,
         title = uploadsWindowTitle
     ) {
-        Column {
-            Text("Hello world")
-        }
+        val state = uploads.collectAsState()
+        UploadsList(state.value)
     }
 }
 
@@ -73,6 +95,244 @@ fun ApplicationScope.trayIcon() {
     UploadsWindow(
         show = openUploadsWindow,
         onCloseRequest = { openUploadsWindow = false }
+    )
+}
+
+@Composable
+fun UploadsList(items: List<StateFlow<UploadState>>) {
+    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+        items(items) { item ->
+            UploadingListItem(item)
+        }
+    }
+}
+
+data class UploadState(
+    val fileId: String,
+    val fileName: String,
+    val fileMimeType: String,
+    val fileSizeBytes: Long,
+    val progress: Float = 0f,
+    val bytesUploadedRate: Long = 0,
+)
+
+@Composable
+fun UploadingListItem(stateFlow: StateFlow<UploadState>) {
+    val state = stateFlow.collectAsState()
+    val upload = state.value
+
+    UploadProgress(
+        fileName = upload.fileName,
+        fileMimeType = upload.fileMimeType,
+        uploadSpeedBytes = upload.bytesUploadedRate,
+        progress = upload.progress
+    )
+}
+
+@Composable
+fun UploadedFile(
+    fileName: String,
+    filePath: String,
+    fileMimeType: String,
+    modifier: Modifier = Modifier,
+    onGetLink: () -> Unit = {},
+    onOpenInFileExplorer: () -> Unit = {},
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        FileIcon(
+            mimeType = fileMimeType,
+            modifier = Modifier.height(60.dp)
+                .padding(end = 13.dp)
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = fileName,
+                style = MaterialTheme.typography.subtitle2,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth()
+                    .padding(bottom = 5.dp)
+            )
+            Text(
+                text = filePath,
+                style = MaterialTheme.typography.body2,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        IconButton(
+            onClick = onOpenInFileExplorer,
+            modifier = Modifier.padding(start = 5.dp)
+        ) {
+            Icon(
+                painter = painterResource("/assets/icons/open_in_explorer.svg"),
+                contentDescription = "Open $fileName in file explorer"
+            )
+        }
+        IconButton(onClick = onGetLink) {
+            Icon(
+                painter = painterResource("/assets/icons/link.svg"),
+                contentDescription = "Copy link of $fileName"
+            )
+        }
+    }
+}
+
+@Composable
+@Preview
+fun UploadedFilePreview() {
+    UploadedFile(
+        fileName = "alya.jpg",
+        filePath = "C:\\Users\\example\\Images\\alya.jpg",
+        fileMimeType = "image/jpeg",
+    )
+}
+
+@Composable
+fun UploadProgress(
+    fileName: String,
+    fileMimeType: String,
+    progress: Float,
+    uploadSpeedBytes: Long,
+    modifier: Modifier = Modifier,
+    onCancel: () -> Unit = { }
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        FileIcon(
+            mimeType = fileMimeType,
+            modifier = Modifier.height(60.dp)
+                .padding(end = 13.dp)
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = fileName,
+                style = MaterialTheme.typography.subtitle2,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth()
+                    .padding(bottom = 10.dp)
+            )
+            LinearProgressIndicator(
+                progress = progress,
+                modifier = Modifier.fillMaxWidth()
+                    .padding(bottom = 3.dp)
+            )
+            BytesSpeedFormatted(bytes = uploadSpeedBytes)
+        }
+        IconButton(onClick = onCancel) {
+            Icon(
+                imageVector = Icons.Filled.Close,
+                contentDescription = "Cancel upload of $fileName",
+                tint = MaterialTheme.colors.error
+            )
+        }
+    }
+}
+
+@Composable
+@Preview
+fun UploadProgressPreview() {
+    UploadProgress(
+        fileName = "alya.jpg",
+        fileMimeType = "image/jpeg",
+        progress = 0.8f,
+        uploadSpeedBytes = Random.nextLong(1, 1024 * 1024 * 1024) // until 1gb
+    )
+}
+
+@Composable
+fun BytesSpeedFormatted(bytes: Long, modifier: Modifier = Modifier) {
+    val kb = bytes / 1024.0
+    val mb = kb / 1024.0
+    val gb = mb / 1024.0
+    val speed = when {
+        gb >= 1 -> String.format("%.2f GB/s", gb)
+        mb >= 1 -> String.format("%.2f MB/s", mb)
+        kb >= 1 -> String.format("%.2f KB/s", kb)
+        else -> "$bytes B/s"
+    }
+
+    Text(
+        text = speed,
+        modifier = modifier.fillMaxWidth(),
+        style = MaterialTheme.typography.body2
+    )
+}
+
+@Composable
+fun FileIcon(mimeType: String, modifier: Modifier = Modifier) {
+    val icon = when {
+        mimeType.startsWith("image/") -> "file-image.svg"
+        mimeType.startsWith("audio/") -> "file-audio.svg"
+        mimeType.startsWith("video/") -> "file-video.svg"
+        mimeType.startsWith("video/") -> "file-video.svg"
+        arrayOf(
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.oasis.opendocument.spreadsheet"
+        ).contains(mimeType) -> "file-excel.svg"
+        arrayOf(
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/rtf",
+            "application/vnd.oasis.opendocument.tex"
+        ).contains(mimeType) -> "file-word.svg"
+        arrayOf(
+            "application/vnd.ms-powerpoint",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "application/vnd.oasis.opendocument.presentation"
+        ).contains(mimeType) -> "file-powerpoint.svg"
+        mimeType == "application/pdf" -> "file-pdf.svg"
+        mimeType == "text/plain" -> "file-lines.svg"
+        arrayOf(
+            "text/x-java-source",
+            "text/x-c",
+            "text/x-c++",
+            "text/x-csharp",
+            "text/x-python",
+            "application/javascript",
+            "application/x-typescript",
+            "text/html",
+            "text/css",
+            "application/x-httpd-php",
+            "text/x-ruby",
+            "text/x-perl",
+            "application/x-sh",
+            "application/x-powershell",
+            "application/sql",
+            "text/x-go",
+            "text/x-rust",
+            "text/x-swift",
+            "text/x-kotlin",
+            "text/x-lua",
+            "text/x-r-source",
+            "text/x-matlab"
+        ).contains(mimeType) -> "file-code.svg"
+        arrayOf(
+            "application/zip",
+            "application/x-7z-compressed",
+            "application/x-rar-compressed",
+            "application/gzip",
+            "application/x-tar",
+            "application/x-bzip2",
+            "application/x-xz",
+            "application/x-lzma",
+            "application/x-apple-diskimage"
+        ).contains(mimeType) -> "file-zipper.svg"
+        else -> "file.svg"
+    }
+
+    Image(
+        painter = painterResource("/assets/icons/$icon"),
+        contentDescription = "File $mimeType",
+        modifier = modifier
     )
 }
 

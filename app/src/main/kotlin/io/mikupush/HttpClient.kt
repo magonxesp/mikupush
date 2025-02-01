@@ -16,17 +16,3 @@ val backendHttpClient get() = HttpClient {
         retryOnServerErrors(3)
     }
 }
-
-val localHttpClient get() = HttpClient {
-    defaultRequest {
-        url("http://127.0.0.1:49152")
-    }
-
-    install(HttpTimeout) {
-        requestTimeoutMillis = 30000
-    }
-
-    install(HttpRequestRetry) {
-        retryOnServerErrors(3)
-    }
-}
