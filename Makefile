@@ -9,8 +9,7 @@ windows-distribution:
 		--vendor "MagonxESP" \
 		--app-version "1.0.0" \
 		--input "app/build/libs" \
-		--main-jar "app-1.0-SNAPSHOT.jar" \
-		--main-class "io.mikupush.MainKt" \
+		--main-jar "app-1.0-SNAPSHOT-all.jar" \
 		--resource-dir "app/resources/windows" \
 		--dest "app/build/dist" \
 		--temp "app/build/tmp/jpackage" \
