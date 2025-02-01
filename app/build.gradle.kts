@@ -1,5 +1,9 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import java.nio.file.Files
+import kotlin.io.path.Path
+import kotlin.io.path.copyTo
+import kotlin.io.path.copyToRecursively
+import kotlin.io.path.ExperimentalPathApi
 
 plugins {
     kotlin("jvm")
@@ -9,7 +13,7 @@ plugins {
 }
 
 group = "io.github.magonxesp"
-version = "1.0-SNAPSHOT"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -45,6 +49,38 @@ tasks.withType<Jar> {
     manifest {
         attributes["Main-Class"] = "io.mikupush.MainKt"
     }
+
+    archiveBaseName = "mikupush"
+}
+
+tasks.register("distWindows") {
+    dependsOn("shadowJar")
+
+    doLast {
+        val rootProjectDir = rootProject.rootDir.path
+        val projectDir = project.projectDir.path
+        val windowsDistPath = Path(rootProjectDir, "dist/windows").toString()
+
+        File(windowsDistPath).apply {
+            if (exists()) deleteRecursively()
+            mkdirs()
+        }
+
+        Files.walk(Path(projectDir, "build/libs")).toList()
+            .find { jar -> Regex(".*mikupush-.*-all\\.jar").matches(jar.toString()) }
+            ?.copyTo(Path(windowsDistPath, "mikupush.jar"))
+            ?: error("The jar file is missing")
+
+        @OptIn(ExperimentalPathApi::class)
+        Path(projectDir, "launcher/windows/runtime").copyToRecursively(
+            target = Path(windowsDistPath, "runtime"),
+            followLinks = true,
+            overwrite = true
+        )
+        Path(projectDir, "launcher/windows/MikuPush.exe").copyTo(Path(windowsDistPath, "MikuPush.exe"))
+        Path(projectDir, "launcher/windows/MikuPush-Requester.exe").copyTo(Path(windowsDistPath, "MikuPush-Requester.exe"))
+        Path(projectDir, "launcher/windows/icon.ico").copyTo(Path(windowsDistPath, "icon.ico"))
+    }
 }
 
 compose.desktop {
@@ -52,7 +88,7 @@ compose.desktop {
         mainClass = "io.mikupush.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
             packageName = "MikuPush"
             packageVersion = "1.0.0"
             copyright = "© 2025 MikuPush. All rights reserved."
