@@ -16,8 +16,14 @@ import kotlin.concurrent.thread
 
 
 private val logger = LoggerFactory.getLogger("Upload")
+private val uploadsInProgress = mutableListOf<String>()
 
 suspend fun upload(filePath: String) {
+    if (uploadsInProgress.contains(filePath)) {
+        return
+    }
+
+    uploadsInProgress.add(filePath)
     val file = File(filePath)
 
     notificationFlow.emit(Notification(
@@ -62,6 +68,7 @@ suspend fun upload(filePath: String) {
     timer.cancel()
     uploadState.removeFromUploadsList()
     copyToClipboard("$baseUrl/$uuid")
+    uploadsInProgress.remove(filePath)
 
     notificationFlow.emit(Notification(
         title = "File uploaded :D",
