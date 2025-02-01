@@ -132,6 +132,18 @@ fun ApplicationScope.trayIcon() {
         tooltip = appName,
         onAction = {
             openUploadsWindow = true
+        },
+        menu = {
+            Item(
+                text = "Open",
+                onClick = {
+                    openUploadsWindow = true
+                }
+            )
+            Item(
+                text = "Exit",
+                onClick = ::exitApplication
+            )
         }
     )
 
