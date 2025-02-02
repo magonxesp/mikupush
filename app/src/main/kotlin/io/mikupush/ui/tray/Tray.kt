@@ -17,17 +17,12 @@ private val notifier by inject<Notifier>(Notifier::class.java)
 @Composable
 fun ApplicationScope.AppTrayIcon(onOpen: () -> Unit) {
     val trayState = rememberTrayState()
-    val appRunNotification = rememberNotification("The app is running 🚀", "Yeeeeeeeey")
 
     LaunchedEffect(trayState) {
         notifier.notifications.collect { notification ->
             logger.debug("showing notification: {}, {}", notification.title, notification.message)
             trayState.sendNotification(notification.toTrayNotification())
         }
-    }
-
-    LaunchedEffect(Unit) {
-        trayState.sendNotification(appRunNotification)
     }
 
     Tray(

@@ -1,7 +1,9 @@
 package io.mikupush.upload
 
+import io.mikupush.backendBaseUrl
 import io.mikupush.notification.Notifier
 import io.mikupush.ui.ViewModel
+import io.mikupush.ui.copyToClipboard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,10 +72,11 @@ class UploadViewModel(private val notifier: Notifier) : ViewModel() {
     private suspend fun notifySuccessUpload(uploadState: UploadState) {
         if (uploadState.isFinished() && uploadState.finishState == UploadFinishState.SUCCESS) {
             notifier.notify(
-                title = "The file ${uploadState.fileName} has been uploaded",
-                message = "The link is copied to the clipboard"
+                title = "Link copied to the clipboard 📎",
+                message = "The file ${uploadState.fileName} has been uploaded"
             )
 
+            copyToClipboard("$backendBaseUrl/${uploadState.fileId}")
             _uiState.update { state -> state.filter { it.fileId != uploadState.fileId } }
         }
     }

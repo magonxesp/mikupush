@@ -2,11 +2,11 @@ package io.mikupush.http
 
 import io.ktor.client.*
 import io.ktor.client.plugins.*
-import io.mikupush.baseUrl
+import io.mikupush.backendBaseUrl
 
 val backendHttpClient get() = HttpClient {
     defaultRequest {
-        url(baseUrl)
+        url(backendBaseUrl)
     }
 
     install(HttpTimeout) {
