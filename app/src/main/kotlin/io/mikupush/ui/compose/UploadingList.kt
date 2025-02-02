@@ -12,12 +12,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import io.mikupush.upload.UploadViewModel
+import io.mikupush.upload.UploadState
 import java.util.*
 import kotlin.random.Random
 
 @Composable
-fun UploadsList(items: List<UploadViewModel.UploadingItem>) {
+fun UploadsList(items: List<UploadState>) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -41,7 +41,7 @@ fun UploadsList(items: List<UploadViewModel.UploadingItem>) {
 @Composable
 fun UploadsListPreview() {
     UploadsList(items = (0..5).map {
-        UploadViewModel.UploadingItem(
+        UploadState(
             fileId = UUID.randomUUID(),
             fileName = "alya.jpeg",
             fileMimeType = "image/jpeg",
@@ -51,7 +51,7 @@ fun UploadsListPreview() {
 }
 
 @Composable
-fun UploadingListItem(upload: UploadViewModel.UploadingItem) {
+fun UploadingListItem(upload: UploadState) {
     UploadProgress(
         fileName = upload.fileName,
         fileMimeType = upload.fileMimeType,

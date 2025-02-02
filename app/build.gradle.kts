@@ -39,6 +39,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposed_version")
+    implementation("org.xerial:sqlite-jdbc:3.42.0.0")
     implementation("org.apache.tika:tika-core:3.0.0")
     implementation("org.apache.commons:commons-lang3:3.17.0")
     implementation("com.github.ajalt.clikt:clikt:5.0.2")
