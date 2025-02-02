@@ -1,6 +1,5 @@
-package io.mikupush
+package io.mikupush.notification
 
-import kotlinx.coroutines.flow.MutableSharedFlow
 import androidx.compose.ui.window.Notification as UINotification
 
 enum class NotificationType {
@@ -21,20 +20,3 @@ fun Notification.toTrayNotification() = UINotification(
         else -> UINotification.Type.None
     }
 )
-
-val notificationFlow = MutableSharedFlow<Notification>()
-
-suspend fun notify(title: String, message: String) {
-    notificationFlow.emit(Notification(
-        title = title,
-        message = message
-    ))
-}
-
-suspend fun notifyError(title: String, message: String) {
-    notificationFlow.emit(Notification(
-        title = title,
-        message = message,
-        type = NotificationType.ERROR
-    ))
-}

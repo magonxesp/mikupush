@@ -1,4 +1,4 @@
-package io.mikupush
+package io.mikupush.ui
 
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
