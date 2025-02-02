@@ -1,5 +1,6 @@
 package io.mikupush.upload
 
+import androidx.compose.runtime.MutableState
 import io.ktor.client.request.*
 import io.ktor.http.content.*
 import io.ktor.utils.io.*
@@ -8,6 +9,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.apache.tika.Tika
 import org.slf4j.LoggerFactory
@@ -34,27 +38,27 @@ class FileUploader(private val workers: Int) {
         progressChannel: SendChannel<UploadState>
     ) = launch(Dispatchers.IO) {
         logger.debug("processing upload request: {}", uploadRequest)
-        var progress = uploadRequest.createState()
-        progressChannel.trySend(progress)
+        val progress = MutableStateFlow(uploadRequest.createState())
+        progressChannel.send(progress.value)
 
         try {
-            val uploadStream = UploadStream(uploadRequest, progress) { updated ->
-                progress = updated
-                progressChannel.trySend(progress)
+            launch {
+                progress.collect { state -> progressChannel.send(state) }
             }
 
             backendHttpClient.use { client ->
                 client.post("/upload/${uploadRequest.fileId}") {
-                    setBody(uploadStream)
+                    setBody(UploadStream(uploadRequest, progress))
                 }
             }
 
-            progressChannel.trySend(progress.copy(finishState = UploadFinishState.SUCCESS))
+            progress.update { state -> state.copy(finishState = UploadFinishState.SUCCESS) }
         } catch (exception: Exception) {
             logger.warn("failed to upload file ${uploadRequest.path}", exception)
-            progressChannel.trySend(progress.copy(finishState = UploadFinishState.FAILED))
+            progress.update { state -> state.copy(finishState = UploadFinishState.FAILED) }
         }
 
+        progressChannel.send(progress.value.copy(finishState = UploadFinishState.SUCCESS))
         logger.debug("upload request finished: {}", uploadRequest)
     }
 
@@ -71,8 +75,7 @@ class FileUploader(private val workers: Int) {
 
     private class UploadStream(
         private val request: UploadRequest,
-        private val progress: UploadState,
-        private val onProgressUpdate: (UploadState) -> Unit,
+        private val progress: MutableStateFlow<UploadState>
     ) : OutgoingContent.WriteChannelContent() {
         private val logger = LoggerFactory.getLogger(this::class.java)
         private val lastUploadedBytes = AtomicLong(0)
@@ -97,11 +100,9 @@ class FileUploader(private val workers: Int) {
             totalUploadedBytes.set(totalUploadedBytes.get() + bytesUploaded)
             logger.debug("updating upload progress of file {}: {}", request.fileId, progress)
 
-            onProgressUpdate(
-                progress.copy(
-                    progress = totalUploadedBytes.get() / file.length().toFloat(),
-                )
-            )
+            progress.update { state ->
+                state.copy(progress = totalUploadedBytes.get() / file.length().toFloat())
+            }
         }
 
         private fun observeUploadSpeedRate() = fixedRateTimer(request.fileId.toString(), period = 500) {
@@ -109,9 +110,9 @@ class FileUploader(private val workers: Int) {
             logger.debug("Speed rate for file {} is {} B/s", request.fileId, speedRate)
             lastUploadedBytes.set(totalUploadedBytes.get())
 
-            onProgressUpdate(
-                progress.copy(bytesUploadedRate = speedRate)
-            )
+            progress.update { state ->
+                state.copy(bytesUploadedRate = speedRate)
+            }
         }
     }
 }
