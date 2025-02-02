@@ -6,7 +6,7 @@ Share screenshots or whatever.
 
 ### Windows
 
-The installer can be built only on Windows.
+⚠️ **The installer can be built only on Windows.** ⚠️
 
 Install [Inno Setup](https://jrsoftware.org/isdl.php) and add It to the `PATH` environment variable.
 
