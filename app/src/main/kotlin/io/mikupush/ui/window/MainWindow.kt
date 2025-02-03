@@ -9,19 +9,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
-import io.mikupush.*
-import io.mikupush.ui.MikuPushTheme
+import io.mikupush.ui.compose.UploadedList
 import io.mikupush.ui.compose.UploadsList
 import io.mikupush.upload.UploadViewModel
+import io.mikupush.uploads.UploadsViewModel
+import io.mikupush.uploadsWindowTitle
 import org.koin.java.KoinJavaComponent.inject
 import java.awt.MouseInfo
 import java.awt.Toolkit
 
-private val uploadsViewModel by inject<UploadViewModel>(UploadViewModel::class.java)
+private val uploadViewModel by inject<UploadViewModel>(UploadViewModel::class.java)
+private val uploadsViewModel by inject<UploadsViewModel>(UploadsViewModel::class.java)
 
 @Composable
 fun MainWindow(
@@ -34,7 +35,7 @@ fun MainWindow(
         onCloseRequest = onCloseRequest,
         state = uploadWindowState(),
         alwaysOnTop = true,
-        resizable = false,
+        resizable = true,
         title = uploadsWindowTitle
     ) {
         UploadsWindowContent()
@@ -44,7 +45,7 @@ fun MainWindow(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UploadsWindowContent() {
-    val state = uploadsViewModel.uiState.collectAsState()
+
     var tab by remember { mutableStateOf(0) }
     val tabTitles = listOf("Uploads", "Uploaded")
 
@@ -60,20 +61,32 @@ fun UploadsWindowContent() {
         }
 
         when (tab) {
-            0 -> UploadsList(state.value)
+            0 -> UploadsTab()
             1 -> UploadedTab()
         }
     }
 }
 
 @Composable
-fun UploadedTab() {
+fun UploadsTab() {
+    val state = uploadViewModel.uiState.collectAsState()
+    UploadsList(state.value)
+}
 
+@Composable
+fun UploadedTab() {
+    val state = uploadsViewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        uploadsViewModel.showAllUploads()
+    }
+
+    UploadedList(state.value)
 }
 
 fun uploadWindowState(): WindowState {
-    val width = 300
-    val height = 600
+    val width = 500
+    val height = 800
     val mouseLocation = MouseInfo.getPointerInfo().location
     val screenSize = Toolkit.getDefaultToolkit().screenSize
 

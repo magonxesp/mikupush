@@ -2,19 +2,26 @@ package io.mikupush.upload
 
 import io.mikupush.backendBaseUrl
 import io.mikupush.notification.Notifier
+import io.mikupush.notification.UploadedSignal
 import io.mikupush.ui.ViewModel
 import io.mikupush.ui.copyToClipboard
+import io.mikupush.uploads.Upload
+import io.mikupush.uploads.insert
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import org.slf4j.LoggerFactory
 import java.util.*
 import kotlin.io.path.Path
 
-class UploadViewModel(private val notifier: Notifier) : ViewModel() {
+class UploadViewModel(
+    private val notifier: Notifier,
+    private val uploadedSignal: UploadedSignal
+) : ViewModel() {
     private val logger = LoggerFactory.getLogger(this::class.java)
     private val uploadRequestChannel = Channel<UploadRequest>(100)
     private val uploadStateChannel = Channel<UploadState>(1)
@@ -43,8 +50,8 @@ class UploadViewModel(private val notifier: Notifier) : ViewModel() {
         logger.debug("listening to progress updates")
         for (uploadState in uploadStateChannel) {
             updateUploadState(uploadState)
-            notifySuccessUpload(uploadState)
-            notifyFailedUpload(uploadState)
+            onSuccessUpload(uploadState)
+            onFailedUpload(uploadState)
         }
     }
 
@@ -69,19 +76,27 @@ class UploadViewModel(private val notifier: Notifier) : ViewModel() {
         )
     }
 
-    private suspend fun notifySuccessUpload(uploadState: UploadState) {
+    private suspend fun onSuccessUpload(uploadState: UploadState) {
         if (uploadState.isFinished() && uploadState.finishState == UploadFinishState.SUCCESS) {
             notifier.notify(
                 title = "Link copied to the clipboard 📎",
                 message = "The file ${uploadState.fileName} has been uploaded"
             )
 
+            Upload(
+                id = uploadState.fileId,
+                fileName = uploadState.fileName,
+                fileMimeType = uploadState.fileMimeType,
+                fileSizeBytes = uploadState.fileSizeBytes,
+                uploadedAt = Clock.System.now()
+            ).insert()
             copyToClipboard("$backendBaseUrl/${uploadState.fileId}")
             _uiState.update { state -> state.filter { it.fileId != uploadState.fileId } }
+            uploadedSignal.emit()
         }
     }
 
-    private suspend fun notifyFailedUpload(uploadState: UploadState) {
+    private suspend fun onFailedUpload(uploadState: UploadState) {
         if (uploadState.isFinished() && uploadState.finishState == UploadFinishState.FAILED) {
             notifier.notifyError(
                 title = "Failed uploading ${uploadState.fileName}",

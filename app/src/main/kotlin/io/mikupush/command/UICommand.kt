@@ -8,6 +8,7 @@ import androidx.compose.ui.window.application
 import com.github.ajalt.clikt.core.CliktCommand
 import io.mikupush.http.startHttpServer
 import io.mikupush.notification.Notifier
+import io.mikupush.setupDatabase
 import io.mikupush.ui.MikuPushTheme
 import io.mikupush.ui.tray.AppTrayIcon
 import io.mikupush.ui.window.MainWindow
@@ -32,6 +33,7 @@ class UICommand : CliktCommand(name = "ui") {
     }
 
     override fun run() {
+        setupDatabase()
         startHttpServer()
         launchUI()
     }

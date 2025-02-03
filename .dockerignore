@@ -1,0 +1,10 @@
+build
+.idea
+.gradle
+.run
+data
+dist
+Dockerfile
+README.md
+.gitignore
+LICENSE
