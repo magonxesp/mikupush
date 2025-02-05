@@ -21,6 +21,7 @@ dependencies {
     val ktor_version = "3.0.3"
     val logback_version = "1.4.14"
 
+    implementation(project(":common"))
     implementation("io.ktor:ktor-server-core:$ktor_version")
     implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-server-host-common:$ktor_version")
