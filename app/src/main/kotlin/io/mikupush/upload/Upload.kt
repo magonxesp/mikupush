@@ -1,4 +1,4 @@
-package io.mikupush.uploads
+package io.mikupush.upload
 
 import kotlinx.datetime.Instant
 import java.util.*

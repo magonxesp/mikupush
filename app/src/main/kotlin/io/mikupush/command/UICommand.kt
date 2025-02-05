@@ -12,8 +12,6 @@ import io.mikupush.setupDatabase
 import io.mikupush.ui.MikuPushTheme
 import io.mikupush.ui.tray.AppTrayIcon
 import io.mikupush.ui.window.MainWindow
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import org.koin.java.KoinJavaComponent.inject
 import org.slf4j.LoggerFactory
 

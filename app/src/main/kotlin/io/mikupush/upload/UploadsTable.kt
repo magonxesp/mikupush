@@ -1,4 +1,4 @@
-package io.mikupush.uploads
+package io.mikupush.upload
 
 import kotlinx.datetime.Clock
 import org.jetbrains.exposed.dao.id.LongIdTable

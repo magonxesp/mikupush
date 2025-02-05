@@ -5,8 +5,6 @@ import io.mikupush.notification.Notifier
 import io.mikupush.notification.UploadedSignal
 import io.mikupush.ui.ViewModel
 import io.mikupush.ui.copyToClipboard
-import io.mikupush.uploads.Upload
-import io.mikupush.uploads.insert
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -3,7 +3,7 @@ package io.mikupush
 import io.mikupush.notification.Notifier
 import io.mikupush.notification.UploadedSignal
 import io.mikupush.upload.UploadViewModel
-import io.mikupush.uploads.UploadsViewModel
+import io.mikupush.upload.UploadsViewModel
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 

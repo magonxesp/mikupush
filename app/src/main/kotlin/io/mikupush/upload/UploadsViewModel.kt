@@ -1,4 +1,4 @@
-package io.mikupush.uploads
+package io.mikupush.upload
 
 import io.mikupush.notification.UploadedSignal
 import io.mikupush.ui.ViewModel

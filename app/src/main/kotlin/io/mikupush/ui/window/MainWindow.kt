@@ -15,7 +15,7 @@ import androidx.compose.ui.window.WindowState
 import io.mikupush.ui.compose.UploadedList
 import io.mikupush.ui.compose.UploadsList
 import io.mikupush.upload.UploadViewModel
-import io.mikupush.uploads.UploadsViewModel
+import io.mikupush.upload.UploadsViewModel
 import io.mikupush.uploadsWindowTitle
 import org.koin.java.KoinJavaComponent.inject
 import java.awt.MouseInfo

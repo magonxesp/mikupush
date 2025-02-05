@@ -12,10 +12,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.mikupush.upload.UploadState
-import io.mikupush.uploads.Upload
+import io.mikupush.upload.Upload
 import kotlinx.datetime.*
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format.DateTimeFormat
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.*
