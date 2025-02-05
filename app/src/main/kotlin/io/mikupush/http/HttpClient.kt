@@ -2,6 +2,8 @@ package io.mikupush.http
 
 import io.ktor.client.*
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
 import io.mikupush.backendBaseUrl
 
 val backendHttpClient get() = HttpClient {
@@ -15,6 +17,10 @@ val backendHttpClient get() = HttpClient {
 
     install(HttpRequestRetry) {
         retryOnServerErrors(3)
+    }
+
+    install(ContentNegotiation) {
+        json()
     }
 }
 

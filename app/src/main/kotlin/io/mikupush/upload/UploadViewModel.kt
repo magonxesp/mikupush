@@ -1,6 +1,9 @@
 package io.mikupush.upload
 
+import io.ktor.client.request.*
+import io.ktor.http.*
 import io.mikupush.backendBaseUrl
+import io.mikupush.http.backendHttpClient
 import io.mikupush.notification.Notifier
 import io.mikupush.notification.UploadedSignal
 import io.mikupush.ui.ViewModel
@@ -81,13 +84,7 @@ class UploadViewModel(
                 message = "The file ${uploadState.fileName} has been uploaded"
             )
 
-            Upload(
-                id = uploadState.fileId,
-                fileName = uploadState.fileName,
-                fileMimeType = uploadState.fileMimeType,
-                fileSizeBytes = uploadState.fileSizeBytes,
-                uploadedAt = Clock.System.now()
-            ).insert()
+            publishUploadDetails(uploadState)
             copyToClipboard("$backendBaseUrl/${uploadState.fileId}")
             _uiState.update { state -> state.filter { it.fileId != uploadState.fileId } }
             uploadedSignal.emit()
@@ -103,5 +100,23 @@ class UploadViewModel(
 
             _uiState.update { state -> state.filter { it.fileId != uploadState.fileId } }
         }
+    }
+
+    private suspend fun publishUploadDetails(uploadState: UploadState) {
+        val uploadDetails = UploadDetails(
+            id = uploadState.fileId,
+            fileName = uploadState.fileName,
+            fileMimeType = uploadState.fileMimeType,
+            fileSizeBytes = uploadState.fileSizeBytes,
+            uploadedAt = Clock.System.now()
+        )
+
+        backendHttpClient.put("/upload/details") {
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
+            setBody(uploadDetails)
+        }
+
+        uploadDetails.insert()
     }
 }

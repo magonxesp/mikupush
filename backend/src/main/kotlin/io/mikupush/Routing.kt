@@ -8,9 +8,6 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.cio.*
 import io.ktor.utils.io.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import org.apache.tika.Tika
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -85,6 +82,10 @@ fun Application.configureRouting() {
             chunkChannel.send(ChunkAppendRequest(id = fileId, chunk = chunk))
 
             call.respond(HttpStatusCode.Accepted)
+        }
+        put("/upload/details") {
+            call.receive<UploadDetails>().insertOrUpdate()
+            call.respond(HttpStatusCode.NoContent)
         }
     }
 }

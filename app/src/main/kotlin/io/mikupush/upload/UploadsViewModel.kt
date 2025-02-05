@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class UploadsViewModel(private val uploadedSignal: UploadedSignal) : ViewModel() {
-    private val _uiState = MutableStateFlow<List<Upload>>(listOf())
+    private val _uiState = MutableStateFlow<List<UploadDetails>>(listOf())
     val uiState = _uiState.asStateFlow()
 
     fun showAllUploads() = viewModelScope.launch {

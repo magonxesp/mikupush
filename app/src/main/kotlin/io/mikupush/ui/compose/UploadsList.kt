@@ -12,7 +12,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.mikupush.upload.UploadState
-import io.mikupush.upload.Upload
+import io.mikupush.upload.UploadDetails
 import kotlinx.datetime.*
 import kotlinx.datetime.TimeZone
 import java.time.format.DateTimeFormatter
@@ -20,7 +20,7 @@ import java.time.format.FormatStyle
 import java.util.*
 
 @Composable
-fun UploadedList(items: List<Upload>) {
+fun UploadedList(items: List<UploadDetails>) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -54,11 +54,11 @@ fun UploadListPreview() {
 }
 
 @Composable
-fun UploadListItem(upload: Upload) {
+fun UploadListItem(uploadDetails: UploadDetails) {
     UploadedFile(
-        fileName = upload.fileName,
-        fileMimeType = upload.fileMimeType,
-        uploadedAt = upload.uploadedAt,
+        fileName = uploadDetails.fileName,
+        fileMimeType = uploadDetails.fileMimeType,
+        uploadedAt = uploadDetails.uploadedAt,
     )
 }
 

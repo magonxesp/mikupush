@@ -14,7 +14,7 @@ object UploadsTable : LongIdTable("uploads") {
     val uploadedAt = timestamp("uploaded_at")
 }
 
-fun Upload.insert() {
+fun UploadDetails.insert() {
     val upload = this
 
     transaction {
@@ -34,7 +34,7 @@ fun findAllUploads() = transaction {
         .map { it.toDto() }
 }
 
-private fun ResultRow.toDto() = Upload(
+private fun ResultRow.toDto() = UploadDetails(
     id = this[UploadsTable.uuid],
     fileName = this[UploadsTable.fileName],
     fileMimeType = this[UploadsTable.fileMimeType],

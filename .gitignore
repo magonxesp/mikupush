@@ -44,3 +44,7 @@ out/
 /data
 /backend/data
 /app/dist
+
+.env.*
+.env
+!.env.example
