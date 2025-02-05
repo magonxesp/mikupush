@@ -11,4 +11,3 @@ rootProject.name = "mikupush"
 
 include(":app")
 include(":backend")
-include(":common")
