@@ -2,6 +2,7 @@ package io.mikupush
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.http.content.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -11,6 +12,7 @@ import io.ktor.utils.io.*
 import org.apache.tika.Tika
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.util.*
 
 private val logger = LoggerFactory.getLogger("Routing")
 
@@ -72,20 +74,22 @@ fun Application.configureRouting() {
 
             call.respond(HttpStatusCode.Created)
         }
-        post("/upload/{fileId}/chunk") {
-            val fileId = call.parameters["fileId"]
-            require(!fileId.isNullOrBlank()) { "File id is required" }
-
-            startChunkAppenderWorkers()
-
-            val chunk = call.receive<ByteArray>()
-            chunkChannel.send(ChunkAppendRequest(id = fileId, chunk = chunk))
-
-            call.respond(HttpStatusCode.Accepted)
-        }
         put("/upload/details") {
             call.receive<UploadDetails>().insertOrUpdate()
             call.respond(HttpStatusCode.NoContent)
+        }
+        delete("/upload/{fileId}") {
+            val fileId = call.parameters["fileId"]
+            require(!fileId.isNullOrBlank()) { "File id is required" }
+
+            val upload = findById(UUID.fromString(fileId)) ?: error("File with id $fileId not found")
+            val deleted = File("data/$fileId").delete()
+
+            if (deleted) {
+                upload.delete()
+            }
+
+            call.respond(HttpStatusCode.OK)
         }
     }
 }

@@ -1,6 +1,5 @@
 package io.mikupush.upload
 
-import androidx.compose.runtime.MutableState
 import io.ktor.client.request.*
 import io.ktor.http.content.*
 import io.ktor.utils.io.*
@@ -10,7 +9,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.apache.tika.Tika

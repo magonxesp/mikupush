@@ -15,14 +15,12 @@ import androidx.compose.ui.window.WindowState
 import io.mikupush.ui.compose.UploadedList
 import io.mikupush.ui.compose.UploadsList
 import io.mikupush.upload.UploadViewModel
-import io.mikupush.upload.UploadsViewModel
 import io.mikupush.uploadsWindowTitle
 import org.koin.java.KoinJavaComponent.inject
 import java.awt.MouseInfo
 import java.awt.Toolkit
 
 private val uploadViewModel by inject<UploadViewModel>(UploadViewModel::class.java)
-private val uploadsViewModel by inject<UploadsViewModel>(UploadsViewModel::class.java)
 
 @Composable
 fun MainWindow(
@@ -45,9 +43,14 @@ fun MainWindow(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UploadsWindowContent() {
-
+    val uploadingList = uploadViewModel.uploadStates.collectAsState()
+    val uploads = uploadViewModel.uploads.collectAsState()
     var tab by remember { mutableStateOf(0) }
     val tabTitles = listOf("Uploads", "Uploaded")
+
+    LaunchedEffect(tab) {
+        uploadViewModel.loadUploads()
+    }
 
     Column {
         PrimaryTabRow(selectedTabIndex = tab) {
@@ -61,27 +64,13 @@ fun UploadsWindowContent() {
         }
 
         when (tab) {
-            0 -> UploadsTab()
-            1 -> UploadedTab()
+            0 -> UploadsList(
+                uploadingList.value,
+                onCancel = { fileId -> uploadViewModel.delete(fileId) }
+            )
+            1 -> UploadedList(uploads.value)
         }
     }
-}
-
-@Composable
-fun UploadsTab() {
-    val state = uploadViewModel.uiState.collectAsState()
-    UploadsList(state.value)
-}
-
-@Composable
-fun UploadedTab() {
-    val state = uploadsViewModel.uiState.collectAsState()
-
-    LaunchedEffect(Unit) {
-        uploadsViewModel.showAllUploads()
-    }
-
-    UploadedList(state.value)
 }
 
 fun uploadWindowState(): WindowState {

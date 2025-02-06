@@ -17,14 +17,20 @@ import java.util.*
 import kotlin.random.Random
 
 @Composable
-fun UploadsList(items: List<UploadState>) {
+fun UploadsList(
+    items: List<UploadState>,
+    onCancel: (fileId: UUID) -> Unit = { }
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
             .padding(15.dp)
     ) {
         itemsIndexed(items) { index, item ->
-            UploadingListItem(item)
+            UploadingListItem(
+                upload = item,
+                onCancel = { onCancel(item.fileId) }
+            )
 
             if (index < items.size - 1) {
                 Divider(
@@ -51,12 +57,16 @@ fun UploadsListPreview() {
 }
 
 @Composable
-fun UploadingListItem(upload: UploadState) {
+fun UploadingListItem(
+    upload: UploadState,
+    onCancel: () -> Unit = { }
+) {
     UploadProgress(
         fileName = upload.fileName,
         fileMimeType = upload.fileMimeType,
         uploadSpeedBytes = upload.bytesUploadedRate,
-        progress = upload.progress
+        progress = upload.progress,
+        onCancel = onCancel
     )
 }
 

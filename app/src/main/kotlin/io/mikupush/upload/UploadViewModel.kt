@@ -5,7 +5,6 @@ import io.ktor.http.*
 import io.mikupush.backendBaseUrl
 import io.mikupush.http.backendHttpClient
 import io.mikupush.notification.Notifier
-import io.mikupush.notification.UploadedSignal
 import io.mikupush.ui.ViewModel
 import io.mikupush.ui.copyToClipboard
 import kotlinx.coroutines.CoroutineScope
@@ -20,15 +19,16 @@ import java.util.*
 import kotlin.io.path.Path
 
 class UploadViewModel(
-    private val notifier: Notifier,
-    private val uploadedSignal: UploadedSignal
+    private val notifier: Notifier
 ) : ViewModel() {
     private val logger = LoggerFactory.getLogger(this::class.java)
     private val uploadRequestChannel = Channel<UploadRequest>(100)
     private val uploadStateChannel = Channel<UploadState>(1)
 
-    private val _uiState = MutableStateFlow<List<UploadState>>(listOf())
-    val uiState = _uiState.asStateFlow()
+    private val _uploadStates = MutableStateFlow<List<UploadState>>(listOf())
+    private val _uploads = MutableStateFlow<List<UploadDetails>>(listOf())
+    val uploadStates = _uploadStates.asStateFlow()
+    val uploads = _uploads.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -47,6 +47,26 @@ class UploadViewModel(
         uploadRequestChannel.send(request)
     }
 
+    fun delete(fileId: UUID) = viewModelScope.launch {
+        backendHttpClient.use {
+            backendHttpClient.delete("/upload/$fileId") {
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+            }
+        }
+
+        _uploadStates.update { state -> state.filter { it.fileId != fileId } }
+        _uploads.update { state -> state.filter { it.id != fileId } }
+    }
+
+    fun cancel(fileId: UUID) = viewModelScope.launch {
+
+    }
+
+    fun loadUploads() = viewModelScope.launch {
+        _uploads.update { findAllUploads() }
+    }
+
     private fun CoroutineScope.updateUploadsStates() = launch {
         logger.debug("listening to progress updates")
         for (uploadState in uploadStateChannel) {
@@ -57,15 +77,15 @@ class UploadViewModel(
     }
 
     private suspend fun updateUploadState(uploadState: UploadState) {
-        val exists = _uiState.value.any { uploadState.fileId == it.fileId }
+        val exists = _uploadStates.value.any { uploadState.fileId == it.fileId }
 
         if (!exists) {
-            _uiState.update { state -> listOf(uploadState) + state }
+            _uploadStates.update { state -> listOf(uploadState) + state }
             notifyNewUpload(uploadState)
             return
         }
 
-        _uiState.update { state ->
+        _uploadStates.update { state ->
             state.map { if (uploadState.fileId == it.fileId) uploadState else it }
         }
     }
@@ -84,10 +104,9 @@ class UploadViewModel(
                 message = "The file ${uploadState.fileName} has been uploaded"
             )
 
+            _uploadStates.update { state -> state.filter { it.fileId != uploadState.fileId } }
             publishUploadDetails(uploadState)
             copyToClipboard("$backendBaseUrl/${uploadState.fileId}")
-            _uiState.update { state -> state.filter { it.fileId != uploadState.fileId } }
-            uploadedSignal.emit()
         }
     }
 
@@ -98,7 +117,7 @@ class UploadViewModel(
                 message = "An error occurred uploading the file, try again later"
             )
 
-            _uiState.update { state -> state.filter { it.fileId != uploadState.fileId } }
+            _uploadStates.update { state -> state.filter { it.fileId != uploadState.fileId } }
         }
     }
 
@@ -111,12 +130,16 @@ class UploadViewModel(
             uploadedAt = Clock.System.now()
         )
 
-        backendHttpClient.put("/upload/details") {
-            contentType(ContentType.Application.Json)
-            accept(ContentType.Application.Json)
-            setBody(uploadDetails)
+        backendHttpClient.use {
+            backendHttpClient.put("/upload/details") {
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                setBody(uploadDetails)
+            }
         }
 
         uploadDetails.insert()
+        _uploads.update { state -> listOf(uploadDetails) + state }
     }
+
 }

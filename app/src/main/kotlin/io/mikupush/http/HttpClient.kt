@@ -22,6 +22,8 @@ val backendHttpClient get() = HttpClient {
     install(ContentNegotiation) {
         json()
     }
+
+    expectSuccess = true
 }
 
 val localHttpClient get() = HttpClient {
@@ -32,4 +34,6 @@ val localHttpClient get() = HttpClient {
     install(HttpTimeout) {
         requestTimeoutMillis = 3000
     }
+
+    expectSuccess = true
 }

@@ -6,6 +6,7 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
@@ -40,6 +41,14 @@ data class UploadDetails(
     val fileSizeBytes: Long,
     val uploadedAt: Instant
 )
+
+fun findById(fileId: UUID) = transaction {
+    UploadsTable.selectAll()
+        .where { UploadsTable.uuid eq fileId }
+        .limit(1)
+        .firstOrNull()
+        ?.toDto()
+}
 
 fun UploadDetails.insertOrUpdate() {
     val upload = this
@@ -82,6 +91,14 @@ fun UploadDetails.update() {
             it[fileSize] = upload.fileSizeBytes
             it[uploadedAt] = Clock.System.now()
         }
+    }
+}
+
+fun UploadDetails.delete() {
+    val upload = this
+
+    transaction {
+        UploadsTable.deleteWhere { UploadsTable.uuid eq upload.id }
     }
 }
 
