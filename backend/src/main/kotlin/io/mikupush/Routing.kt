@@ -43,19 +43,24 @@ fun Application.configureRouting() {
         get("/{fileId}") {
             val fileId = call.parameters["fileId"]
             require(!fileId.isNullOrBlank()) { "File id is required" }
+
+            val upload = findById(UUID.fromString(fileId))
             val file = File("data/$fileId")
 
-            if (!file.exists()) {
+            if (!file.exists() || upload == null) {
                 call.respond(HttpStatusCode.NotFound)
                 return@get
             }
 
-            val contentType = Tika().detect(file)
-            if (contentType.isNullOrBlank()) {
-                error("Unable to resolve content type for file $file")
-            }
+            call.response.headers.append(
+                name = "Content-Disposition",
+                value = "inline; filename=${upload.fileName}"
+            )
 
-            call.respondBytes(contentType = ContentType.parse(contentType), bytes = file.readBytes())
+            call.respondBytes(
+                contentType = ContentType.parse(upload.fileMimeType),
+                bytes = file.readBytes()
+            )
         }
         post("/upload/{fileId}") {
             val fileId = call.parameters["fileId"]
