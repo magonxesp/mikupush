@@ -12,7 +12,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
-import io.mikupush.ui.compose.UploadedList
 import io.mikupush.ui.compose.UploadsList
 import io.mikupush.upload.UploadViewModel
 import io.mikupush.uploadsWindowTitle
@@ -43,33 +42,17 @@ fun MainWindow(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UploadsWindowContent() {
-    val uploadingList = uploadViewModel.uploadStates.collectAsState()
     val uploads = uploadViewModel.uploads.collectAsState()
-    var tab by remember { mutableStateOf(0) }
-    val tabTitles = listOf("Uploads", "Uploaded")
 
-    LaunchedEffect(tab) {
+    LaunchedEffect(Unit) {
         uploadViewModel.loadUploads()
     }
 
     Column {
-        PrimaryTabRow(selectedTabIndex = tab) {
-            tabTitles.forEachIndexed { index, title ->
-                Tab(
-                    selected = tab == index,
-                    onClick = { tab = index },
-                    text = { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) }
-                )
-            }
-        }
-
-        when (tab) {
-            0 -> UploadsList(
-                uploadingList.value,
-                onCancel = { fileId -> uploadViewModel.delete(fileId) }
-            )
-            1 -> UploadedList(uploads.value)
-        }
+        UploadsList(
+            uploads.value,
+            onCancel = { fileId -> uploadViewModel.delete(fileId) }
+        )
     }
 }
 

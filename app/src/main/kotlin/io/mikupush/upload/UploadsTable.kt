@@ -14,15 +14,15 @@ object UploadsTable : LongIdTable("uploads") {
     val uploadedAt = timestamp("uploaded_at")
 }
 
-fun UploadDetails.insert() {
+fun Upload.insert() {
     val upload = this
 
     transaction {
         UploadsTable.insert {
-            it[uuid] = upload.id
-            it[fileName] = upload.fileName
-            it[fileMimeType] = upload.fileMimeType
-            it[fileSize] = upload.fileSizeBytes
+            it[uuid] = upload.details.id
+            it[fileName] = upload.details.fileName
+            it[fileMimeType] = upload.details.fileMimeType
+            it[fileSize] = upload.details.fileSizeBytes
             it[uploadedAt] = Clock.System.now()
         }
     }
@@ -34,10 +34,13 @@ fun findAllUploads() = transaction {
         .map { it.toDto() }
 }
 
-private fun ResultRow.toDto() = UploadDetails(
-    id = this[UploadsTable.uuid],
-    fileName = this[UploadsTable.fileName],
-    fileMimeType = this[UploadsTable.fileMimeType],
-    fileSizeBytes = this[UploadsTable.fileSize],
-    uploadedAt = this[UploadsTable.uploadedAt]
+private fun ResultRow.toDto() = Upload(
+    details = UploadDetails(
+        id = this[UploadsTable.uuid],
+        fileName = this[UploadsTable.fileName],
+        fileMimeType = this[UploadsTable.fileMimeType],
+        fileSizeBytes = this[UploadsTable.fileSize],
+        uploadedAt = this[UploadsTable.uploadedAt]
+    ),
+    progress = 1f,
 )

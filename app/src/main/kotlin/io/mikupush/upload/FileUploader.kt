@@ -5,112 +5,80 @@ import io.ktor.http.content.*
 import io.ktor.utils.io.*
 import io.mikupush.http.backendHttpClient
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.apache.tika.Tika
+import kotlinx.datetime.Clock
 import org.slf4j.LoggerFactory
-import java.util.concurrent.atomic.AtomicLong
+import java.io.File
+import java.util.*
 import kotlin.concurrent.fixedRateTimer
 
-class FileUploader(private val workers: Int) {
+class FileUploader {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
-    fun CoroutineScope.uploadFiles(
-        uploadRequestChannel: ReceiveChannel<UploadRequest>,
-        uploadStateChannel: SendChannel<UploadState>
-    ) = launch {
-        repeat(workers) { workerNumber ->
-            logger.debug("Starting worker $workerNumber to listen to new pending files to upload")
-            for (fileToUpload in uploadRequestChannel) {
-                doUpload(fileToUpload, uploadStateChannel)
-            }
-        }
-    }
+    suspend fun upload(
+        fileId: UUID,
+        file: File,
+        onProgress: (Float) -> Unit,
+        onByteRate: (Long) -> Unit
+    ) {
+        logger.debug("processing upload request for file id: {}: {}", fileId, file.path)
 
-    private fun CoroutineScope.doUpload(
-        uploadRequest: UploadRequest,
-        progressChannel: SendChannel<UploadState>
-    ) = launch(Dispatchers.IO) {
-        logger.debug("processing upload request: {}", uploadRequest)
-        val progress = MutableStateFlow(uploadRequest.createState())
-        progressChannel.send(progress.value)
-
-        try {
-            launch {
-                progress.collect { state -> progressChannel.send(state) }
-            }
-
-            backendHttpClient.use { client ->
-                client.post("/upload/${uploadRequest.fileId}") {
-                    setBody(UploadStream(uploadRequest, progress))
-                }
-            }
-
-            progress.update { state -> state.copy(finishState = UploadFinishState.SUCCESS) }
-        } catch (exception: Exception) {
-            logger.warn("failed to upload file ${uploadRequest.path}", exception)
-            progress.update { state -> state.copy(finishState = UploadFinishState.FAILED) }
-        }
-
-        progressChannel.send(progress.value.copy(finishState = UploadFinishState.SUCCESS))
-        logger.debug("upload request finished: {}", uploadRequest)
-    }
-
-    private fun UploadRequest.createState(): UploadState {
-        val file = path.toFile()
-
-        return UploadState(
+        val streamWriter = createWriteStream(
+            file = file,
             fileId = fileId,
-            fileName = file.name,
-            fileSizeBytes = file.length(),
-            fileMimeType = Tika().detect(file),
+            onProgress = onProgress,
+            onByteRate = onByteRate
         )
+
+        backendHttpClient.use { client ->
+            client.post("/upload/$fileId") {
+                setBody(streamWriter)
+            }
+        }
+
+        logger.debug("upload request finished for file id: {}: {}", fileId, file.path)
     }
 
-    private class UploadStream(
-        private val request: UploadRequest,
-        private val progress: MutableStateFlow<UploadState>
-    ) : OutgoingContent.WriteChannelContent() {
-        private val logger = LoggerFactory.getLogger(this::class.java)
-        private val lastUploadedBytes = AtomicLong(0)
-        private val totalUploadedBytes = AtomicLong(0)
-        private val file = request.path.toFile()
+    private fun createWriteStream(
+        file: File,
+        fileId: UUID,
+        onProgress: (Float) -> Unit,
+        onByteRate: (Long) -> Unit
+    ) = object : OutgoingContent.WriteChannelContent() {
+        @get:Synchronized
+        @set:Synchronized
+        private var lastUploadedBytes = 0L
+        @get:Synchronized
+        @set:Synchronized
+        private var totalUploadedBytes = 0L
 
         override suspend fun writeTo(channel: ByteWriteChannel) {
-            val timer = observeUploadSpeedRate()
+            val rateUpdater = updateByteRate()
             val reader = file.inputStream().buffered(100 * 1000)
             val buffer = ByteArray(100 * 1000) // 100kb
 
             while (reader.read(buffer) != -1) {
-                logger.debug("sending new chunk to file {}", request.fileId)
                 channel.writeByteArray(buffer)
                 updateProgress(buffer.size)
             }
 
-            timer.cancel()
+            rateUpdater.cancel()
         }
 
-        private fun updateProgress(bytesUploaded: Int) {
-            totalUploadedBytes.set(totalUploadedBytes.get() + bytesUploaded)
-            logger.debug("updating upload progress of file {}: {}", request.fileId, progress)
-
-            progress.update { state ->
-                state.copy(progress = totalUploadedBytes.get() / file.length().toFloat())
-            }
+        private fun updateProgress(bytes: Int) {
+            totalUploadedBytes += bytes
+            val progress = totalUploadedBytes / file.length().toFloat()
+            logger.debug("updating upload progress of file {}: {}", fileId, progress)
+            onProgress(progress)
         }
 
-        private fun observeUploadSpeedRate() = fixedRateTimer(request.fileId.toString(), period = 500) {
-            val speedRate = totalUploadedBytes.get() - lastUploadedBytes.get()
-            logger.debug("Speed rate for file {} is {} B/s", request.fileId, speedRate)
-            lastUploadedBytes.set(totalUploadedBytes.get())
-
-            progress.update { state ->
-                state.copy(bytesUploadedRate = speedRate)
-            }
+        private fun updateByteRate() = fixedRateTimer(period = 500) {
+            val speedRate = totalUploadedBytes - lastUploadedBytes
+            logger.debug("speed rate for file {} is {} B/s", fileId, speedRate)
+            lastUploadedBytes = totalUploadedBytes
+            onByteRate(speedRate)
         }
     }
 }

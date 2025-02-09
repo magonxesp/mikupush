@@ -5,6 +5,14 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import java.util.*
 
+data class Upload(
+    val details: UploadDetails,
+    val progress: Float = 0f,
+    val bytesUploadedRate: Long = 0,
+) {
+    fun isFinished() = progress >= 1f
+}
+
 @Serializable
 data class UploadDetails(
     @Serializable(with = UUIDSerializer::class)
@@ -12,5 +20,5 @@ data class UploadDetails(
     val fileName: String,
     val fileMimeType: String,
     val fileSizeBytes: Long,
-    val uploadedAt: Instant
+    val uploadedAt: Instant,
 )

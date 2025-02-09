@@ -7,44 +7,66 @@ import io.mikupush.http.backendHttpClient
 import io.mikupush.notification.Notifier
 import io.mikupush.ui.ViewModel
 import io.mikupush.ui.copyToClipboard
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import org.apache.tika.Tika
 import org.slf4j.LoggerFactory
 import java.util.*
 import kotlin.io.path.Path
 
 class UploadViewModel(
-    private val notifier: Notifier
+    private val notifier: Notifier,
+    private val fileUploader: FileUploader
 ) : ViewModel() {
     private val logger = LoggerFactory.getLogger(this::class.java)
-    private val uploadRequestChannel = Channel<UploadRequest>(100)
-    private val uploadStateChannel = Channel<UploadState>(1)
 
-    private val _uploadStates = MutableStateFlow<List<UploadState>>(listOf())
-    private val _uploads = MutableStateFlow<List<UploadDetails>>(listOf())
-    val uploadStates = _uploadStates.asStateFlow()
+    private val _uploads = MutableStateFlow<List<Upload>>(listOf())
     val uploads = _uploads.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            updateUploadsStates()
-
-            with(FileUploader(1)) {
-                uploadFiles(uploadRequestChannel, uploadStateChannel)
-            }
-        }
-    }
 
     fun upload(filePath: String) = viewModelScope.launch {
         logger.debug("starting upload file {}", filePath)
 
-        val request = UploadRequest(UUID.randomUUID(), Path(filePath))
-        uploadRequestChannel.send(request)
+        val fileId = UUID.randomUUID()
+        val file = Path(filePath).toFile()
+
+        var upload = Upload(
+            details = UploadDetails(
+                id = fileId,
+                fileName = file.name,
+                fileMimeType = Tika().detect(file),
+                fileSizeBytes = file.length(),
+                uploadedAt = Clock.System.now()
+            )
+        )
+
+        _uploads.update { state -> listOf(upload) + state }
+        notifier.notify(
+            title = "Uploading ${upload.details.fileName} 🚀",
+            message = "It will take some time, please be patient"
+        )
+
+        try {
+            fileUploader.upload(
+                fileId = fileId,
+                file = file,
+                onProgress = { progress ->
+                    upload = upload.copy(progress = progress)
+                    updateUploadProgress(upload)
+                },
+                onByteRate = { rate ->
+                    upload = upload.copy(bytesUploadedRate = rate)
+                    updateUploadProgress(upload)
+                }
+            )
+
+            onSuccessUpload(upload)
+        } catch (exception: Exception) {
+            logger.warn("failed to upload file ${file.path}", exception)
+            onFailedUpload(upload)
+        }
     }
 
     fun delete(fileId: UUID) = viewModelScope.launch {
@@ -55,8 +77,7 @@ class UploadViewModel(
             }
         }
 
-        _uploadStates.update { state -> state.filter { it.fileId != fileId } }
-        _uploads.update { state -> state.filter { it.id != fileId } }
+        _uploads.update { state -> state.filter { it.details.id != fileId } }
     }
 
     fun cancel(fileId: UUID) = viewModelScope.launch {
@@ -67,79 +88,36 @@ class UploadViewModel(
         _uploads.update { findAllUploads() }
     }
 
-    private fun CoroutineScope.updateUploadsStates() = launch {
-        logger.debug("listening to progress updates")
-        for (uploadState in uploadStateChannel) {
-            updateUploadState(uploadState)
-            onSuccessUpload(uploadState)
-            onFailedUpload(uploadState)
+    private fun updateUploadProgress(upload: Upload) = viewModelScope.launch {
+        _uploads.update { state ->
+            state.map { if (upload.details.id == it.details.id) upload else it }
         }
     }
 
-    private suspend fun updateUploadState(uploadState: UploadState) {
-        val exists = _uploadStates.value.any { uploadState.fileId == it.fileId }
-
-        if (!exists) {
-            _uploadStates.update { state -> listOf(uploadState) + state }
-            notifyNewUpload(uploadState)
-            return
-        }
-
-        _uploadStates.update { state ->
-            state.map { if (uploadState.fileId == it.fileId) uploadState else it }
-        }
-    }
-
-    private suspend fun notifyNewUpload(uploadState: UploadState) {
-        notifier.notify(
-            title = "Uploading ${uploadState.fileName} 🚀",
-            message = "It will take some time, please be patient"
-        )
-    }
-
-    private suspend fun onSuccessUpload(uploadState: UploadState) {
-        if (uploadState.isFinished() && uploadState.finishState == UploadFinishState.SUCCESS) {
-            notifier.notify(
-                title = "Link copied to the clipboard 📎",
-                message = "The file ${uploadState.fileName} has been uploaded"
-            )
-
-            _uploadStates.update { state -> state.filter { it.fileId != uploadState.fileId } }
-            publishUploadDetails(uploadState)
-            copyToClipboard("$backendBaseUrl/${uploadState.fileId}")
-        }
-    }
-
-    private suspend fun onFailedUpload(uploadState: UploadState) {
-        if (uploadState.isFinished() && uploadState.finishState == UploadFinishState.FAILED) {
-            notifier.notifyError(
-                title = "Failed uploading ${uploadState.fileName}",
-                message = "An error occurred uploading the file, try again later"
-            )
-
-            _uploadStates.update { state -> state.filter { it.fileId != uploadState.fileId } }
-        }
-    }
-
-    private suspend fun publishUploadDetails(uploadState: UploadState) {
-        val uploadDetails = UploadDetails(
-            id = uploadState.fileId,
-            fileName = uploadState.fileName,
-            fileMimeType = uploadState.fileMimeType,
-            fileSizeBytes = uploadState.fileSizeBytes,
-            uploadedAt = Clock.System.now()
-        )
-
+    private suspend fun onSuccessUpload(upload: Upload) {
         backendHttpClient.use {
             backendHttpClient.put("/upload/details") {
                 contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
-                setBody(uploadDetails)
+                setBody(upload.details)
             }
         }
 
-        uploadDetails.insert()
-        _uploads.update { state -> listOf(uploadDetails) + state }
+        upload.insert()
+        copyToClipboard("$backendBaseUrl/${upload.details.id}")
+
+        notifier.notify(
+            title = "Link copied to the clipboard 📎",
+            message = "The file ${upload.details.fileName} has been uploaded"
+        )
+
+        updateUploadProgress(upload.copy(progress = 1f))
     }
 
+    private suspend fun onFailedUpload(upload: Upload) {
+        notifier.notifyError(
+            title = "Failed uploading ${upload.details.fileName}",
+            message = "An error occurred uploading the file, try again later"
+        )
+    }
 }
