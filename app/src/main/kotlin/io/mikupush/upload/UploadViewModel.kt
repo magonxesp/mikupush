@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import org.apache.tika.Tika
 import org.slf4j.LoggerFactory
+import java.io.File
 import java.util.*
 import kotlin.io.path.Path
 
@@ -42,23 +43,27 @@ class UploadViewModel(
         logger.debug("starting upload file {}", filePath)
         val file = Path(filePath).toFile()
 
-        var upload = Upload(
-            details = UploadDetails(
-                id = fileId,
-                fileName = file.name,
-                fileMimeType = Tika().detect(file),
-                fileSizeBytes = file.length(),
-                uploadedAt = Clock.System.now()
-            )
-        )
-
-        _uploads.update { state -> listOf(upload) + state }
-        notifier.notify(
-            title = "Uploading ${upload.details.fileName} 🚀",
-            message = "It will take some time, please be patient"
-        )
+        if (!file.isFile) {
+            return
+        }
 
         try {
+            var upload = Upload(
+                details = UploadDetails(
+                    id = fileId,
+                    fileName = file.name,
+                    fileMimeType = Tika().detect(file),
+                    fileSizeBytes = file.length(),
+                    uploadedAt = Clock.System.now()
+                )
+            )
+
+            _uploads.update { state -> listOf(upload) + state }
+            notifier.notify(
+                title = "Uploading ${upload.details.fileName} 🚀",
+                message = "It will take some time, please be patient"
+            )
+
             fileUploader.upload(
                 fileId = fileId,
                 file = file,
@@ -75,7 +80,7 @@ class UploadViewModel(
             onSuccessUpload(upload)
         } catch (exception: Exception) {
             logger.warn("failed to upload file ${file.path}", exception)
-            onFailedUpload(upload)
+            onFailedUpload(file)
         }
 
         uploadJobs.remove(fileId)
@@ -129,9 +134,9 @@ class UploadViewModel(
         updateUploadProgress(upload.copy(progress = 1f))
     }
 
-    private suspend fun onFailedUpload(upload: Upload) {
+    private suspend fun onFailedUpload(file: File) {
         notifier.notifyError(
-            title = "Failed uploading ${upload.details.fileName}",
+            title = "Failed uploading ${file.name}",
             message = "An error occurred uploading the file, try again later"
         )
     }

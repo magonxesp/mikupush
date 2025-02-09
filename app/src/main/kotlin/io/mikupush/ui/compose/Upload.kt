@@ -28,10 +28,7 @@ fun UploadListItem(
 ) {
     ListItem(
         icon = {
-            FileIcon(
-                mimeType = fileMimeType,
-                modifier = Modifier.height(40.dp)
-            )
+            FileIcon(mimeType = fileMimeType)
         },
         text = {
             Text(
