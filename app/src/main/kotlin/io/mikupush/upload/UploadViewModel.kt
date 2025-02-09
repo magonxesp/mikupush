@@ -7,6 +7,7 @@ import io.mikupush.http.backendHttpClient
 import io.mikupush.notification.Notifier
 import io.mikupush.ui.ViewModel
 import io.mikupush.ui.copyToClipboard
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -26,7 +27,7 @@ class UploadViewModel(
     private val _uploads = MutableStateFlow<List<Upload>>(listOf())
     val uploads = _uploads.asStateFlow()
 
-    fun upload(filePath: String) = viewModelScope.launch {
+    fun upload(filePath: String) = viewModelScope.launch(Dispatchers.IO) {
         logger.debug("starting upload file {}", filePath)
 
         val fileId = UUID.randomUUID()
