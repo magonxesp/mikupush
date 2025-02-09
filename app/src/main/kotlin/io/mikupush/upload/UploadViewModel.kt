@@ -8,6 +8,7 @@ import io.mikupush.notification.Notifier
 import io.mikupush.ui.ViewModel
 import io.mikupush.ui.copyToClipboard
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -24,13 +25,21 @@ class UploadViewModel(
 ) : ViewModel() {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
+    private val uploadJobs = mutableMapOf<UUID, Job>()
     private val _uploads = MutableStateFlow<List<Upload>>(listOf())
     val uploads = _uploads.asStateFlow()
 
-    fun upload(filePath: String) = viewModelScope.launch(Dispatchers.IO) {
-        logger.debug("starting upload file {}", filePath)
-
+    fun startUpload(filePath: String) {
         val fileId = UUID.randomUUID()
+        val job = viewModelScope.launch(Dispatchers.IO) {
+            upload(fileId, filePath)
+        }
+
+        uploadJobs[fileId] = job
+    }
+
+    private suspend fun upload(fileId: UUID, filePath: String) {
+        logger.debug("starting upload file {}", filePath)
         val file = Path(filePath).toFile()
 
         var upload = Upload(
@@ -68,6 +77,8 @@ class UploadViewModel(
             logger.warn("failed to upload file ${file.path}", exception)
             onFailedUpload(upload)
         }
+
+        uploadJobs.remove(fileId)
     }
 
     fun delete(fileId: UUID) = viewModelScope.launch {
@@ -81,8 +92,11 @@ class UploadViewModel(
         _uploads.update { state -> state.filter { it.details.id != fileId } }
     }
 
-    fun cancel(fileId: UUID) = viewModelScope.launch {
+    fun cancel(fileId: UUID) {
+        val job = uploadJobs[fileId] ?: return
+        job.cancel()
 
+        delete(fileId)
     }
 
     fun loadUploads() = viewModelScope.launch {

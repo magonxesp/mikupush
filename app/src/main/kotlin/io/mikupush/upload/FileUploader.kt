@@ -56,15 +56,19 @@ class FileUploader {
 
         override suspend fun writeTo(channel: ByteWriteChannel) {
             val rateUpdater = updateByteRate()
-            val reader = file.inputStream().buffered(100 * 1000)
-            val buffer = ByteArray(100 * 1000) // 100kb
 
-            while (reader.read(buffer) != -1) {
-                channel.writeByteArray(buffer)
-                updateProgress(buffer.size)
+            try {
+                val reader = file.inputStream().buffered(100 * 1000)
+                val buffer = ByteArray(100 * 1000) // 100kb
+
+                while (reader.read(buffer) != -1) {
+                    channel.writeByteArray(buffer)
+                    updateProgress(buffer.size)
+                }
+            } finally {
+                logger.debug("canceling bytes rate timer")
+                rateUpdater.cancel()
             }
-
-            rateUpdater.cancel()
         }
 
         private fun updateProgress(bytes: Int) {

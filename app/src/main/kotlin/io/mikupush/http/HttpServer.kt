@@ -13,7 +13,7 @@ import org.koin.java.KoinJavaComponent.inject
 fun Routing.configureRoutes() {
     post("/upload") {
         val viewModel: UploadViewModel by inject(UploadViewModel::class.java)
-        viewModel.upload(call.receiveText())
+        viewModel.startUpload(call.receiveText())
         call.respond(HttpStatusCode.NoContent)
     }
 }

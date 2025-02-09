@@ -1,12 +1,10 @@
 package io.mikupush.ui.window
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.Tab
-import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.PrimaryTabRow
-import androidx.compose.runtime.*
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -39,7 +37,6 @@ fun MainWindow(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UploadsWindowContent() {
     val uploads = uploadViewModel.uploads.collectAsState()
@@ -51,7 +48,7 @@ fun UploadsWindowContent() {
     Column {
         UploadsList(
             uploads.value,
-            onCancel = { fileId -> uploadViewModel.delete(fileId) }
+            onCancel = { fileId -> uploadViewModel.cancel(fileId) }
         )
     }
 }

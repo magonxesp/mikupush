@@ -87,11 +87,15 @@ fun Application.configureRouting() {
             val fileId = call.parameters["fileId"]
             require(!fileId.isNullOrBlank()) { "File id is required" }
 
-            val upload = findById(UUID.fromString(fileId)) ?: error("File with id $fileId not found")
-            val deleted = File("data/$fileId").delete()
+            val upload = findById(UUID.fromString(fileId))
+            val file = File("data/$fileId")
 
-            if (deleted) {
-                upload.delete()
+            if (file.exists()) {
+                val deleted = file.delete()
+
+                if (deleted) {
+                    upload?.delete()
+                }
             }
 
             call.respond(HttpStatusCode.OK)
