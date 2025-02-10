@@ -48,7 +48,9 @@ fun UploadsWindowContent() {
     Column {
         UploadsList(
             uploads.value,
-            onCancel = { fileId -> uploadViewModel.cancel(fileId) }
+            onCancel = { fileId -> uploadViewModel.cancel(fileId) },
+            onGetLink = { fileId -> uploadViewModel.copyLinkToClipboard(fileId) },
+            onShowInExplorer = { path -> uploadViewModel.showInFileExplorer(path) }
         )
     }
 }

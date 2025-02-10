@@ -3,10 +3,12 @@ package io.mikupush.upload
 import io.mikupush.serialization.UUIDSerializer
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import java.nio.file.Path
 import java.util.*
 
 data class Upload(
     val details: UploadDetails,
+    val path: Path,
     val progress: Float = 0f,
     val bytesUploadedRate: Long = 0,
 ) {

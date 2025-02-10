@@ -14,12 +14,16 @@ import androidx.compose.ui.unit.dp
 import io.mikupush.upload.Upload
 import io.mikupush.upload.UploadDetails
 import kotlinx.datetime.Clock
+import java.nio.file.Path
 import java.util.*
+import kotlin.io.path.Path
 
 @Composable
 fun UploadsList(
     items: List<Upload>,
-    onCancel: (fileId: UUID) -> Unit = { }
+    onCancel: (fileId: UUID) -> Unit = { },
+    onGetLink: (fileId: UUID) -> Unit = { },
+    onShowInExplorer: (path: Path) -> Unit = { },
 ) {
     LazyColumn(
         modifier = Modifier
@@ -66,6 +70,8 @@ fun UploadsList(
                 fileName = upload.details.fileName,
                 fileMimeType = upload.details.fileMimeType,
                 uploadedAt = upload.details.uploadedAt,
+                onOpenInFileExplorer = { onShowInExplorer(upload.path) },
+                onGetLink = { onGetLink(upload.details.id) }
             )
         }
     }
@@ -83,7 +89,8 @@ fun UploadsListPreview() {
                 fileSizeBytes = 1024,
                 uploadedAt = Clock.System.now()
             ),
-            progress = if (it % 2 == 0) 0.8f else 1f
+            progress = if (it % 2 == 0) 0.8f else 1f,
+            path = Path("")
         )
     })
 }

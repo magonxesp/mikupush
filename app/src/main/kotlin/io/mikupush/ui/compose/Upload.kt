@@ -57,7 +57,7 @@ fun UploadListItem(
                     modifier = Modifier.padding(start = 5.dp)
                 ) {
                     Icon(
-                        painter = painterResource("/assets/icons/open_in_explorer.svg"),
+                        painter = painterResource("/assets/icons/folder.svg"),
                         contentDescription = "Open $fileName in file explorer"
                     )
                 }

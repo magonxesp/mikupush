@@ -16,9 +16,12 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import org.apache.tika.Tika
 import org.slf4j.LoggerFactory
+import java.awt.Desktop
 import java.io.File
+import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.Path
+
 
 class UploadViewModel(
     private val notifier: Notifier,
@@ -41,7 +44,8 @@ class UploadViewModel(
 
     private suspend fun upload(fileId: UUID, filePath: String) {
         logger.debug("starting upload file {}", filePath)
-        val file = Path(filePath).toFile()
+        val path = Path(filePath)
+        val file = path.toFile()
 
         if (!file.isFile) {
             return
@@ -55,7 +59,8 @@ class UploadViewModel(
                     fileMimeType = Tika().detect(file),
                     fileSizeBytes = file.length(),
                     uploadedAt = Clock.System.now()
-                )
+                ),
+                path = path
             )
 
             _uploads.update { state -> listOf(upload) + state }
@@ -104,6 +109,25 @@ class UploadViewModel(
         delete(fileId)
     }
 
+    fun copyLinkToClipboard(fileId: UUID) = viewModelScope.launch {
+        val upload = findById(fileId) ?: return@launch
+        copyToClipboard("$backendBaseUrl/${upload.details.id}")
+
+        notifier.notify(
+            title = "Link copied to the clipboard 📎",
+            message = "The file ${upload.details.fileName} has been uploaded"
+        )
+    }
+
+    fun showInFileExplorer(path: Path) = viewModelScope.launch {
+        val desktop = Desktop.getDesktop()
+        val file = path.parent.toFile()
+
+        if (file.isDirectory) {
+            desktop.open(file)
+        }
+    }
+
     fun loadUploads() = viewModelScope.launch {
         _uploads.update { findAllUploads() }
     }
@@ -124,12 +148,7 @@ class UploadViewModel(
         }
 
         upload.insert()
-        copyToClipboard("$backendBaseUrl/${upload.details.id}")
-
-        notifier.notify(
-            title = "Link copied to the clipboard 📎",
-            message = "The file ${upload.details.fileName} has been uploaded"
-        )
+        copyLinkToClipboard(upload.details.id)
 
         updateUploadProgress(upload.copy(progress = 1f))
     }
