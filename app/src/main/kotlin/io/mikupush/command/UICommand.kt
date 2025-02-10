@@ -9,7 +9,6 @@ import com.github.ajalt.clikt.core.CliktCommand
 import io.mikupush.http.startHttpServer
 import io.mikupush.notification.Notifier
 import io.mikupush.setupDatabase
-import io.mikupush.ui.MikuPushTheme
 import io.mikupush.ui.tray.AppTrayIcon
 import io.mikupush.ui.window.MainWindow
 import org.koin.java.KoinJavaComponent.inject
@@ -22,10 +21,8 @@ class UICommand : CliktCommand(name = "ui") {
     private fun launchUI() = application {
         var openUploadsWindow by rememberSaveable { mutableStateOf(false) }
 
-        MikuPushTheme {
-            AppTrayIcon(onOpen = { openUploadsWindow = true })
-            MainWindow(openUploadsWindow, onCloseRequest = { openUploadsWindow = false })
-        }
+        AppTrayIcon(onOpen = { openUploadsWindow = true })
+        MainWindow(openUploadsWindow, onCloseRequest = { openUploadsWindow = false })
 
         logger.debug("Application launched")
     }

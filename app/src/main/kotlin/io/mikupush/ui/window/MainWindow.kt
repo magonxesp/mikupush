@@ -1,18 +1,29 @@
 package io.mikupush.ui.window
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
+import io.mikupush.ui.MikuPushTheme
 import io.mikupush.ui.compose.UploadsList
+import io.mikupush.ui.fredokaFamily
 import io.mikupush.upload.UploadViewModel
-import io.mikupush.uploadsWindowTitle
+import io.mikupush.appTitle
 import org.koin.java.KoinJavaComponent.inject
 import java.awt.MouseInfo
 import java.awt.Toolkit
@@ -31,9 +42,11 @@ fun MainWindow(
         state = uploadWindowState(),
         alwaysOnTop = true,
         resizable = true,
-        title = uploadsWindowTitle
+        title = appTitle
     ) {
-        UploadsWindowContent()
+        MikuPushTheme {
+            UploadsWindowContent()
+        }
     }
 }
 
@@ -45,13 +58,38 @@ fun UploadsWindowContent() {
         uploadViewModel.loadUploads()
     }
 
-    Column {
-        UploadsList(
-            uploads.value,
-            onCancel = { fileId -> uploadViewModel.cancel(fileId) },
-            onGetLink = { fileId -> uploadViewModel.copyLinkToClipboard(fileId) },
-            onShowInExplorer = { path -> uploadViewModel.showInFileExplorer(path) }
-        )
+    Surface {
+        Column {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(5.dp)
+                    .fillMaxWidth()
+            ) {
+                Image(
+                    painter = painterResource("/icon.png"),
+                    contentDescription = null,
+                    modifier = Modifier.height(80.dp)
+                        .padding(end = 10.dp)
+                )
+                Text(
+                    text = appTitle,
+                    style = MaterialTheme.typography.titleLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 60.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = fredokaFamily,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            UploadsList(
+                uploads.value,
+                onCancel = { fileId -> uploadViewModel.cancel(fileId) },
+                onGetLink = { fileId -> uploadViewModel.copyLinkToClipboard(fileId) },
+                onShowInExplorer = { path -> uploadViewModel.showInFileExplorer(path) }
+            )
+        }
     }
 }
 

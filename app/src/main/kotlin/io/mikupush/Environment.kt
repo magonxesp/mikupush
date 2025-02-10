@@ -21,6 +21,6 @@ val properties = Properties().apply {
 }
 
 val appName: String = properties.getProperty("app.name")
-val uploadsWindowTitle: String = properties.getProperty("app.uploads_window.title")
+val appTitle: String = properties.getProperty("app.title")
 val backendBaseUrl: String = properties.getProperty("backend.base_url")
 
