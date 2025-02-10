@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -37,7 +37,7 @@ fun UploadsList(
             if (index == 0) {
                 Text(
                     text = "Uploading (${inProgress.size})",
-                    style = MaterialTheme.typography.subtitle1
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
 
@@ -58,7 +58,7 @@ fun UploadsList(
             if (index == 0) {
                 Text(
                     text = "Uploads (${finished.size})",
-                    style = MaterialTheme.typography.subtitle1
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
 

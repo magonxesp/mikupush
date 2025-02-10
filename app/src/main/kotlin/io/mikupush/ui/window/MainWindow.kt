@@ -2,14 +2,15 @@ package io.mikupush.ui.window
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -19,16 +20,20 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
+import io.mikupush.appTitle
 import io.mikupush.ui.MikuPushTheme
 import io.mikupush.ui.compose.UploadsList
 import io.mikupush.ui.fredokaFamily
 import io.mikupush.upload.UploadViewModel
-import io.mikupush.appTitle
 import org.koin.java.KoinJavaComponent.inject
+import java.awt.Dimension
 import java.awt.MouseInfo
 import java.awt.Toolkit
 
 private val uploadViewModel by inject<UploadViewModel>(UploadViewModel::class.java)
+
+private val MinimumWindowWidth = 300.dp
+private val MinimumWindowHeight = 600.dp
 
 @Composable
 fun MainWindow(
@@ -44,6 +49,13 @@ fun MainWindow(
         resizable = true,
         title = appTitle
     ) {
+        with(LocalDensity.current) {
+            window.minimumSize = Dimension(
+                MinimumWindowWidth.toPx().toInt(),
+                MinimumWindowHeight.toPx().toInt()
+            )
+        }
+
         MikuPushTheme {
             UploadsWindowContent()
         }
@@ -58,7 +70,7 @@ fun UploadsWindowContent() {
         uploadViewModel.loadUploads()
     }
 
-    Surface {
+    Surface(modifier = Modifier.fillMaxSize()) {
         Column {
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -93,24 +105,28 @@ fun UploadsWindowContent() {
     }
 }
 
+@Composable
 fun uploadWindowState(): WindowState {
-    val width = 500
-    val height = 800
+    val density = LocalDensity.current
     val mouseLocation = MouseInfo.getPointerInfo().location
     val screenSize = Toolkit.getDefaultToolkit().screenSize
 
-    val windowY = if (mouseLocation.y > screenSize.height / 2) {
-        mouseLocation.y - height
-    } else {
-        mouseLocation.y + height
+    val windowY = with(density) {
+        if (mouseLocation.y > screenSize.height / 2) {
+            mouseLocation.y - MinimumWindowHeight.toPx()
+        } else {
+            mouseLocation.y + MinimumWindowHeight.toPx()
+        }
     }
 
-    val windowX = mouseLocation.x - (width / 2)
+    val windowX = with(density) {
+        mouseLocation.x - (MinimumWindowWidth.toPx() / 2)
+    }
 
     return WindowState(
         size = DpSize(
-            width = width.dp,
-            height = height.dp
+            width = MinimumWindowWidth,
+            height = MinimumWindowHeight
         ),
         position = WindowPosition(
             x = windowX.dp,

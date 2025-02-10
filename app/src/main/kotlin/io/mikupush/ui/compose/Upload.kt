@@ -1,23 +1,20 @@
 package io.mikupush.ui.compose
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import io.mikupush.upload.Upload
-import io.mikupush.upload.UploadDetails
 import kotlinx.datetime.*
-import kotlinx.datetime.TimeZone
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import java.util.*
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun UploadListItem(
     fileName: String,
@@ -27,30 +24,30 @@ fun UploadListItem(
     onOpenInFileExplorer: () -> Unit = {},
 ) {
     ListItem(
-        icon = {
+        leadingContent = {
             FileIcon(mimeType = fileMimeType)
         },
-        text = {
+        headlineContent = {
             Text(
                 text = fileName,
-                style = MaterialTheme.typography.subtitle2,
+                style = MaterialTheme.typography.bodyLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
         },
-        secondaryText = {
+        supportingContent = {
             Text(
                 text = uploadedAt.toLocalDateTime(TimeZone.currentSystemDefault())
                     .toJavaLocalDateTime()
                     .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)),
-                style = MaterialTheme.typography.body2,
+                style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
         },
-        trailing = {
+        trailingContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(
                     onClick = onOpenInFileExplorer,

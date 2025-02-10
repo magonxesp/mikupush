@@ -2,19 +2,16 @@ package io.mikupush.ui.compose
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import io.mikupush.upload.Upload
 import kotlin.random.Random
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun UploadingListItem(
     fileName: String,
@@ -24,22 +21,22 @@ fun UploadingListItem(
     onCancel: () -> Unit = { }
 ) {
     ListItem(
-        icon = {
+        leadingContent = {
             FileIcon(mimeType = fileMimeType)
         },
-        text = {
+        headlineContent = {
             Text(
                 text = fileName,
-                style = MaterialTheme.typography.subtitle2,
+                style = MaterialTheme.typography.bodyLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
         },
-        secondaryText = {
+        supportingContent = {
             BytesSpeedFormatted(bytes = uploadSpeedBytes)
         },
-        trailing = {
+        trailingContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 CircularProgressIndicator(
                     progress = progress,
@@ -49,7 +46,7 @@ fun UploadingListItem(
                     Icon(
                         imageVector = Icons.Filled.Close,
                         contentDescription = "Cancel upload of $fileName",
-                        tint = MaterialTheme.colors.error,
+                        tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(start = 5.dp)
                     )
                 }
@@ -84,6 +81,6 @@ fun BytesSpeedFormatted(bytes: Long, modifier: Modifier = Modifier) {
     Text(
         text = speed,
         modifier = modifier.fillMaxWidth(),
-        style = MaterialTheme.typography.body2
+        style = MaterialTheme.typography.bodyMedium
     )
 }
