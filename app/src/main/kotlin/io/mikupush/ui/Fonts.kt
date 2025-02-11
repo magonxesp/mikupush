@@ -10,3 +10,7 @@ val fredokaFamily = FontFamily(
     Font("/assets/fonts/fredoka_medium.ttf", FontWeight.Medium),
     Font("/assets/fonts/fredoka_bold.ttf", FontWeight.Bold)
 )
+
+val segoeUIFontFamily = FontFamily(
+    Font("/assets/fonts/segoe_fluent_icons.ttf", FontWeight.Normal),
+)
