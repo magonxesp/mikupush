@@ -24,14 +24,16 @@ fun UploadsList(
     onCancel: (fileId: UUID) -> Unit = { },
     onGetLink: (fileId: UUID) -> Unit = { },
     onShowInExplorer: (path: Path) -> Unit = { },
+    onRetry: (path: Path, fileId: UUID) -> Unit = { _, _ -> },
 ) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
             .padding(15.dp)
     ) {
-        val inProgress = items.filter { !it.isFinished() }
+        val inProgress = items.filter { it.isInProgress() }
         val finished = items.filter { it.isFinished() }
+        val finishedWithError = items.filter { it.isFinishedWithError() }
 
         itemsIndexed(inProgress) { index, upload ->
             if (index == 0) {
@@ -51,6 +53,26 @@ fun UploadsList(
                 uploadSpeedBytes = upload.bytesUploadedRate,
                 progress = upload.progress,
                 onCancel = { onCancel(upload.details.id) }
+            )
+        }
+
+        itemsIndexed(finishedWithError) { index, upload ->
+            if (index == 0) {
+                Text(
+                    text = "Failed (${finishedWithError.size})",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+
+            if (index < items.size && index != 0) {
+                Divider(modifier = Modifier.fillMaxWidth())
+            }
+
+            UploadFailedListItem(
+                fileName = upload.details.fileName,
+                fileMimeType = upload.details.fileMimeType,
+                error = upload.error,
+                onRetry = { onRetry(upload.path, upload.details.id) }
             )
         }
 

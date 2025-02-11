@@ -11,8 +11,12 @@ data class Upload(
     val path: Path,
     val progress: Float = 0f,
     val bytesUploadedRate: Long = 0,
+    val error: String = "",
+    val finished: Boolean = false
 ) {
-    fun isFinished() = progress >= 1f
+    fun isFinished() = finished && error.isBlank()
+    fun isInProgress() = !finished
+    fun isFinishedWithError() = finished && error.isNotBlank()
 }
 
 @Serializable

@@ -99,7 +99,8 @@ fun UploadsWindowContent() {
                 uploads.value,
                 onCancel = { fileId -> uploadViewModel.cancel(fileId) },
                 onGetLink = { fileId -> uploadViewModel.copyLinkToClipboard(fileId) },
-                onShowInExplorer = { path -> uploadViewModel.showInFileExplorer(path) }
+                onShowInExplorer = { path -> uploadViewModel.showInFileExplorer(path) },
+                onRetry = { path, fileId -> uploadViewModel.startUpload(path.toString(), fileId) }
             )
         }
     }

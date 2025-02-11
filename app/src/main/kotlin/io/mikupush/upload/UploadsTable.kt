@@ -56,5 +56,6 @@ private fun ResultRow.toDto() = Upload(
         uploadedAt = this[UploadsTable.uploadedAt]
     ),
     progress = 1f,
-    path = Path(this[UploadsTable.filePath])
+    path = Path(this[UploadsTable.filePath]),
+    finished = true
 )

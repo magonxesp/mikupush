@@ -17,7 +17,6 @@ import kotlinx.datetime.Clock
 import org.apache.tika.Tika
 import org.slf4j.LoggerFactory
 import java.awt.Desktop
-import java.io.File
 import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.Path
@@ -33,8 +32,11 @@ class UploadViewModel(
     private val _uploads = MutableStateFlow<List<Upload>>(listOf())
     val uploads = _uploads.asStateFlow()
 
-    fun startUpload(filePath: String) {
-        val fileId = UUID.randomUUID()
+    fun startUpload(filePath: String, fileId: UUID = UUID.randomUUID()) {
+        _uploads.update { state ->
+            state.filter { it.details.id != fileId }
+        }
+
         val job = viewModelScope.launch(Dispatchers.IO) {
             upload(fileId, filePath)
         }
@@ -51,18 +53,18 @@ class UploadViewModel(
             return
         }
 
-        try {
-            var upload = Upload(
-                details = UploadDetails(
-                    id = fileId,
-                    fileName = file.name,
-                    fileMimeType = Tika().detect(file),
-                    fileSizeBytes = file.length(),
-                    uploadedAt = Clock.System.now()
-                ),
-                path = path
-            )
+        var upload = Upload(
+            details = UploadDetails(
+                id = fileId,
+                fileName = file.name,
+                fileMimeType = Tika().detect(file),
+                fileSizeBytes = file.length(),
+                uploadedAt = Clock.System.now()
+            ),
+            path = path
+        )
 
+        try {
             _uploads.update { state -> listOf(upload) + state }
             notifier.notify(
                 title = "Uploading ${upload.details.fileName} 🚀",
@@ -85,7 +87,7 @@ class UploadViewModel(
             onSuccessUpload(upload)
         } catch (exception: Exception) {
             logger.warn("failed to upload file ${file.path}", exception)
-            onFailedUpload(file)
+            onFailedUpload(upload, exception)
         }
 
         uploadJobs.remove(fileId)
@@ -150,13 +152,15 @@ class UploadViewModel(
         upload.insert()
         copyLinkToClipboard(upload.details.id)
 
-        updateUploadProgress(upload.copy(progress = 1f))
+        updateUploadProgress(upload.copy(finished = true))
     }
 
-    private suspend fun onFailedUpload(file: File) {
+    private suspend fun onFailedUpload(upload: Upload, exception: Exception) {
         notifier.notifyError(
-            title = "Failed uploading ${file.name}",
+            title = "Failed uploading ${upload.details.fileName}",
             message = "An error occurred uploading the file, try again later"
         )
+
+        updateUploadProgress(upload.copy(finished = true, error = exception.message ?: "failed with unknown reason"))
     }
 }
