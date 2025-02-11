@@ -2,17 +2,42 @@ package io.mikupush.ui.compose
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.FrameWindowScope
 import io.mikupush.ui.segoeUIFontFamily
+import java.awt.Frame
 
 @Composable
-fun AppTitleBar(
+fun FrameWindowScope.AppTitleBar(onCloseRequest: () -> Unit) {
+    var isMaximized by remember { mutableStateOf(false) }
+
+    WindowDraggableArea {
+        AppTitleBarContent(
+            onMinimize = { window.isMinimized = !window.isMinimized },
+            onMaximize = {
+                if (window.extendedState == Frame.NORMAL) {
+                    window.extendedState = Frame.MAXIMIZED_BOTH
+                    isMaximized = true
+                } else if (window.extendedState == Frame.MAXIMIZED_BOTH) {
+                    window.extendedState = Frame.NORMAL
+                    isMaximized = false
+                }
+            },
+            onClose = onCloseRequest,
+            isMaximized = isMaximized
+        )
+    }
+}
+
+@Composable
+fun AppTitleBarContent(
     onMinimize: () -> Unit = { },
     onMaximize: () -> Unit = { },
     onClose: () -> Unit = { },
@@ -54,6 +79,6 @@ fun AppTitleBar(
 
 @Preview
 @Composable
-fun CustomTitleBarPreview() {
-    AppTitleBar()
+fun AppTitleBarContentPreview() {
+    AppTitleBarContent()
 }

@@ -24,6 +24,7 @@ import androidx.compose.ui.window.WindowState
 import io.mikupush.appTitle
 import io.mikupush.ui.MikuPushTheme
 import io.mikupush.ui.compose.AppTitleBar
+import io.mikupush.ui.compose.AppWindow
 import io.mikupush.ui.compose.UploadsList
 import io.mikupush.ui.fredokaFamily
 import io.mikupush.upload.UploadViewModel
@@ -45,16 +46,11 @@ fun MainWindow(
 ) {
     if (!show) return
 
-    Window(
+    AppWindow(
         onCloseRequest = onCloseRequest,
         state = uploadWindowState(),
-        alwaysOnTop = true,
-        resizable = true,
-        undecorated = true,
         title = appTitle
     ) {
-        var isMaximized by remember { mutableStateOf(false) }
-
         with(LocalDensity.current) {
             window.minimumSize = Dimension(
                 MinimumWindowWidth.toPx().toInt(),
@@ -62,39 +58,7 @@ fun MainWindow(
             )
         }
 
-        MikuPushTheme {
-            Surface(
-                modifier = Modifier.fillMaxSize()
-                    .border(
-                        width = 0.1.dp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        shape = ShapeDefaults.Medium
-                    )
-            ) {
-                Column {
-                    WindowDraggableArea {
-                        AppTitleBar(
-                            onMinimize = { window.isMinimized = !window.isMinimized },
-                            onMaximize = {
-                                when {
-                                    window.extendedState == Frame.NORMAL -> {
-                                        window.extendedState = Frame.MAXIMIZED_BOTH
-                                        isMaximized = true
-                                    }
-                                    window.extendedState == Frame.MAXIMIZED_BOTH -> {
-                                        window.extendedState = Frame.NORMAL
-                                        isMaximized = false
-                                    }
-                                }
-                            },
-                            onClose = onCloseRequest,
-                            isMaximized = isMaximized
-                        )
-                    }
-                    UploadsWindowContent()
-                }
-            }
-        }
+        UploadsWindowContent()
     }
 }
 
