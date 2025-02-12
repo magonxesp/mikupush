@@ -13,7 +13,7 @@ version = "1.0.0"
 
 repositories {
     mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://packages.jetbrains.team/maven/p/kpm/public/")
     google()
 }
 
@@ -49,6 +49,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
     implementation("io.insert-koin:koin-core:$koin_version")
+    implementation("org.jetbrains.jewel:jewel-int-ui-standalone-243:0.27.0")
+    implementation("org.jetbrains.jewel:jewel-int-ui-decorated-window-243:0.27.0")
 }
 
 tasks.withType<Jar> {

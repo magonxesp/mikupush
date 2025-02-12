@@ -1,19 +1,32 @@
 package io.mikupush.ui.compose
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.*
+import androidx.compose.ui.window.FrameWindowScope
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowState
+import androidx.compose.ui.window.rememberWindowState
 import io.mikupush.ui.MikuPushTheme
 import org.apache.commons.lang3.SystemUtils
+import org.jetbrains.jewel.foundation.theme.JewelTheme
+import org.jetbrains.jewel.intui.standalone.theme.IntUiTheme
+import org.jetbrains.jewel.intui.standalone.theme.darkThemeDefinition
+import org.jetbrains.jewel.intui.standalone.theme.default
+import org.jetbrains.jewel.intui.window.decoratedWindow
+import org.jetbrains.jewel.intui.window.styling.dark
+import org.jetbrains.jewel.ui.ComponentStyling
+import org.jetbrains.jewel.window.DecoratedWindow
+import org.jetbrains.jewel.window.TitleBar
+import org.jetbrains.jewel.window.defaultDecoratedWindowStyle
+import org.jetbrains.jewel.window.newFullscreenControls
+import org.jetbrains.jewel.window.styling.DecoratedWindowStyle
+import org.jetbrains.jewel.window.styling.TitleBarColors
+import org.jetbrains.jewel.window.styling.TitleBarStyle
+import java.awt.Color
 
 @Composable
 fun AppWindow(
@@ -36,48 +49,26 @@ fun WindowsAppWindowWrapper(
     title: String = "",
     content: @Composable FrameWindowScope.() -> Unit
 ) {
-    Window(
-        onCloseRequest = onCloseRequest,
-        state = state,
-        alwaysOnTop = false,
-        resizable = true,
-        undecorated = true,
-        transparent = true,
-        title = title,
-    ) {
-        @Composable
-        fun Modifier.windowBorder(): Modifier {
-            if (state.placement == WindowPlacement.Floating) {
-                return border(
-                    width = 0.1.dp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    shape = ShapeDefaults.Medium
-                ).clip(RoundedCornerShape(12.0.dp))
-            }
-
-            return this
-        }
-
-        MikuPushTheme {
-            Surface(
-                modifier = Modifier.fillMaxSize()
-                    .windowBorder()
-            ) {
-                Column {
-                    AppTitleBar(
-                        onCloseRequest = onCloseRequest,
-                        onMaximize = {
-                            if (state.placement == WindowPlacement.Maximized) {
-                                state.placement = WindowPlacement.Floating
-                            } else {
-                                state.placement = WindowPlacement.Maximized
-                            }
-                        },
-                        onMinimize = {
-                            state.isMinimized = true
-                        },
-                        isMaximized = state.placement == WindowPlacement.Maximized
+    MikuPushTheme {
+        IntUiTheme(
+            theme = JewelTheme.darkThemeDefinition(),
+            styling = ComponentStyling.default().decoratedWindow(
+                titleBarStyle = TitleBarStyle.dark(
+                    colors = TitleBarColors.dark(
+                        backgroundColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.surface,
+                        borderColor = MaterialTheme.colorScheme.surface
                     )
+                )
+            ),
+        ) {
+            DecoratedWindow(
+                onCloseRequest = onCloseRequest,
+                state = state,
+                title = title
+            ) {
+                TitleBar(Modifier.newFullscreenControls()) {}
+                Surface(modifier = Modifier.fillMaxSize()) {
                     content()
                 }
             }
