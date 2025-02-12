@@ -91,11 +91,12 @@ fun UploadsWindowContent() {
         }
         if (uploads.value.isNotEmpty()) {
             UploadsList(
-                uploads.value,
+                items = uploads.value,
                 onCancel = { fileId -> uploadViewModel.cancel(fileId) },
                 onGetLink = { fileId -> uploadViewModel.copyLinkToClipboard(fileId) },
                 onShowInExplorer = { path -> uploadViewModel.showInFileExplorer(path) },
-                onRetry = { path, fileId -> uploadViewModel.startUpload(path.toString(), fileId) }
+                onRetry = { path, fileId -> uploadViewModel.startUpload(path.toString(), fileId) },
+                onDelete = { fileId -> uploadViewModel.delete(fileId) }
             )
         } else {
             UploadListEmptyState()

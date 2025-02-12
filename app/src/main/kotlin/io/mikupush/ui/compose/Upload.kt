@@ -4,6 +4,8 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,6 +24,7 @@ fun UploadListItem(
     uploadedAt: Instant,
     onGetLink: () -> Unit = {},
     onOpenInFileExplorer: () -> Unit = {},
+    onDelete: () -> Unit = {},
 ) {
     ListItem(
         leadingContent = {
@@ -62,6 +65,13 @@ fun UploadListItem(
                     Icon(
                         painter = painterResource("/assets/icons/link.svg"),
                         contentDescription = "Copy link of $fileName"
+                    )
+                }
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = "Delete $fileName",
+                        tint = MaterialTheme.colorScheme.error
                     )
                 }
             }

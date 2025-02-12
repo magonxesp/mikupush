@@ -29,6 +29,7 @@ fun UploadsList(
     items: List<Upload>,
     onCancel: (fileId: UUID) -> Unit = { },
     onGetLink: (fileId: UUID) -> Unit = { },
+    onDelete: (fileId: UUID) -> Unit = { },
     onShowInExplorer: (path: Path) -> Unit = { },
     onRetry: (path: Path, fileId: UUID) -> Unit = { _, _ -> },
 ) {
@@ -99,7 +100,8 @@ fun UploadsList(
                 fileMimeType = upload.details.fileMimeType,
                 uploadedAt = upload.details.uploadedAt,
                 onOpenInFileExplorer = { onShowInExplorer(upload.path) },
-                onGetLink = { onGetLink(upload.details.id) }
+                onGetLink = { onGetLink(upload.details.id) },
+                onDelete = { onDelete(upload.details.id) }
             )
         }
     }
