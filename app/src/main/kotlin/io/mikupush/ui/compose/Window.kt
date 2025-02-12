@@ -3,11 +3,13 @@ package io.mikupush.ui.compose
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import io.mikupush.ui.MikuPushTheme
@@ -40,7 +42,8 @@ fun WindowsAppWindowWrapper(
         alwaysOnTop = false,
         resizable = true,
         undecorated = true,
-        title = title
+        transparent = true,
+        title = title,
     ) {
         @Composable
         fun Modifier.windowBorder(): Modifier {
@@ -49,7 +52,7 @@ fun WindowsAppWindowWrapper(
                     width = 0.1.dp,
                     color = MaterialTheme.colorScheme.onSurface,
                     shape = ShapeDefaults.Medium
-                )
+                ).clip(RoundedCornerShape(12.0.dp))
             }
 
             return this
