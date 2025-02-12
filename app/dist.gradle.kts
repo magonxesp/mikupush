@@ -1,5 +1,4 @@
 import org.gradle.kotlin.dsl.support.unzipTo
-import java.net.URI
 import java.net.URL
 import java.nio.file.Files
 import kotlin.io.path.*

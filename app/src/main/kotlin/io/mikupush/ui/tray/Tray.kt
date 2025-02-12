@@ -1,13 +1,14 @@
 package io.mikupush.ui.tray
 
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.window.*
-import io.mikupush.notification.Notifier
+import androidx.compose.ui.window.ApplicationScope
+import androidx.compose.ui.window.Tray
+import androidx.compose.ui.window.rememberTrayState
 import io.mikupush.appName
+import io.mikupush.notification.Notifier
 import io.mikupush.notification.toTrayNotification
-import io.mikupush.ui.window.MainWindow
 import org.koin.java.KoinJavaComponent.inject
 import org.slf4j.LoggerFactory
 
