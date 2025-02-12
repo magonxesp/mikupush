@@ -20,6 +20,7 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import io.mikupush.appTitle
 import io.mikupush.ui.compose.AppWindow
+import io.mikupush.ui.compose.UploadListEmptyState
 import io.mikupush.ui.compose.UploadsList
 import io.mikupush.ui.fredokaFamily
 import io.mikupush.upload.UploadViewModel
@@ -88,13 +89,17 @@ fun UploadsWindowContent() {
                 color = MaterialTheme.colorScheme.primary
             )
         }
-        UploadsList(
-            uploads.value,
-            onCancel = { fileId -> uploadViewModel.cancel(fileId) },
-            onGetLink = { fileId -> uploadViewModel.copyLinkToClipboard(fileId) },
-            onShowInExplorer = { path -> uploadViewModel.showInFileExplorer(path) },
-            onRetry = { path, fileId -> uploadViewModel.startUpload(path.toString(), fileId) }
-        )
+        if (uploads.value.isNotEmpty()) {
+            UploadsList(
+                uploads.value,
+                onCancel = { fileId -> uploadViewModel.cancel(fileId) },
+                onGetLink = { fileId -> uploadViewModel.copyLinkToClipboard(fileId) },
+                onShowInExplorer = { path -> uploadViewModel.showInFileExplorer(path) },
+                onRetry = { path, fileId -> uploadViewModel.startUpload(path.toString(), fileId) }
+            )
+        } else {
+            UploadListEmptyState()
+        }
     }
 }
 
