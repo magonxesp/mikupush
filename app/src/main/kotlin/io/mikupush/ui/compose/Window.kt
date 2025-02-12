@@ -6,13 +6,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.FrameWindowScope
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowState
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.*
 import io.mikupush.ui.MikuPushTheme
 import org.apache.commons.lang3.SystemUtils
 
@@ -45,17 +42,39 @@ fun WindowsAppWindowWrapper(
         undecorated = true,
         title = title
     ) {
+        @Composable
+        fun Modifier.windowBorder(): Modifier {
+            if (state.placement == WindowPlacement.Floating) {
+                return border(
+                    width = 0.1.dp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    shape = ShapeDefaults.Medium
+                )
+            }
+
+            return this
+        }
+
         MikuPushTheme {
             Surface(
                 modifier = Modifier.fillMaxSize()
-                    .border(
-                        width = 0.1.dp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        shape = ShapeDefaults.Medium
-                    )
+                    .windowBorder()
             ) {
                 Column {
-                    AppTitleBar(onCloseRequest)
+                    AppTitleBar(
+                        onCloseRequest = onCloseRequest,
+                        onMaximize = {
+                            if (state.placement == WindowPlacement.Maximized) {
+                                state.placement = WindowPlacement.Floating
+                            } else {
+                                state.placement = WindowPlacement.Maximized
+                            }
+                        },
+                        onMinimize = {
+                            state.isMinimized = true
+                        },
+                        isMaximized = state.placement == WindowPlacement.Maximized
+                    )
                     content()
                 }
             }

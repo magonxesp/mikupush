@@ -11,25 +11,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.FrameWindowScope
+import androidx.compose.ui.window.WindowPlacement
 import io.mikupush.ui.segoeUIFontFamily
 import java.awt.Frame
 
 @Composable
-fun FrameWindowScope.AppTitleBar(onCloseRequest: () -> Unit) {
-    var isMaximized by remember { mutableStateOf(false) }
-
+fun FrameWindowScope.AppTitleBar(
+    onCloseRequest: () -> Unit,
+    onMinimize: () -> Unit = { },
+    onMaximize: () -> Unit = { },
+    isMaximized: Boolean = false
+) {
     WindowDraggableArea {
         AppTitleBarContent(
-            onMinimize = { window.isMinimized = !window.isMinimized },
-            onMaximize = {
-                if (window.extendedState == Frame.NORMAL) {
-                    window.extendedState = Frame.MAXIMIZED_BOTH
-                    isMaximized = true
-                } else if (window.extendedState == Frame.MAXIMIZED_BOTH) {
-                    window.extendedState = Frame.NORMAL
-                    isMaximized = false
-                }
-            },
+            onMinimize = onMinimize,
+            onMaximize = onMaximize,
             onClose = onCloseRequest,
             isMaximized = isMaximized
         )
