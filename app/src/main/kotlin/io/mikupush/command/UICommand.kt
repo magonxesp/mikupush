@@ -19,7 +19,7 @@ class UICommand : CliktCommand(name = "ui") {
     private val notifier: Notifier by inject(Notifier::class.java)
 
     private fun launchUI() = application {
-        var openUploadsWindow by rememberSaveable { mutableStateOf(false) }
+        var openUploadsWindow by rememberSaveable { mutableStateOf(true) }
 
         AppTrayIcon(onOpen = { openUploadsWindow = true })
         MainWindow(openUploadsWindow, onCloseRequest = { openUploadsWindow = false })

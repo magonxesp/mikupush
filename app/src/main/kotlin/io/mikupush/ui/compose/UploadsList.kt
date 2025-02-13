@@ -78,7 +78,8 @@ fun UploadsList(
                 fileName = upload.details.fileName,
                 fileMimeType = upload.details.fileMimeType,
                 error = upload.error,
-                onRetry = { onRetry(upload.path, upload.details.id) }
+                onRetry = { onRetry(upload.path, upload.details.id) },
+                onDelete = { onDelete(upload.details.id) }
             )
         }
 

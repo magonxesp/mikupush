@@ -32,19 +32,30 @@ class UploadViewModel(
     private val _uploads = MutableStateFlow<List<Upload>>(listOf())
     val uploads = _uploads.asStateFlow()
 
-    fun startUpload(filePath: String, fileId: UUID = UUID.randomUUID()) {
+    fun startUpload(filePath: String, fileId: UUID = UUID.randomUUID(), notifyUpload: Boolean = true) {
         _uploads.update { state ->
             state.filter { it.details.id != fileId }
         }
 
         val job = viewModelScope.launch(Dispatchers.IO) {
-            upload(fileId, filePath)
+            upload(fileId, filePath, notifyUpload)
         }
 
         uploadJobs[fileId] = job
     }
 
-    private suspend fun upload(fileId: UUID, filePath: String) {
+    fun startUploadMultiple(filePaths: List<String>) = viewModelScope.launch {
+        notifier.notify(
+            title = "Uploading ${filePaths.size} files 🚀",
+            message = "It will take some time, please be patient"
+        )
+
+        for (filePath in filePaths) {
+            startUpload(filePath, notifyUpload = false)
+        }
+    }
+
+    private suspend fun upload(fileId: UUID, filePath: String, notifyUpload: Boolean = true) {
         logger.debug("starting upload file {}", filePath)
         val path = Path(filePath)
         val file = path.toFile()
@@ -66,10 +77,13 @@ class UploadViewModel(
 
         try {
             _uploads.update { state -> listOf(upload) + state }
-            notifier.notify(
-                title = "Uploading ${upload.details.fileName} 🚀",
-                message = "It will take some time, please be patient"
-            )
+
+            if (notifyUpload) {
+                notifier.notify(
+                    title = "Uploading ${upload.details.fileName} 🚀",
+                    message = "It will take some time, please be patient"
+                )
+            }
 
             fileUploader.upload(
                 fileId = fileId,
@@ -94,10 +108,16 @@ class UploadViewModel(
     }
 
     fun delete(fileId: UUID) = viewModelScope.launch {
-        backendHttpClient.use {
-            backendHttpClient.delete("/upload/$fileId") {
-                contentType(ContentType.Application.Json)
-                accept(ContentType.Application.Json)
+        val upload = _uploads.value.firstOrNull {
+            it.details.id == fileId
+        }
+
+        if (upload?.isFinishedWithError() != true) {
+            backendHttpClient.use {
+                backendHttpClient.delete("/upload/$fileId") {
+                    contentType(ContentType.Application.Json)
+                    accept(ContentType.Application.Json)
+                }
             }
         }
 

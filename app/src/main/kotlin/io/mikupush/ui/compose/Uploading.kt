@@ -49,8 +49,7 @@ fun UploadingListItem(
                     Icon(
                         imageVector = Icons.Filled.Close,
                         contentDescription = "Cancel upload of $fileName",
-                        tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(start = 5.dp)
+                        tint = MaterialTheme.colorScheme.error
                     )
                 }
             }

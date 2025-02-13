@@ -2,11 +2,12 @@ package io.mikupush.ui.window
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -20,6 +21,7 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import io.mikupush.appTitle
 import io.mikupush.ui.compose.AppWindow
+import io.mikupush.ui.compose.UploadDropInput
 import io.mikupush.ui.compose.UploadListEmptyState
 import io.mikupush.ui.compose.UploadsList
 import io.mikupush.ui.fredokaFamily
@@ -36,14 +38,24 @@ private val MinimumWindowHeight = 400.dp
 
 @Composable
 fun MainWindow(
-    show: Boolean = false,
+    show: Boolean = true,
     onCloseRequest: () -> Unit = {}
 ) {
     if (!show) return
 
+    val state = remember {
+        WindowState(
+            size = DpSize(
+                width = MinimumWindowWidth,
+                height = MinimumWindowHeight
+            ),
+            position = WindowPosition(alignment = Alignment.Center)
+        )
+    }
+
     AppWindow(
         onCloseRequest = onCloseRequest,
-        state = uploadWindowState(),
+        state = state,
         title = appTitle
     ) {
         with(LocalDensity.current) {
@@ -59,36 +71,51 @@ fun MainWindow(
 
 @Composable
 fun UploadsWindowContent() {
-    val uploads = uploadViewModel.uploads.collectAsState()
+    var tabIndex by rememberSaveable { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
         uploadViewModel.loadUploads()
     }
 
     Column {
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(5.dp)
-                .fillMaxWidth()
-        ) {
-            Image(
-                painter = painterResource("/icon.png"),
-                contentDescription = null,
-                modifier = Modifier.height(80.dp)
-                    .padding(end = 10.dp)
+        MainWindowHeader()
+        TabRow(selectedTabIndex = tabIndex) {
+            Tab(
+                selected = tabIndex == 0,
+                onClick = { tabIndex = 0 },
+                text = { Text("Upload file") },
+                icon = {
+                    Icon(
+                        painter = painterResource("/assets/icons/upload.svg"),
+                        contentDescription = null
+                    )
+                }
             )
-            Text(
-                text = appTitle,
-                style = MaterialTheme.typography.titleLarge,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = 60.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = fredokaFamily,
-                color = MaterialTheme.colorScheme.primary
+            Tab(
+                selected = tabIndex == 1,
+                onClick = { tabIndex = 1 },
+                text = { Text("Uploaded files") },
+                icon = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.List,
+                        contentDescription = null
+                    )
+                }
             )
         }
+
+        when(tabIndex) {
+            0 -> UploadFileInputTab()
+            1 -> UploadedFilesTab()
+        }
+    }
+}
+
+@Composable
+fun UploadedFilesTab() {
+    val uploads = uploadViewModel.uploads.collectAsState()
+
+    Column {
         if (uploads.value.isNotEmpty()) {
             UploadsList(
                 items = uploads.value,
@@ -107,31 +134,35 @@ fun UploadsWindowContent() {
 }
 
 @Composable
-fun uploadWindowState(): WindowState {
-    val density = LocalDensity.current
-    val mouseLocation = MouseInfo.getPointerInfo().location
-    val screenSize = Toolkit.getDefaultToolkit().screenSize
+fun UploadFileInputTab() {
+    UploadDropInput(onUpload = { paths ->
+        uploadViewModel.startUploadMultiple(paths.map { path -> path.toString() })
+    })
+}
 
-    val windowY = with(density) {
-        if (mouseLocation.y > screenSize.height / 2) {
-            mouseLocation.y - MinimumWindowHeight.toPx()
-        } else {
-            mouseLocation.y.toFloat()
-        }
-    }
-
-    val windowX = with(density) {
-        mouseLocation.x - (MinimumWindowWidth.toPx() / 2)
-    }
-
-    return WindowState(
-        size = DpSize(
-            width = MinimumWindowWidth,
-            height = MinimumWindowHeight
-        ),
-        position = WindowPosition(
-            x = windowX.dp,
-            y = windowY.dp
+@Composable
+fun MainWindowHeader() {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(5.dp)
+            .fillMaxWidth()
+    ) {
+        Image(
+            painter = painterResource("/icon.png"),
+            contentDescription = null,
+            modifier = Modifier.height(80.dp)
+                .padding(end = 10.dp)
         )
-    )
+        Text(
+            text = appTitle,
+            style = MaterialTheme.typography.titleLarge,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            fontSize = 60.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = fredokaFamily,
+            color = MaterialTheme.colorScheme.primary
+        )
+    }
 }
