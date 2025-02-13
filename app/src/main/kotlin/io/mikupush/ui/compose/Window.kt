@@ -32,14 +32,14 @@ fun AppWindow(
     content: @Composable FrameWindowScope.() -> Unit
 ) {
     when {
-        SystemUtils.IS_OS_WINDOWS_11 -> WindowsAppWindowWrapper(onCloseRequest, state, title, content)
-        SystemUtils.IS_OS_MAC -> MacOSAppWindowWrapper(onCloseRequest, state, title, content)
+        SystemUtils.IS_OS_WINDOWS -> JewelWindowWrapper(onCloseRequest, state, title, content)
+        SystemUtils.IS_OS_MAC -> JewelWindowWrapper(onCloseRequest, state, title, content)
         else -> SystemAppWindowWrapper(onCloseRequest, state, title, content)
     }
 }
 
 @Composable
-fun WindowsAppWindowWrapper(
+fun JewelWindowWrapper(
     onCloseRequest: () -> Unit,
     state: WindowState = rememberWindowState(),
     title: String = "",
@@ -67,32 +67,6 @@ fun WindowsAppWindowWrapper(
                 Surface(modifier = Modifier.fillMaxSize()) {
                     content()
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun MacOSAppWindowWrapper(
-    onCloseRequest: () -> Unit,
-    state: WindowState = rememberWindowState(),
-    title: String = "",
-    content: @Composable FrameWindowScope.() -> Unit
-) {
-    Window(
-        onCloseRequest = onCloseRequest,
-        state = state,
-        alwaysOnTop = false,
-        resizable = true,
-        undecorated = false,
-        title = title
-    ) {
-        window.rootPane.putClientProperty("apple.awt.fullWindowContent", true)
-        window.rootPane.putClientProperty("apple.awt.transparentTitleBar", true)
-
-        MikuPushTheme {
-            Surface(modifier = Modifier.fillMaxSize()) {
-                content()
             }
         }
     }

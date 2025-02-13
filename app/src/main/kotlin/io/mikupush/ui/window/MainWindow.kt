@@ -32,7 +32,7 @@ import java.awt.Toolkit
 private val uploadViewModel by inject<UploadViewModel>(UploadViewModel::class.java)
 
 private val MinimumWindowWidth = 300.dp
-private val MinimumWindowHeight = 600.dp
+private val MinimumWindowHeight = 400.dp
 
 @Composable
 fun MainWindow(
@@ -114,7 +114,7 @@ fun uploadWindowState(): WindowState {
         if (mouseLocation.y > screenSize.height / 2) {
             mouseLocation.y - MinimumWindowHeight.toPx()
         } else {
-            mouseLocation.y + MinimumWindowHeight.toPx()
+            mouseLocation.y.toFloat()
         }
     }
 
