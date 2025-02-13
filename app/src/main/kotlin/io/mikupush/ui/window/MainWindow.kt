@@ -99,7 +99,9 @@ fun UploadsWindowContent() {
                 onDelete = { fileId -> uploadViewModel.delete(fileId) }
             )
         } else {
-            UploadListEmptyState()
+            UploadListEmptyState(onUpload = { path ->
+                uploadViewModel.startUpload(path.toString())
+            })
         }
     }
 }

@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
@@ -61,7 +62,8 @@ fun JewelWindowWrapper(
             DecoratedWindow(
                 onCloseRequest = onCloseRequest,
                 state = state,
-                title = title
+                title = title,
+                icon = painterResource("/icon.png")
             ) {
                 TitleBar(Modifier.newFullscreenControls()) {}
                 Surface(modifier = Modifier.fillMaxSize()) {
@@ -85,7 +87,8 @@ fun SystemAppWindowWrapper(
         alwaysOnTop = false,
         resizable = true,
         undecorated = false,
-        title = title
+        title = title,
+        icon = painterResource("/icon.png")
     ) {
         MikuPushTheme {
             Surface(modifier = Modifier.fillMaxSize()) {

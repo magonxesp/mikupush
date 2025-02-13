@@ -5,17 +5,16 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.mikupush.upload.Upload
 import io.mikupush.upload.UploadDetails
@@ -126,7 +125,9 @@ fun UploadsListPreview() {
 }
 
 @Composable
-fun UploadListEmptyState() {
+fun UploadListEmptyState(onUpload: (Path) -> Unit = {}) {
+    var isFileChooserOpen by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier.fillMaxSize().padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -141,7 +142,31 @@ fun UploadListEmptyState() {
         Text(
             text = "No files uploaded yet. Try uploading one to get started!",
             style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(bottom = 10.dp),
+        )
+        Button(onClick = { isFileChooserOpen = !isFileChooserOpen }) {
+            Image(
+                painter = painterResource("/assets/icons/upload.svg"),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+            )
+            Text(
+                text = "Upload",
+                modifier = Modifier.padding(start = 5.dp)
+            )
+        }
+    }
+
+    if (isFileChooserOpen) {
+        FileDialog(
+            onCloseRequest = {
+                isFileChooserOpen = false
+
+                if (it.isNotEmpty()) {
+                    onUpload(it.first().toPath())
+                }
+            }
         )
     }
 }

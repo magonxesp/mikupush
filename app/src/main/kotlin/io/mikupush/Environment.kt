@@ -6,10 +6,10 @@ import kotlin.io.path.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.notExists
 
-val appDataDir = if (SystemUtils.IS_OS_WINDOWS) {
-    Path(System.getenv("APPDATA"), "MikuPush")
-} else {
-    Path(System.getProperty("user.home"), ".mikupush")
+val appDataDir = when {
+    SystemUtils.IS_OS_WINDOWS -> Path(System.getenv("APPDATA"), "MikuPush")
+    SystemUtils.IS_OS_MAC -> Path(System.getProperty("user.home"), "Library/Application Support/io.mikupush.app")
+    else -> Path(System.getProperty("user.home"), ".mikupush")
 }.apply {
     if (notExists()) {
         createDirectories()
