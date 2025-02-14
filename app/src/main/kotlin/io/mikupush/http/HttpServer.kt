@@ -11,6 +11,9 @@ import org.koin.java.KoinJavaComponent.inject
 
 
 fun Routing.configureRoutes() {
+    get("/ping") {
+        call.respondText("pong", status = HttpStatusCode.OK)
+    }
     post("/upload") {
         val viewModel: UploadViewModel by inject(UploadViewModel::class.java)
         viewModel.startUpload(call.receiveText())
