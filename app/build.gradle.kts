@@ -10,6 +10,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
     kotlin("plugin.serialization")
     id("com.gradleup.shadow")
+    id("mikupush.distribution")
 }
 
 group = "io.github.magonxesp"
@@ -83,75 +84,6 @@ compose.desktop {
                 console = true
                 dirChooser = true
             }
-        }
-    }
-}
-
-tasks.register("distWindows") {
-    dependsOn("shadowJar")
-
-    doLast {
-        val rootProjectDir = rootProject.rootDir.path
-        val projectDir = project.projectDir.path
-        val windowsDistPath = Path(rootProjectDir, "dist/windows").toString()
-
-        File(windowsDistPath).apply {
-            if (exists()) deleteRecursively()
-            mkdirs()
-        }
-
-        Files.walk(Path(projectDir, "build/libs")).toList()
-            .find { jar -> Regex(".*mikupush-.*-all\\.jar").matches(jar.toString()) }
-            ?.copyTo(Path(windowsDistPath, "mikupush.jar"))
-            ?: error("The jar file is missing")
-
-        // https://github.com/JetBrains/JetBrainsRuntime/releases
-        URL("https://cache-redirector.jetbrains.com/intellij-jbr/jbr_jcef-17.0.14-windows-x64-b1367.22.zip").run {
-            Path(windowsDistPath, "runtime.zip").toFile().run {
-                writeBytes(openStream().readAllBytes())
-                val unzippedPath = Path(windowsDistPath, "jbr17")
-                unzipTo(unzippedPath.toFile(), this)
-
-                @OptIn(ExperimentalPathApi::class)
-                Path(unzippedPath.toString(), "jbr_jcef-17.0.14-windows-x64-b1367.22").copyToRecursively(
-                    target = Path(windowsDistPath, "runtime"),
-                    followLinks = true,
-                    overwrite = true
-                )
-
-                @OptIn(ExperimentalPathApi::class)
-                unzippedPath.deleteRecursively()
-            }
-        }
-
-        @OptIn(ExperimentalPathApi::class)
-        Path(projectDir, "launcher/windows/curl").copyToRecursively(
-            target = Path(windowsDistPath, "curl"),
-            followLinks = true,
-            overwrite = true
-        )
-//        Path(projectDir, "launcher/windows/MikuPush.exe").copyTo(Path(windowsDistPath, "MikuPush.exe"))
-//        Path(projectDir, "launcher/windows/MikuPush-Requester.exe").copyTo(Path(windowsDistPath, "MikuPush-Requester.exe"))
-        Path(projectDir, "launcher/windows/icon.ico").copyTo(Path(windowsDistPath, "icon.ico"))
-
-        arrayOf(
-            "powershell.exe", "-file", "$rootProjectDir\\scripts\\compile-windows-launchers.ps1",
-            "-icon", "$projectDir\\launcher\\windows\\icon.ico",
-            "-script", "$projectDir\\launcher\\windows\\launcher.ps1",
-            "-target", "$windowsDistPath\\MikuPush.exe"
-        ).run {
-            println("Running: ${this.joinToString(" ")}")
-            Runtime.getRuntime().exec(this).waitFor()
-        }
-
-        arrayOf(
-            "powershell.exe", "-file", "$rootProjectDir\\scripts\\compile-windows-launchers.ps1",
-            "-icon", "$projectDir\\launcher\\windows\\icon.ico",
-            "-script", "$projectDir\\launcher\\windows\\upload-request.ps1",
-            "-target", "$windowsDistPath\\MikuPush-Requester.exe"
-        ).run {
-            println("Running: ${this.joinToString(" ")}")
-            Runtime.getRuntime().exec(this).waitFor()
         }
     }
 }
