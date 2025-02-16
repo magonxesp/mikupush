@@ -159,10 +159,12 @@ class UploadViewModel(
     }
 
     fun showWindow() = viewModelScope.launch {
+        logger.debug("Show window")
         _showWindow.update { _ -> true }
     }
 
     fun closeWindow() = viewModelScope.launch {
+        logger.debug("Close window")
         _showWindow.update { _ -> false }
     }
 
