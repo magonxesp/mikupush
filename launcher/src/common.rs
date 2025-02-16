@@ -1,4 +1,5 @@
 use std::env;
+use std::fmt::Debug;
 use std::path::Path;
 use std::process::{Command, Stdio};
 use std::time::Duration;
@@ -9,7 +10,12 @@ pub fn get_current_executable_path() -> Option<String> {
         Err(_) => return None,
     };
 
-    let path_str = match path.to_str() {
+    let parent = match path.parent() {
+        Some(parent) => parent,
+        None => return None,
+    };
+
+    let path_str = match parent.to_str() {
         Some(path_str) => path_str,
         None => return None,
     };
@@ -126,6 +132,8 @@ pub fn request_upload(path: &str) -> Result<(), &str> {
 pub fn launch_java_command_blocking(args: Vec<String>) -> i32 {
     let java_executable = get_java_executable_path()
         .expect("Could not get java executable path");
+
+    println!("Java executable: {}", java_executable);
 
     let mut child = Command::new(java_executable)
         .args(args)

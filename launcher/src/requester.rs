@@ -28,8 +28,9 @@ pub fn main() -> ExitCode {
     }
 
     let paths = env::args().collect::<Vec<String>>();
+    let upload_paths = paths[1..].to_vec();
 
-    for path in paths {
+    for path in upload_paths {
         if let Err(e) = request_upload(&path) {
             println!("Failed to request upload for {}: {}", path, e);
         }

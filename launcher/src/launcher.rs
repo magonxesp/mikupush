@@ -19,9 +19,12 @@ fn main() {
         String::from("ui")
     ]);
 
-    for arg in args {
+    let extra_args = args[1..].to_vec();
+    for arg in extra_args {
         command_args.push(arg);
     }
+
+    println!("Extra args {:?}", command_args);
 
     std::process::exit(launch_java_command_blocking(command_args))
 }
