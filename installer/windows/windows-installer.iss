@@ -22,9 +22,9 @@ DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
 LicenseFile=D:\repos\mikupush\LICENSE
 ;PrivilegesRequired=admin
-OutputDir=D:\repos\mikupush\dist\windows
+OutputDir=D:\repos\mikupush\dist\windows_x64
 OutputBaseFilename=MikuPush Setup
-SetupIconFile=D:\repos\mikupush\app\launcher\windows\icon.ico
+SetupIconFile=D:\repos\mikupush\dist\windows_x64\icon.ico
 SolidCompression=yes
 WizardStyle=modern
 
@@ -36,11 +36,11 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "D:\repos\mikupush\dist\windows\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\repos\mikupush\dist\windows\runtime\*"; DestDir: "{app}\runtime"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\repos\mikupush\dist\windows\mikupush.jar"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\repos\mikupush\dist\windows\MikuPush-Requester.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\repos\mikupush\dist\windows\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\repos\mikupush\dist\windows_x64\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\repos\mikupush\dist\windows_x64\runtime\*"; DestDir: "{app}\runtime"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "D:\repos\mikupush\dist\windows_x64\mikupush.jar"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\repos\mikupush\dist\windows_x64\MikuPush-upload.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\repos\mikupush\dist\windows_x64\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -52,5 +52,5 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 
 [Registry]
 Root: HKCU; Subkey: "Software\Classes\*\shell\MikuPush"; ValueName: ""; ValueType: string; ValueData: "Upload with MikuPush"; Flags: uninsdeletekey
-Root: HKCU; Subkey: "Software\Classes\*\shell\MikuPush\command"; ValueName: ""; ValueType: string; ValueData: """{app}\MikuPush-Requester.exe"" ""%1"""; Flags: uninsdeletevalue
+Root: HKCU; Subkey: "Software\Classes\*\shell\MikuPush\command"; ValueName: ""; ValueType: string; ValueData: """{app}\MikuPush-upload.exe"" ""%1"""; Flags: uninsdeletevalue
 Root: HKCU; Subkey: "Software\Classes\*\shell\MikuPush"; ValueName: "Icon"; ValueType: string; ValueData: "{app}\MikuPush.exe"; Flags: uninsdeletevalue
