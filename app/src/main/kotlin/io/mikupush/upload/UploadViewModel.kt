@@ -1,5 +1,7 @@
 package io.mikupush.upload
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.mikupush.backendBaseUrl
@@ -30,7 +32,9 @@ class UploadViewModel(
 
     private val uploadJobs = mutableMapOf<UUID, Job>()
     private val _uploads = MutableStateFlow<List<Upload>>(listOf())
+    private val _showWindow = MutableStateFlow(false)
     val uploads = _uploads.asStateFlow()
+    val showWindow = _showWindow.asStateFlow()
 
     fun startUpload(filePath: String, fileId: UUID = UUID.randomUUID(), notifyUpload: Boolean = true) {
         _uploads.update { state ->
@@ -152,6 +156,14 @@ class UploadViewModel(
 
     fun loadUploads() = viewModelScope.launch {
         _uploads.update { findAllUploads() }
+    }
+
+    fun showWindow() = viewModelScope.launch {
+        _showWindow.update { _ -> true }
+    }
+
+    fun closeWindow() = viewModelScope.launch {
+        _showWindow.update { _ -> false }
     }
 
     private fun updateUploadProgress(upload: Upload) = viewModelScope.launch {
