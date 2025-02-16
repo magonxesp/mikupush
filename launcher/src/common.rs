@@ -1,8 +1,10 @@
 use std::env;
 use std::fmt::Debug;
+use std::os::windows::process::CommandExt;
 use std::path::Path;
 use std::process::{Command, Stdio};
 use std::time::Duration;
+use winapi::um::winbase::CREATE_NO_WINDOW;
 
 pub fn get_current_executable_path() -> Option<String> {
     let path = match env::current_exe() {
@@ -137,6 +139,7 @@ pub fn launch_java_command_blocking(args: Vec<String>) -> i32 {
 
     let mut child = Command::new(java_executable)
         .args(args)
+        .creation_flags(CREATE_NO_WINDOW)
         .spawn()
         .expect("Could not spawn child process");
 
@@ -152,6 +155,7 @@ pub fn start_miku_push_silently() {
 
     let process = Command::new(launcher_path)
         .args(["--tray"])
+        .creation_flags(CREATE_NO_WINDOW)
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
