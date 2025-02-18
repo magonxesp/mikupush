@@ -1,41 +1,16 @@
-# MikuPush
+# Miku Push!
 
-Share screenshots or whatever.
+A new Flutter project.
 
-## Build installer
+## Getting Started
 
-### Windows
+This project is a starting point for a Flutter application.
 
-⚠️ **The installer can be built only on Windows.** ⚠️
+A few resources to get you started if this is your first Flutter project:
 
-Install [Inno Setup](https://jrsoftware.org/isdl.php) and add It to the `PATH` environment variable.
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-Create `.exe` of the `.bat` launch scripts with **Bat To Exe Coverter**, it is in the `bin` directory.
-If the launch scripts are converted to `.exe` and you don't make any changes on the scripts you don't need
-to convert then again.
-
-Open it and select the `app/launcher/windows/launcher.bat` script and covert it to `.exe`, then convert the 
-`app/launcher/windows/upload-request.bat` to `.exe` too.
-
-Now you will have the following directory tree:
-
-```
-app
-└───launcher
-    └───windows
-        ├───icon.ico
-        ├───launcher.bat
-        ├───MikuPush.exe <-- Converted from launcher.bat
-        ├───MikuPush-Requester.exe <-- Converted from upload-request.bat
-        └───upload-request.bat
-```
-
-Launch the `distWindows` Gradle task.
-
-```sh
-$ ./gradlew :app:distWindows
-```
-
-Then you have to create the installer with Inno Setup
-
-TODO: inno setup from the command line
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
