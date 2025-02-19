@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:miku_push/uploaded_file_list_item.dart';
+import 'package:miku_push/widgets/uploaded_file_list_item.dart';
 
 class UploadedListTab extends StatelessWidget {
   const UploadedListTab({super.key});

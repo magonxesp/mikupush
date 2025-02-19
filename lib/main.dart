@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:miku_push/upload_file_tab.dart';
-import 'package:miku_push/uploading_list_tab.dart';
-import 'package:miku_push/uploaded_list_tab.dart';
+import 'package:miku_push/widgets/upload_file_tab.dart';
+import 'package:miku_push/widgets/uploading_list_tab.dart';
+import 'package:miku_push/widgets/uploaded_list_tab.dart';
 
 void main() {
   runApp(const MyApp());

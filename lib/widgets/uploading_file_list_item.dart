@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:miku_push/file_list_item.dart';
+import 'package:miku_push/widgets/file_list_item.dart';
 
 class UploadedFileListItem extends StatelessWidget {
   final String name;
@@ -33,7 +33,7 @@ class UploadedFileListItem extends StatelessWidget {
         Spacer(),
         Icon(Icons.folder_outlined),
         Icon(
-          Icons.delete,
+          Icons.close,
           color: theme.colorScheme.error,
         ),
       ],

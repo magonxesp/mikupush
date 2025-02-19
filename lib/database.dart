@@ -2,17 +2,9 @@ import 'package:miku_push/environment.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as path;
 
+import 'exceptions/database.dart';
+
 Database? _database = null;
-
-class DatabaseNotAvailableException implements Exception {
-
-  final String message;
-
-  const DatabaseNotAvailableException(this.message);
-
-  @override
-  String toString() => message;
-}
 
 void initializeDatabase() async {
   final appDataDir = getAppDataDir();
