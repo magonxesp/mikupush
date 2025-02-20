@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
                 ),
                 Tab(
                   icon: Icon(Icons.access_time_outlined),
-                  text: 'Files being uploaded',
+                  text: 'Uploads in progress',
                 ),
                 Tab(
                   icon: Icon(Icons.list),

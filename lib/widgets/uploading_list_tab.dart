@@ -8,8 +8,17 @@ class UploadingListTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final model = context.watch<FileUploadsModel>();
 
+    if (model.filesUploading.isNotEmpty) {
+      return _uploadingList(model);
+    } else {
+      return _emptyState(theme);
+    }
+  }
+
+  Widget _uploadingList(FileUploadsModel model) {
     return ListView.separated(
       itemCount: model.filesUploading.length,
       padding: EdgeInsets.all(15),
@@ -33,6 +42,24 @@ class UploadingListTab extends StatelessWidget {
           child: Divider(height: 1),
         );
       },
+    );
+  }
+
+  Widget _emptyState(ThemeData theme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(Icons.inventory_2),
+          SizedBox(height: 15),
+          Text(
+            'No uploads in progress yet. Try uploading a file!',
+            style: theme.textTheme.bodyLarge,
+            textAlign: TextAlign.center,
+          )
+        ],
+      ),
     );
   }
 }
