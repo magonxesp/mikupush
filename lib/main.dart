@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:miku_push/model/file_uploads_model.dart';
 import 'package:miku_push/widgets/upload_file_tab.dart';
 import 'package:miku_push/widgets/uploading_list_tab.dart';
 import 'package:miku_push/widgets/uploaded_list_tab.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (context) => FileUploadsModel(),
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {

@@ -11,7 +11,8 @@ class FileUploadProgress extends FileUpload {
     required super.id,
     required super.fileName,
     required super.filePath,
-    required super.fileMimeType
+    required super.fileMimeType,
+    required super.uploadedAt
   });
 
   static FileUploadProgress fromFileUpload(FileUpload fileUpload) {
@@ -19,10 +20,12 @@ class FileUploadProgress extends FileUpload {
       id: fileUpload.id,
       fileName: fileUpload.fileName,
       fileMimeType: fileUpload.fileMimeType,
-      filePath: fileUpload.filePath
+      filePath: fileUpload.filePath,
+      uploadedAt: fileUpload.uploadedAt
     );
   }
 
+  bool get inProgress => _inProgress;
   bool get isSuccess => _isFinished && !_inProgress && _error == '';
   bool get isFailed => _isFinished && !_inProgress && _error != '';
 

@@ -144,3 +144,46 @@ class FileListItemIcon extends StatelessWidget {
     return 'assets/icons/$asset';
   }
 }
+
+class FileListItemSpeed extends StatelessWidget {
+  final double speed;
+
+  const FileListItemSpeed({required this.speed});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Text(
+      _formattedSpeed(),
+      style: theme.textTheme.bodyMedium,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+
+  String _formattedSpeed() {
+    final kb = speed / 1024;
+    final mb = kb / 1024;
+    final gb = mb / 1024;
+
+    if (gb >= 1) return '${gb.toStringAsFixed(0)} GB/s';
+    if (mb >= 1) return '${mb.toStringAsFixed(0)} MB/s';
+    if (kb >= 1) return '${kb.toStringAsFixed(0)} KB/s';
+    return '${speed.toStringAsFixed(0)} B/s';
+  }
+}
+
+class FileListItemQueued extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Text(
+      'Queued',
+      style: theme.textTheme.bodyMedium,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+}

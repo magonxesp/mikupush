@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:miku_push/widgets/file_list_item.dart';
 
-class UploadedFileListItem extends StatelessWidget {
+class UploadingFileListItem extends StatelessWidget {
   final String name;
   final String mimeType;
-  final DateTime uploadedAt;
+  final double speed;
+  final double progress;
+  final bool inProgress;
+  final void Function() onCancel;
 
-  const UploadedFileListItem({
+  const UploadingFileListItem({
     required this.name,
     required this.mimeType,
-    required this.uploadedAt,
+    required this.speed,
+    required this.progress,
+    required this.inProgress,
+    required this.onCancel
   });
 
   @override
@@ -27,16 +33,32 @@ class UploadedFileListItem extends StatelessWidget {
           children: [
             FileListItemName(name: name),
             SizedBox(width: 5),
-            FileListItemUploadedAt(uploadedAt: uploadedAt),
+            _subtitle(),
           ],
         ),
         Spacer(),
-        Icon(Icons.folder_outlined),
-        Icon(
-          Icons.close,
-          color: theme.colorScheme.error,
+        CircularProgressIndicator(
+          value: progress,
+          color: theme.colorScheme.primary,
+          constraints: BoxConstraints.expand(width: 30, height: 30),
+        ),
+        SizedBox(width: 10),
+        IconButton(
+          onPressed: onCancel,
+          icon: Icon(
+            Icons.close,
+            color: theme.colorScheme.error,
+          ),
         ),
       ],
     );
+  }
+
+  Widget _subtitle() {
+    if (inProgress) {
+      return FileListItemSpeed(speed: speed);
+    } else {
+      return FileListItemQueued();
+    }
   }
 }

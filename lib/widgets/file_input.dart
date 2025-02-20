@@ -85,7 +85,7 @@ class _FileInputState extends State<FileInput> {
 
     for (var item in event.files) {
       File file = File(item.path);
-      if (file.statSync().type != FileSystemEntityType.file) {
+      if (file.statSync().type == FileSystemEntityType.file) {
         files.add(file);
       }
     }

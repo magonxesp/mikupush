@@ -12,12 +12,14 @@ class FileUpload {
   final String fileName;
   final String filePath;
   final String fileMimeType;
+  final DateTime uploadedAt;
 
   FileUpload({
     required this.id,
     required this.fileName,
     required this.filePath,
     required this.fileMimeType,
+    required this.uploadedAt,
   });
 
   static FileUpload fromFile(File file) {
@@ -27,6 +29,7 @@ class FileUpload {
         filePath: file.path,
         fileMimeType: lookupMimeType(file.path, headerBytes: file.readAsBytesSync())
           ?? (throw UnknownFileMimeTypeException.forFilePath(file.path)),
+        uploadedAt: DateTime.now(),
     );
   }
 

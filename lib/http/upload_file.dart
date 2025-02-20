@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:miku_push/exceptions/upload_canceled.dart';
 import 'package:miku_push/exceptions/upload_file_failed.dart';
-import 'package:miku_push/model/file_upload.dart';
 import 'package:miku_push/model/file_upload_progress.dart';
 
 // TODO: Use Uri.parse instead
@@ -13,16 +12,15 @@ final Uri uploadUri = Uri.https('mikupush.io', 'upload');
 
 Future<void> uploadFile({
   required File file,
-  required FileUpload fileUpload,
+  required FileUploadProgress progress,
   required void Function(FileUploadProgress) onStartUpload,
   required void Function(FileUploadProgress) onUpdateProgress,
   required StreamController<String> cancelSignal,
 }) async {
   cancelSignal.stream.listen((id) {
-    if (fileUpload.id == id) throw UploadCanceledException.forId(fileUpload.id);
+    if (progress.id == id) throw UploadCanceledException.forId(progress.id);
   });
 
-  FileUploadProgress progress = fileUpload.createProgress();
   Stream<List<int>> progressStream = await _createUploadProgressObserverStream(
       file: file,
       progress: progress,
@@ -63,8 +61,8 @@ Future<Stream<List<int>>> _createUploadProgressObserverStream({
     int timeDiff = currentTime - lastTime;
 
     if (timeDiff > 1000) {
-      progress.progress = (totalBytesSent / fileLength) * 100;
-      progress.speed = (totalBytesSent / 1024) / (timeDiff / 1000);
+      progress.progress = totalBytesSent / fileLength;
+      progress.speed = totalBytesSent / (timeDiff / 1000);
       debugPrint(progress.toString());
       onUpdate(progress);
 
