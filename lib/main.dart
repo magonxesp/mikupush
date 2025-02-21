@@ -5,8 +5,17 @@ import 'package:miku_push/widgets/upload_file_tab.dart';
 import 'package:miku_push/widgets/uploading_list_tab.dart';
 import 'package:miku_push/widgets/uploaded_list_tab.dart';
 import 'package:provider/provider.dart';
+import 'package:window_manager/window_manager.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await windowManager.ensureInitialized();
+
+  windowManager.waitUntilReadyToShow().then((_) async {
+    await windowManager.setSize(const Size(500, 650));
+  });
+
   runApp(ChangeNotifierProvider(
     create: (context) => FileUploadsModel(),
     child: MyApp(),
