@@ -10,22 +10,22 @@ import 'package:miku_push/model/file_upload_progress.dart';
 class FileUploadsModel extends ChangeNotifier {
   List<FileUpload> _filesUploaded = [];
   List<FileUploadProgress> _filesUploading = [];
-  final _cancelController = StreamController<String>();
-  final _filesToUpload = Queue<(File, FileUpload, FileUploadProgress)>();
+  final _cancelController = StreamController<String>.broadcast();
+  final _filesToUpload = Queue<(FileUpload, FileUploadProgress)>();
   bool _isUploadingFiles = false;
 
   List<FileUpload> get filesUploaded => _filesUploaded;
   List<FileUploadProgress> get filesUploading => _filesUploading;
 
-  void uploadFiles(List<File> files) {
-    debugPrint('Adding to queue files $files to upload');
+  void uploadFiles(List<String> filesPaths) {
+    debugPrint('Adding to queue files $filesPaths to upload');
 
-    for (var file in files) {
-      final upload = FileUpload.fromFile(file);
+    for (var path in filesPaths) {
+      final upload = FileUpload.fromFilePath(path);
       final progress = upload.createProgress();
 
       _filesUploading.add(progress);
-      _filesToUpload.add((file, upload, progress));
+      _filesToUpload.add((upload, progress));
     }
 
     _filesUploading.sort(_sortByDateDesc);
@@ -35,6 +35,8 @@ class FileUploadsModel extends ChangeNotifier {
 
   void cancel(String id) {
     _cancelController.sink.add(id);
+    _filesUploading.removeWhere((progress) => progress.id == id);
+    notifyListeners();
   }
 
   void delete(String id) {
@@ -43,14 +45,14 @@ class FileUploadsModel extends ChangeNotifier {
 
   void _startUploadFiles() async {
     if (_isUploadingFiles) return;
+    debugPrint('Starting uploading incoming files');
     _isUploadingFiles = true;
 
     while (_filesToUpload.isNotEmpty) {
-      final (file, upload, progress) = _filesToUpload.removeFirst();
+      final (upload, progress) = _filesToUpload.removeFirst();
 
       try {
         await uploadFile(
-          file: file,
           progress: progress,
           onStartUpload: (progress) {
             notifyListeners();
@@ -61,21 +63,27 @@ class FileUploadsModel extends ChangeNotifier {
           cancelSignal: _cancelController,
         );
 
-        progress.finishSuccess();
-        _saveUploadedFile(upload);
-      } on Exception catch (exception) {
-        progress.finishFailed(exception.toString());
+        _handleUploadSuccess(upload, progress);
+      } catch (exception) {
+        debugPrint('Failed uploading file ${progress.filePath}: $exception');
+        _handleUploadError(exception, progress);
       }
     }
 
-    notifyListeners();
     _isUploadingFiles = false;
   }
 
-  void _saveUploadedFile(FileUpload upload) {
+  void _handleUploadSuccess(FileUpload upload, FileUploadProgress progress) {
+    progress.finishSuccess();
+    _filesUploading.removeWhere((progress) => progress.id == upload.id);
     _filesUploaded.add(upload);
     _filesUploaded.sort(_sortByDateDesc);
 
+    notifyListeners();
+  }
+
+  void _handleUploadError(dynamic exception, FileUploadProgress progress) {
+    progress.finishFailed(exception.toString());
     notifyListeners();
   }
 

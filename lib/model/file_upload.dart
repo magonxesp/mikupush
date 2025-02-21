@@ -22,7 +22,9 @@ class FileUpload {
     required this.uploadedAt,
   });
 
-  static FileUpload fromFile(File file) {
+  static FileUpload fromFilePath(String filePath) {
+    final file = File(filePath);
+
     return FileUpload(
         id: Uuid().v4(),
         fileName: basename(file.path),

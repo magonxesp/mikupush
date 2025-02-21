@@ -1,8 +1,8 @@
 import 'package:miku_push/model/file_upload.dart';
 
 class FileUploadProgress extends FileUpload {
-  double speed = 0;
-  double progress = 0;
+  double _speed = 0;
+  double _progress = 0;
   bool _inProgress = false;
   bool _isFinished = false;
   String _error = '';
@@ -25,16 +25,26 @@ class FileUploadProgress extends FileUpload {
     );
   }
 
+  double get progress => _progress;
+  double get speed => _speed;
   bool get inProgress => _inProgress;
   bool get isSuccess => _isFinished && !_inProgress && _error == '';
   bool get isFailed => _isFinished && !_inProgress && _error != '';
 
+  void updateProgress(double progress, double speed) {
+    _progress = progress;
+    _speed = speed;
+    _inProgress = true;
+  }
+
   void finishSuccess() {
+    _progress = 1;
     _inProgress = false;
     _isFinished = true;
   }
 
   void finishFailed(String error) {
+    _progress = 1;
     _inProgress = false;
     _isFinished = true;
     _error = error;
@@ -47,8 +57,8 @@ class FileUploadProgress extends FileUpload {
   @override
   String toString() {
     return '''
-      Progress: ${progress.toStringAsFixed(2)}%
-      Upload Speed: ${speed.toStringAsFixed(2)} KB/s
+      Progress: ${progress.toStringAsFixed(2)}
+      Upload Speed: ${speed.toStringAsFixed(2)} B/s
     ''';
   }
 }

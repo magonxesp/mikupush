@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:miku_push/model/file_uploads_model.dart';
+import 'package:miku_push/widgets/badge_tab.dart';
 import 'package:miku_push/widgets/upload_file_tab.dart';
 import 'package:miku_push/widgets/uploading_list_tab.dart';
 import 'package:miku_push/widgets/uploaded_list_tab.dart';
@@ -17,28 +18,32 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final model = context.watch<FileUploadsModel>();
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: DefaultTabController(
-        initialIndex: 1,
+        initialIndex: 0,
         length: 3,
         child: Scaffold(
           appBar: AppBar(
             toolbarHeight: 120,
             title: AppTitle(),
-            bottom: const TabBar(
+            bottom: TabBar(
               tabs: [
-                Tab(
+                const Tab(
                   icon: Icon(Icons.file_upload_outlined),
                   text: 'Upload file',
                 ),
-                Tab(
-                  icon: Icon(Icons.access_time_outlined),
+                BadgeTab(
+                  icon: Icons.access_time_outlined,
                   text: 'Uploads in progress',
+                  value: model.filesUploading.length,
                 ),
-                Tab(
-                  icon: Icon(Icons.list),
+                BadgeTab(
+                  icon: Icons.list,
                   text: 'Uploaded files',
+                  value: model.filesUploaded.length,
                 ),
               ],
             ),

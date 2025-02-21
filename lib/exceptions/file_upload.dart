@@ -1,5 +1,4 @@
 class UnknownFileMimeTypeException implements Exception {
-
   final String message;
 
   const UnknownFileMimeTypeException(this.message);

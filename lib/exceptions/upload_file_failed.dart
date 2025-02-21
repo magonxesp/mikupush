@@ -1,4 +1,4 @@
-import 'package:http/http.dart';
+import 'package:dio/dio.dart';
 
 class UploadFileFailedException implements Exception {
 
@@ -9,10 +9,7 @@ class UploadFileFailedException implements Exception {
   @override
   String toString() => message;
 
-  static UploadFileFailedException forResponse(String filePath, Response response) {
-    return UploadFileFailedException('''
-      Failed uploading file $filePath, server sent status code ${response.statusCode}
-      with body: ${response.body}
-    ''');
+  static UploadFileFailedException forResponse(String filePath, Response<dynamic> response) {
+    return UploadFileFailedException('Failed uploading file $filePath, server sent status code ${response.statusCode}');
   }
 }

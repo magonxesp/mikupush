@@ -6,7 +6,7 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_picker/file_picker.dart';
 
 class FileInput extends StatefulWidget {
-  final void Function(List<File>) onChange;
+  final void Function(List<String>) onChange;
 
   const FileInput({super.key, this.onChange = _defaultOnChange});
 
@@ -16,7 +16,7 @@ class FileInput extends StatefulWidget {
 
 class _FileInputState extends State<FileInput> {
   bool _isActive = false;
-  final void Function(List<File>) onChange;
+  final void Function(List<String>) onChange;
 
   _FileInputState({this.onChange = _defaultOnChange});
 
@@ -80,17 +80,17 @@ class _FileInputState extends State<FileInput> {
     );
   }
 
-  List<File> _filterFiles(DropDoneDetails event) {
-    List<File> files = [];
+  List<String> _filterFiles(DropDoneDetails event) {
+    List<String> paths = [];
 
     for (var item in event.files) {
-      File file = File(item.path);
+      final file = File(item.path);
       if (file.statSync().type == FileSystemEntityType.file) {
-        files.add(file);
+        paths.add(item.path);
       }
     }
 
-    return files;
+    return paths;
   }
 
   void _pickFile() async {
@@ -100,11 +100,11 @@ class _FileInputState extends State<FileInput> {
       return;
     }
 
-    List<File> files = [];
+    List<String> files = [];
 
     for (var item in result.files) {
       if (item.path != null) {
-        files.add(File(item.path!));
+        files.add(item.path!);
       }
     }
 
