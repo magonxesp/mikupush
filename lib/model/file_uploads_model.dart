@@ -29,6 +29,7 @@ class FileUploadsModel extends ChangeNotifier {
     }
 
     _filesUploading.sort(_sortByDateDesc);
+    _filesUploading.sort(_sortQueuedLast);
     _startUploadFiles();
     notifyListeners();
   }
@@ -58,6 +59,7 @@ class FileUploadsModel extends ChangeNotifier {
             notifyListeners();
           },
           onUpdateProgress: (progress) {
+            _filesUploading.sort(_sortQueuedLast);
             notifyListeners();
           },
           cancelSignal: _cancelController,
@@ -94,6 +96,19 @@ class FileUploadsModel extends ChangeNotifier {
     if (uploadAMillis > uploadBMillis) {
       return -1;
     } else if (uploadAMillis < uploadBMillis) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
+  static int _sortQueuedLast(FileUploadProgress uploadA, FileUploadProgress uploadB) {
+    final uploadAProgress = uploadA.inProgress;
+    final uploadBProgress = uploadB.inProgress;
+
+    if (uploadAProgress && !uploadBProgress) {
+      return -1;
+    } else if (!uploadAProgress && uploadBProgress) {
       return 1;
     } else {
       return 0;
