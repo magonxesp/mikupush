@@ -7,6 +7,7 @@ class UploadingFileListItem extends StatelessWidget {
   final double speed;
   final double progress;
   final bool inProgress;
+  final String error;
   final void Function() onCancel;
 
   const UploadingFileListItem({
@@ -14,6 +15,7 @@ class UploadingFileListItem extends StatelessWidget {
     required this.mimeType,
     required this.speed,
     required this.progress,
+    required this.error,
     required this.inProgress,
     required this.onCancel
   });
@@ -57,6 +59,8 @@ class UploadingFileListItem extends StatelessWidget {
   Widget _subtitle() {
     if (inProgress) {
       return FileListItemSpeed(speed: speed);
+    } else if (!inProgress && error != '') {
+      return FileListItemError(error: error);
     } else {
       return FileListItemQueued();
     }

@@ -30,6 +30,7 @@ class FileUploadProgress extends FileUpload {
   bool get inProgress => _inProgress;
   bool get isSuccess => _isFinished && !_inProgress && _error == '';
   bool get isFailed => _isFinished && !_inProgress && _error != '';
+  String get error => _error;
 
   void updateProgress(double progress, double speed) {
     _progress = progress;
@@ -44,7 +45,7 @@ class FileUploadProgress extends FileUpload {
   }
 
   void finishFailed(String error) {
-    _progress = 1;
+    _progress = 0;
     _inProgress = false;
     _isFinished = true;
     _error = error;

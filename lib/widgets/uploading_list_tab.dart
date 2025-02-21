@@ -31,6 +31,7 @@ class UploadingListTab extends StatelessWidget {
           speed: uploading.speed,
           progress: uploading.progress,
           inProgress: uploading.inProgress,
+          error: uploading.error,
           onCancel: () {
             model.cancel(uploading.id);
           },

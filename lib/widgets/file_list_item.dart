@@ -187,3 +187,23 @@ class FileListItemQueued extends StatelessWidget {
     );
   }
 }
+
+class FileListItemError extends StatelessWidget {
+  final String error;
+
+  const FileListItemError({required this.error, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Text(
+      error,
+      style: theme.textTheme.bodyMedium?.copyWith(
+        color: theme.colorScheme.error
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+}
