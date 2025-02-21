@@ -51,6 +51,13 @@ class FileUploadProgress extends FileUpload {
     _error = error;
   }
 
+  void reset() {
+    _progress = 0;
+    _inProgress = false;
+    _isFinished = false;
+    _error = '';
+  }
+
   FileUpload toFileUpload() {
     return this as FileUpload;
   }

@@ -28,8 +28,7 @@ class FileUploadsModel extends ChangeNotifier {
       _filesToUpload.add((upload, progress));
     }
 
-    _filesUploading.sort(_sortByDateDesc);
-    _filesUploading.sort(_sortQueuedLast);
+    _sortRunningUploads();
     _startUploadFiles();
     notifyListeners();
   }
@@ -42,6 +41,14 @@ class FileUploadsModel extends ChangeNotifier {
 
   void delete(String id) {
 
+  }
+
+  void retry(FileUploadProgress progress) {
+    progress.reset();
+    _filesToUpload.add((progress.toFileUpload(), progress));
+    _sortRunningUploads();
+    _startUploadFiles();
+    notifyListeners();
   }
 
   void _startUploadFiles() async {
@@ -87,6 +94,11 @@ class FileUploadsModel extends ChangeNotifier {
   void _handleUploadError(dynamic exception, FileUploadProgress progress) {
     progress.finishFailed(exception.toString());
     notifyListeners();
+  }
+
+  void _sortRunningUploads() {
+    _filesUploading.sort(_sortByDateDesc);
+    _filesUploading.sort(_sortQueuedLast);
   }
 
   static int _sortByDateDesc(FileUpload uploadA, FileUpload uploadB) {

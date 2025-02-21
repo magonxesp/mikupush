@@ -14,6 +14,7 @@ void main() async {
 
   windowManager.waitUntilReadyToShow().then((_) async {
     await windowManager.setSize(const Size(500, 650));
+    await windowManager.setMinimumSize(const Size(500, 650));
   });
 
   runApp(ChangeNotifierProvider(

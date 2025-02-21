@@ -9,16 +9,17 @@ class UploadingFileListItem extends StatelessWidget {
   final bool inProgress;
   final String error;
   final void Function() onCancel;
+  final void Function() onRetry;
 
-  const UploadingFileListItem({
-    required this.name,
-    required this.mimeType,
-    required this.speed,
-    required this.progress,
-    required this.error,
-    required this.inProgress,
-    required this.onCancel
-  });
+  const UploadingFileListItem(
+      {required this.name,
+      required this.mimeType,
+      required this.speed,
+      required this.progress,
+      required this.error,
+      required this.inProgress,
+      required this.onCancel,
+      required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -26,17 +27,21 @@ class UploadingFileListItem extends StatelessWidget {
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
       children: [
         FileListItemIcon(mimeType: mimeType),
         SizedBox(width: 10),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            FileListItemName(name: name),
-            SizedBox(width: 5),
-            _subtitle(),
-          ],
+        Expanded(
+          flex: 20,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              FileListItemName(name: name),
+              SizedBox(height: 5),
+              _subtitle(),
+            ],
+          ),
         ),
         Spacer(),
         CircularProgressIndicator(
@@ -45,15 +50,36 @@ class UploadingFileListItem extends StatelessWidget {
           constraints: BoxConstraints.expand(width: 30, height: 30),
         ),
         SizedBox(width: 10),
-        IconButton(
-          onPressed: onCancel,
-          icon: Icon(
-            Icons.close,
-            color: theme.colorScheme.error,
-          ),
-        ),
+        ..._actions(theme),
       ],
     );
+  }
+
+  List<Widget> _actions(ThemeData theme) {
+    List<Widget> actions = [];
+
+    if (error != '') {
+      actions.add(
+        IconButton(
+          onPressed: onRetry,
+          icon: Icon(Icons.refresh,),
+        ),
+      );
+
+      actions.add(SizedBox(width: 5));
+    }
+
+    actions.add(
+      IconButton(
+        onPressed: onCancel,
+        icon: Icon(
+          Icons.close,
+          color: theme.colorScheme.error,
+        ),
+      ),
+    );
+
+    return actions;
   }
 
   Widget _subtitle() {

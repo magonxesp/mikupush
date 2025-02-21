@@ -35,6 +35,9 @@ class UploadingListTab extends StatelessWidget {
           onCancel: () {
             model.cancel(uploading.id);
           },
+          onRetry: () {
+            model.retry(uploading);
+          },
         );
       },
       separatorBuilder: (context, index) {
