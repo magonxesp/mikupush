@@ -27,12 +27,14 @@ Future<void> uploadFile({
 
   final options = Options(headers: {
     Headers.contentTypeHeader: progress.fileMimeType,
-    Headers.contentLengthHeader: await file.length()
+    Headers.contentLengthHeader: await file.length(),
+    'X-File-Id': progress.id,
+    'X-File-Name': progress.fileName
   });
 
   try {
     final response = await dio.post(
-      'https://mikupush.io/upload/${progress.id}',
+      'http://localhost:8080/upload',
       data: file.openRead(),
       options: options,
       onSendProgress: (sent, total) {
