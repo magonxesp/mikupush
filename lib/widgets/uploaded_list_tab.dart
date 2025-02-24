@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:miku_push/helpers/file_explorer.dart';
+import 'package:miku_push/model/file_uploads_model.dart';
 import 'package:miku_push/widgets/uploaded_file_list_item.dart';
 import 'package:provider/provider.dart';
-
-import '../model/file_uploads_model.dart';
 
 class UploadedListTab extends StatelessWidget {
   const UploadedListTab({super.key});
@@ -30,6 +30,12 @@ class UploadedListTab extends StatelessWidget {
           name: uploaded.fileName,
           mimeType: uploaded.fileMimeType,
           uploadedAt: uploaded.uploadedAt,
+          onDelete: () {
+            model.delete(uploaded.id);
+          },
+          onShowInExplorer: () {
+            showFileInExplorer(uploaded.filePath);
+          },
         );
       },
       separatorBuilder: (context, index) {

@@ -5,11 +5,15 @@ class UploadedFileListItem extends StatelessWidget {
   final String name;
   final String mimeType;
   final DateTime uploadedAt;
+  final void Function() onShowInExplorer;
+  final void Function() onDelete;
 
   const UploadedFileListItem({
     required this.name,
     required this.mimeType,
     required this.uploadedAt,
+    required this.onShowInExplorer,
+    required this.onDelete,
   });
 
   @override
@@ -21,20 +25,30 @@ class UploadedFileListItem extends StatelessWidget {
       children: [
         FileListItemIcon(mimeType: mimeType),
         SizedBox(width: 10),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            FileListItemName(name: name),
-            SizedBox(width: 5),
-            FileListItemUploadedAt(uploadedAt: uploadedAt),
-          ],
+        Expanded(
+          flex: 20,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              FileListItemName(name: name),
+              SizedBox(width: 5),
+              FileListItemUploadedAt(uploadedAt: uploadedAt),
+            ],
+          ),
         ),
         Spacer(),
-        Icon(Icons.folder_outlined),
-        Icon(
-          Icons.delete,
-          color: theme.colorScheme.error,
+        IconButton(
+          onPressed: onShowInExplorer,
+          icon: Icon(Icons.folder_outlined),
+        ),
+        SizedBox(width: 10),
+        IconButton(
+          onPressed: onDelete,
+          icon: Icon(
+            Icons.delete,
+            color: theme.colorScheme.error,
+          ),
         ),
       ],
     );
