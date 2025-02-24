@@ -47,7 +47,11 @@ class FileUploadsModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void delete(String id) {}
+  void delete(String id) {
+    _database.delete(_database.uploadedFile).where((t) => t.uuid.equals(id));
+    filesUploaded.removeWhere((uploaded) => uploaded.id == id);
+    notifyListeners();
+  }
 
   void loadAllUploadedFiles() async {
     if (_isFilesUploadedLoaded) {

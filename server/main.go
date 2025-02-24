@@ -8,7 +8,8 @@ func main() {
 	server := gin.Default()
 
 	server.POST("/upload", UploadHandler)
-	server.GET("/:uuid", FileHandler)
+	server.GET("/:uuid", GetFileHandler)
+	server.DELETE("/:uuid", DeleteFileHandler)
 
 	server.Run(GetServerPort())
 }

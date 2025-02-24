@@ -21,7 +21,7 @@ type UploadedFile struct {
 	UploadedAt time.Time `gorm:"column:uploaded_at"`
 }
 
-func FileHandler(c *gin.Context) {
+func GetFileHandler(c *gin.Context) {
 	db := GetDatabase()
 
 	fileId := c.Param("uuid")
@@ -53,4 +53,29 @@ func FileHandler(c *gin.Context) {
 	c.Header("Content-Disposition", fmt.Sprintf("inline; filename=%s", uploadedFile.Name))
 	c.Status(http.StatusOK)
 	c.Writer.Write(content)
+}
+
+func DeleteFileHandler(c *gin.Context) {
+	db := GetDatabase()
+
+	fileId := c.Param("uuid")
+	result := db.Where("uuid = ?", fileId).Delete(&UploadedFile{})
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": fmt.Sprintf("Failed to remove uploaded file: %s", result.Error.Error()),
+		})
+		return
+	}
+
+	filePath := path.Join(GetDataDir(), fileId)
+	err := os.Remove(filePath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": fmt.Sprintf("Failed to remove uploaded file: %s", err.Error()),
+		})
+		return
+	}
+
+	c.Status(200)
 }
