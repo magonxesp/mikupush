@@ -48,6 +48,8 @@ dependencies:
   badges: ^3.1.2
   dio: ^5.8.0+1
   window_manager: ^0.4.3
+  drift: ^2.25.1
+  drift_flutter: ^0.2.4
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +61,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
+  drift_dev: ^2.25.2
+  build_runner: ^2.4.15
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

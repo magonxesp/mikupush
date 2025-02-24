@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:io';
 
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:miku_push/http/upload_file.dart';
 import 'package:miku_push/model/file_upload.dart';
 import 'package:miku_push/model/file_upload_progress.dart';
+
+import '../database/database.dart';
 
 class FileUploadsModel extends ChangeNotifier {
   List<FileUpload> _filesUploaded = [];
@@ -13,9 +15,15 @@ class FileUploadsModel extends ChangeNotifier {
   final _cancelController = StreamController<String>.broadcast();
   final _filesToUpload = Queue<(FileUpload, FileUploadProgress)>();
   bool _isUploadingFiles = false;
+  bool _isFilesUploadedLoaded = false;
+  int _newFilesUploadedCount = 0;
+  final _database = AppDatabase();
 
   List<FileUpload> get filesUploaded => _filesUploaded;
+
   List<FileUploadProgress> get filesUploading => _filesUploading;
+
+  int get newFilesUploadedCount => _newFilesUploadedCount;
 
   void uploadFiles(List<String> filesPaths) {
     debugPrint('Adding to queue files $filesPaths to upload');
@@ -39,8 +47,32 @@ class FileUploadsModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void delete(String id) {
+  void delete(String id) {}
 
+  void loadAllUploadedFiles() async {
+    if (_isFilesUploadedLoaded) {
+      return;
+    }
+
+    debugPrint('Loading saved uploaded files');
+
+    final query = _database.select(_database.uploadedFile)
+      ..orderBy([(t) => OrderingTerm(expression: t.uploadedAt, mode: OrderingMode.desc)]);
+
+    List<UploadedFileData> all = await query.get();
+
+    _filesUploaded = all.map((uploadedFile) {
+      return FileUpload(
+        id: uploadedFile.uuid,
+        fileName: uploadedFile.fileName,
+        filePath: uploadedFile.filePath,
+        fileMimeType: uploadedFile.fileMimeType,
+        uploadedAt: uploadedFile.uploadedAt,
+      );
+    }).toList();
+
+    notifyListeners();
+    _isFilesUploadedLoaded = true;
   }
 
   void retry(FileUploadProgress progress) {
@@ -48,6 +80,12 @@ class FileUploadsModel extends ChangeNotifier {
     _filesToUpload.add((progress.toFileUpload(), progress));
     _sortRunningUploads();
     _startUploadFiles();
+    notifyListeners();
+  }
+
+  Future<void> resetUploadedFilesCount() async {
+    Future.delayed(Duration(seconds: 1));
+    _newFilesUploadedCount = 0;
     notifyListeners();
   }
 
@@ -87,8 +125,17 @@ class FileUploadsModel extends ChangeNotifier {
     _filesUploading.removeWhere((progress) => progress.id == upload.id);
     _filesUploaded.add(upload);
     _filesUploaded.sort(_sortByDateDesc);
+    _newFilesUploadedCount++;
 
     notifyListeners();
+
+    _database.into(_database.uploadedFile).insert(UploadedFileCompanion.insert(
+          uuid: upload.id,
+          fileName: upload.fileName,
+          filePath: upload.filePath,
+          fileMimeType: upload.fileMimeType,
+          uploadedAt: upload.uploadedAt,
+        ));
   }
 
   void _handleUploadError(dynamic exception, FileUploadProgress progress) {
@@ -127,4 +174,3 @@ class FileUploadsModel extends ChangeNotifier {
     }
   }
 }
-

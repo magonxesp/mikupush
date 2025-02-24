@@ -24,7 +24,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +40,12 @@ class MyApp extends StatelessWidget {
             toolbarHeight: 120,
             title: AppTitle(),
             bottom: TabBar(
+              onTap: (index) {
+                if (index == 2) {
+                  model.loadAllUploadedFiles();
+                  model.resetUploadedFilesCount();
+                }
+              },
               tabs: [
                 const Tab(
                   icon: Icon(Icons.file_upload_outlined),
@@ -53,7 +59,7 @@ class MyApp extends StatelessWidget {
                 BadgeTab(
                   icon: Icons.list,
                   text: 'Uploaded files',
-                  value: model.filesUploaded.length,
+                  value: model.newFilesUploadedCount,
                 ),
               ],
             ),
