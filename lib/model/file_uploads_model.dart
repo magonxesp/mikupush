@@ -3,6 +3,7 @@ import 'dart:collection';
 
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
+import 'package:miku_push/http/delete_file.dart';
 import 'package:miku_push/http/upload_file.dart';
 import 'package:miku_push/model/file_upload.dart';
 import 'package:miku_push/model/file_upload_progress.dart';
@@ -47,10 +48,18 @@ class FileUploadsModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void delete(String id) {
-    _database.delete(_database.uploadedFile).where((t) => t.uuid.equals(id));
-    filesUploaded.removeWhere((uploaded) => uploaded.id == id);
-    notifyListeners();
+  void delete(String id) async {
+    try {
+      final deleteQuery = _database.delete(_database.uploadedFile)
+        ..where((t) => t.uuid.equals(id));
+
+      await deleteFile(id);
+      await deleteQuery.go();
+      filesUploaded.removeWhere((uploaded) => uploaded.id == id);
+      notifyListeners();
+    } catch (exception) {
+      debugPrint('Failed deleting file with $id: $exception');
+    }
   }
 
   void loadAllUploadedFiles() async {

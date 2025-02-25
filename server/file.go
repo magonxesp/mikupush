@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"path"
@@ -62,20 +63,16 @@ func DeleteFileHandler(c *gin.Context) {
 	result := db.Where("uuid = ?", fileId).Delete(&UploadedFile{})
 
 	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": fmt.Sprintf("Failed to remove uploaded file: %s", result.Error.Error()),
-		})
+		log.Println("Failed to delete file with id", fileId, "error:", result.Error.Error())
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
 	filePath := path.Join(GetDataDir(), fileId)
 	err := os.Remove(filePath)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": fmt.Sprintf("Failed to remove uploaded file: %s", err.Error()),
-		})
-		return
+		log.Println("Failed to delete file with id", fileId, "error:", err.Error())
 	}
 
-	c.Status(200)
+	c.Status(http.StatusOK)
 }
