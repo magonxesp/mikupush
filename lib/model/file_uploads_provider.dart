@@ -9,6 +9,7 @@ import 'package:miku_push/http/upload_file.dart';
 import 'package:miku_push/model/file_upload.dart';
 import 'package:miku_push/model/file_upload_progress.dart';
 import 'package:miku_push/database/database.dart';
+import 'package:local_notifier/local_notifier.dart';
 
 class FileUploadsProvider extends ChangeNotifier {
   List<FileUpload> _filesUploaded = [];
@@ -107,6 +108,19 @@ class FileUploadsProvider extends ChangeNotifier {
   void copyLink(String id) async {
     debugPrint('Copy link of file with id $id to clipboard');
     await Clipboard.setData(ClipboardData(text: 'http://localhost:8080/$id'));
+
+    final query = _database.select(_database.uploadedFile)
+      ..where((t) => t.uuid.equals(id));
+
+    final uploadedFile = await query.getSingleOrNull();
+    if (uploadedFile != null) {
+      LocalNotification notification = LocalNotification(
+        title: '📎Link copied to clipboard!',
+        body: 'The link for ${uploadedFile.fileName} is in the clipboard',
+      );
+
+      await notification.show();
+    }
   }
 
   void _startUploadFiles() async {

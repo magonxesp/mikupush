@@ -7,12 +7,19 @@ import 'package:miku_push/widgets/uploading_list_tab.dart';
 import 'package:miku_push/widgets/uploaded_list_tab.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:local_notifier/local_notifier.dart';
 
 final appTitle = 'Miku Push!';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
+
+  await localNotifier.setup(
+    appName: appTitle,
+    // The parameter shortcutPolicy only works on Windows
+    shortcutPolicy: ShortcutPolicy.requireCreate,
+  );
 
   windowManager.waitUntilReadyToShow().then((_) async {
     await windowManager.setSize(const Size(500, 650));
