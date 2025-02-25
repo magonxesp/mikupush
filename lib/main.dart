@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:miku_push/model/file_uploads_model.dart';
+import 'package:miku_push/model/file_uploads_provider.dart';
 import 'package:miku_push/theme.dart';
 import 'package:miku_push/widgets/badge_tab.dart';
 import 'package:miku_push/widgets/upload_file_tab.dart';
@@ -20,7 +20,7 @@ void main() async {
   });
 
   runApp(ChangeNotifierProvider(
-    create: (context) => FileUploadsModel(),
+    create: (context) => FileUploadsProvider(),
     child: MyApp(),
   ));
 }
@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = context.watch<FileUploadsModel>();
+    final model = context.watch<FileUploadsProvider>();
 
     return MaterialApp(
       title: appTitle,

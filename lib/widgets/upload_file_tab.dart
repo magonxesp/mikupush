@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:miku_push/model/file_uploads_model.dart';
+import 'package:miku_push/model/file_uploads_provider.dart';
 import 'package:miku_push/widgets/file_input.dart';
 import 'package:provider/provider.dart';
 
@@ -8,7 +8,7 @@ class UploadFileTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = context.read<FileUploadsModel>();
+    final model = context.read<FileUploadsProvider>();
 
     return Padding(
       padding: EdgeInsets.all(20),

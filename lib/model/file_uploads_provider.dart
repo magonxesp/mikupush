@@ -10,7 +10,7 @@ import 'package:miku_push/model/file_upload_progress.dart';
 
 import '../database/database.dart';
 
-class FileUploadsModel extends ChangeNotifier {
+class FileUploadsProvider extends ChangeNotifier {
   List<FileUpload> _filesUploaded = [];
   List<FileUploadProgress> _filesUploading = [];
   final _cancelController = StreamController<String>.broadcast();

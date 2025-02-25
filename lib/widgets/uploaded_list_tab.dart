@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:miku_push/helpers/file_explorer.dart';
-import 'package:miku_push/model/file_uploads_model.dart';
+import 'package:miku_push/model/file_uploads_provider.dart';
 import 'package:miku_push/widgets/uploaded_file_list_item.dart';
 import 'package:provider/provider.dart';
 
@@ -10,7 +10,7 @@ class UploadedListTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final model = context.watch<FileUploadsModel>();
+    final model = context.watch<FileUploadsProvider>();
 
     if (model.filesUploaded.isNotEmpty) {
       return _uploadedList(model);
@@ -19,7 +19,7 @@ class UploadedListTab extends StatelessWidget {
     }
   }
 
-  Widget _uploadedList(FileUploadsModel model) {
+  Widget _uploadedList(FileUploadsProvider model) {
     return ListView.separated(
       itemCount: model.filesUploaded.length,
       padding: EdgeInsets.all(15),
