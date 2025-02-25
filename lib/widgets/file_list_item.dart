@@ -52,9 +52,12 @@ class FileListItemIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return SvgPicture.asset(
       _iconAsset(),
       height: 50,
+      colorFilter: ColorFilter.mode(theme.colorScheme.onSurface, BlendMode.srcIn),
     );
   }
 

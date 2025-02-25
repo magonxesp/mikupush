@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:miku_push/model/file_uploads_model.dart';
+import 'package:miku_push/theme.dart';
 import 'package:miku_push/widgets/badge_tab.dart';
 import 'package:miku_push/widgets/upload_file_tab.dart';
 import 'package:miku_push/widgets/uploading_list_tab.dart';
@@ -32,6 +33,9 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: lightThemeData,
+      darkTheme: darkThemeData,
+      themeMode: ThemeMode.system,
       home: DefaultTabController(
         initialIndex: 0,
         length: 3,
