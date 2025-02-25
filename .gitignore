@@ -47,5 +47,6 @@ app.*.map.json
 # Server
 mikupush-server.exe
 mikupush-server
+/data
 server/data
 server/.env

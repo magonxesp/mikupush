@@ -28,15 +28,15 @@ func GetFileHandler(c *gin.Context) {
 	fileId := c.Param("uuid")
 	fileUuid, err := uuid.Parse(fileId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": fmt.Sprintf("Failed to parse file id: %s", err.Error()),
-		})
+		log.Println("Failed to parse file id:", err.Error())
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
 	var uploadedFile UploadedFile
 	result := db.Where("uuid = ?", fileUuid).First(&uploadedFile)
 	if result.Error != nil {
+		log.Println("Uploaded file not found", fileId, "error:", result.Error.Error())
 		c.Status(http.StatusNotFound)
 		return
 	}
@@ -44,16 +44,21 @@ func GetFileHandler(c *gin.Context) {
 	filePath := path.Join(GetDataDir(), fileId)
 	content, err := os.ReadFile(filePath)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": fmt.Sprintf("Failed to read file: %s", err.Error()),
-		})
+		log.Println("Failed to read content of file with id", fileId, "error:", err.Error())
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
 	c.Header("Content-Type", uploadedFile.MimeType)
 	c.Header("Content-Disposition", fmt.Sprintf("inline; filename=%s", uploadedFile.Name))
+	_, err = c.Writer.Write(content)
+	if err != nil {
+		log.Println("Failed to write the response body for file with id", fileId, "error:", err.Error())
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
 	c.Status(http.StatusOK)
-	c.Writer.Write(content)
 }
 
 func DeleteFileHandler(c *gin.Context) {
