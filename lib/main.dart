@@ -8,9 +8,10 @@ import 'package:miku_push/widgets/uploaded_list_tab.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
+final appTitle = 'Miku Push!';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await windowManager.ensureInitialized();
 
   windowManager.waitUntilReadyToShow().then((_) async {
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
     final model = context.watch<FileUploadsModel>();
 
     return MaterialApp(
+      title: appTitle,
       debugShowCheckedModeBanner: false,
       theme: lightThemeData,
       darkTheme: darkThemeData,
@@ -91,7 +93,7 @@ class AppTitle extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Image.asset(
-          'assets/icons/app_icon.png',
+          'assets/icons/app-icon.png',
           height: 100,
           fit: BoxFit.contain,
         ),
