@@ -5,6 +5,7 @@ class UploadedFileListItem extends StatelessWidget {
   final String name;
   final String mimeType;
   final DateTime uploadedAt;
+  final void Function() onGetLink;
   final void Function() onShowInExplorer;
   final void Function() onDelete;
 
@@ -12,6 +13,7 @@ class UploadedFileListItem extends StatelessWidget {
     required this.name,
     required this.mimeType,
     required this.uploadedAt,
+    required this.onGetLink,
     required this.onShowInExplorer,
     required this.onDelete,
   });
@@ -38,6 +40,11 @@ class UploadedFileListItem extends StatelessWidget {
           ),
         ),
         Spacer(),
+        IconButton(
+          onPressed: onGetLink,
+          icon: Icon(Icons.link),
+        ),
+        SizedBox(width: 10),
         IconButton(
           onPressed: onShowInExplorer,
           icon: Icon(Icons.folder_outlined),

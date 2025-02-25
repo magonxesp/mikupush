@@ -30,6 +30,9 @@ class UploadedListTab extends StatelessWidget {
           name: uploaded.fileName,
           mimeType: uploaded.fileMimeType,
           uploadedAt: uploaded.uploadedAt,
+          onGetLink: () {
+            model.copyLink(uploaded.id);
+          },
           onDelete: () {
             model.delete(uploaded.id);
           },

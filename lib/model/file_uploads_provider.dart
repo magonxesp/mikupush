@@ -3,12 +3,12 @@ import 'dart:collection';
 
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:miku_push/http/delete_file.dart';
 import 'package:miku_push/http/upload_file.dart';
 import 'package:miku_push/model/file_upload.dart';
 import 'package:miku_push/model/file_upload_progress.dart';
-
-import '../database/database.dart';
+import 'package:miku_push/database/database.dart';
 
 class FileUploadsProvider extends ChangeNotifier {
   List<FileUpload> _filesUploaded = [];
@@ -70,7 +70,9 @@ class FileUploadsProvider extends ChangeNotifier {
     debugPrint('Loading saved uploaded files');
 
     final query = _database.select(_database.uploadedFile)
-      ..orderBy([(t) => OrderingTerm(expression: t.uploadedAt, mode: OrderingMode.desc)]);
+      ..orderBy([
+        (t) => OrderingTerm(expression: t.uploadedAt, mode: OrderingMode.desc)
+      ]);
 
     List<UploadedFileData> all = await query.get();
 
@@ -100,6 +102,11 @@ class FileUploadsProvider extends ChangeNotifier {
     Future.delayed(Duration(seconds: 1));
     _newFilesUploadedCount = 0;
     notifyListeners();
+  }
+
+  void copyLink(String id) async {
+    debugPrint('Copy link of file with id $id to clipboard');
+    await Clipboard.setData(ClipboardData(text: 'http://localhost:8080/$id'));
   }
 
   void _startUploadFiles() async {
@@ -174,7 +181,8 @@ class FileUploadsProvider extends ChangeNotifier {
     }
   }
 
-  static int _sortQueuedLast(FileUploadProgress uploadA, FileUploadProgress uploadB) {
+  static int _sortQueuedLast(
+      FileUploadProgress uploadA, FileUploadProgress uploadB) {
     final uploadAProgress = uploadA.inProgress;
     final uploadBProgress = uploadB.inProgress;
 
