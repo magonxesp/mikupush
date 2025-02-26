@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -16,12 +17,18 @@ final appTitle = 'Miku Push!';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
 
   localNotifier.setup(
     appName: appTitle,
     // The parameter shortcutPolicy only works on Windows
     shortcutPolicy: ShortcutPolicy.requireCreate,
   );
+
+  windowManager.waitUntilReadyToShow().then((_) async {
+    await windowManager.setSize(const Size(500, 650));
+    await windowManager.setMinimumSize(const Size(500, 650));
+  });
 
   runApp(ChangeNotifierProvider(
     create: (context) => FileUploadsProvider(),
@@ -34,12 +41,37 @@ class MyApp extends StatefulWidget {
   _MyApp createState() => _MyApp();
 }
 
-class _MyApp extends State<MyApp> with TrayListener {
+class _MyApp extends State<MyApp> with TrayListener, WindowListener {
   @override
   void initState() {
     super.initState();
+
+    windowManager.addListener(this);
     trayManager.addListener(this);
+
+    _initWindow();
     _initTray();
+  }
+
+  @override
+  void onWindowClose() {
+    windowManager.hide();
+  }
+
+  @override
+  void onTrayIconMouseDown() {
+    windowManager.show();
+  }
+
+  @override
+  void onTrayIconRightMouseDown() {
+    trayManager.popUpContextMenu();
+  }
+
+  @override
+  void dispose() {
+    windowManager.removeListener(this);
+    super.dispose();
   }
 
   @override
@@ -96,15 +128,19 @@ class _MyApp extends State<MyApp> with TrayListener {
     );
   }
 
-  Future<void> _initTray() async {
+  void _initTray() async {
     Menu menu = Menu(items: [
       MenuItem(label: 'Mostrar', onClick: (_) => windowManager.show()),
       MenuItem(label: 'Salir', onClick: (_) => windowManager.destroy()),
     ]);
 
-    await trayManager.setIcon('assets/icons/app-icon.png'); // Agrega un ícono para el tray
+    await trayManager.setIcon(_trayIcon());
     await trayManager.setToolTip(appTitle);
     await trayManager.setContextMenu(menu);
+  }
+
+  void _initWindow() async {
+    await windowManager.setPreventClose(true);
   }
 }
 
@@ -135,5 +171,13 @@ class AppTitle extends StatelessWidget {
         )
       ],
     );
+  }
+}
+
+String _trayIcon() {
+  if (Platform.isWindows) {
+    return 'assets/icons/app-icon.ico';
+  } else {
+    return 'assets/icons/app-icon.png';
   }
 }
