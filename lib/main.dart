@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:miku_push/model/file_uploads_provider.dart';
 import 'package:miku_push/theme.dart';
@@ -12,10 +10,20 @@ import 'package:provider/provider.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:local_notifier/local_notifier.dart';
+import 'package:miku_push/socket/socket_server.dart';
+import 'package:miku_push/socket/socket_client.dart';
+import 'package:collection/collection.dart';
 
 final appTitle = 'Miku Push!';
+String _initialRequestedUploadFilePath = '';
 
-void main() async {
+void main(List<String> args) async {
+  final filePath = args.firstOrNull;
+  if (filePath != null && await _sendUploadRequest(filePath)) {
+    return;
+  }
+
+  debugPrint('No file upload request made or it failed, launching gui');
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
 
@@ -46,6 +54,8 @@ class _MyApp extends State<MyApp> with TrayListener, WindowListener {
   void initState() {
     super.initState();
 
+    listenUploadRequests(context);
+    _launchInitialUploadRequest();
     windowManager.addListener(this);
     trayManager.addListener(this);
 
@@ -142,6 +152,16 @@ class _MyApp extends State<MyApp> with TrayListener, WindowListener {
   void _initWindow() async {
     await windowManager.setPreventClose(true);
   }
+
+  void _launchInitialUploadRequest() {
+    if (_initialRequestedUploadFilePath == '') {
+      return;
+    }
+
+    debugPrint('Starrting initial file upload request');
+    final provider = Provider.of<FileUploadsProvider>(context, listen: false);
+    provider.uploadFile(_initialRequestedUploadFilePath);
+  }
 }
 
 class AppTitle extends StatelessWidget {
@@ -179,5 +199,16 @@ String _trayIcon() {
     return 'assets/icons/app-icon.ico';
   } else {
     return 'assets/icons/app-icon.png';
+  }
+}
+
+Future<bool> _sendUploadRequest(String filePath) async {
+  try {
+    _initialRequestedUploadFilePath = filePath;
+    await sendUploadRequest(filePath);
+    return true;
+  } catch (exception) {
+    debugPrint('Send file upload request failed: $exception');
+    return false;
   }
 }

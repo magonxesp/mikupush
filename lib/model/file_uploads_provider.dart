@@ -4,12 +4,13 @@ import 'dart:collection';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:miku_push/http/delete_file.dart';
-import 'package:miku_push/http/upload_file.dart';
+import 'package:miku_push/http/delete_file.dart' as server;
+import 'package:miku_push/http/upload_file.dart' as server;
 import 'package:miku_push/model/file_upload.dart';
 import 'package:miku_push/model/file_upload_progress.dart';
 import 'package:miku_push/database/database.dart';
 import 'package:local_notifier/local_notifier.dart';
+import 'package:path/path.dart' as path;
 
 class FileUploadsProvider extends ChangeNotifier {
   List<FileUpload> _filesUploaded = [];
@@ -31,12 +32,25 @@ class FileUploadsProvider extends ChangeNotifier {
     debugPrint('Adding to queue files $filesPaths to upload');
 
     for (var path in filesPaths) {
-      final upload = FileUpload.fromFilePath(path);
-      final progress = upload.createProgress();
-
-      _filesUploading.add(progress);
-      _filesToUpload.add((upload, progress));
+      _addFileToUploadQueue(path);
     }
+
+    _sortRunningUploads();
+    _startUploadFiles();
+    notifyListeners();
+  }
+
+  void uploadFile(String filePath) async {
+    debugPrint('Adding to queue file $filePath to upload');
+    _addFileToUploadQueue(filePath);
+
+    final fileName = path.basename(filePath);
+    LocalNotification notification = LocalNotification(
+      title: 'Uploading file $fileName 🚀',
+      body: 'The file $fileName is added to the upload queue',
+    );
+
+    notification.show();
 
     _sortRunningUploads();
     _startUploadFiles();
@@ -54,7 +68,7 @@ class FileUploadsProvider extends ChangeNotifier {
       final deleteQuery = _database.delete(_database.uploadedFile)
         ..where((t) => t.uuid.equals(id));
 
-      await deleteFile(id);
+      await server.deleteFile(id);
       await deleteQuery.go();
       filesUploaded.removeWhere((uploaded) => uploaded.id == id);
       notifyListeners();
@@ -123,6 +137,14 @@ class FileUploadsProvider extends ChangeNotifier {
     }
   }
 
+  void _addFileToUploadQueue(String filePath) {
+    final upload = FileUpload.fromFilePath(filePath);
+    final progress = upload.createProgress();
+
+    _filesUploading.add(progress);
+    _filesToUpload.add((upload, progress));
+  }
+
   void _startUploadFiles() async {
     if (_isUploadingFiles) return;
     debugPrint('Starting uploading incoming files');
@@ -132,7 +154,7 @@ class FileUploadsProvider extends ChangeNotifier {
       final (upload, progress) = _filesToUpload.removeFirst();
 
       try {
-        await uploadFile(
+        await server.uploadFile(
           progress: progress,
           onStartUpload: (progress) {
             notifyListeners();
