@@ -51,6 +51,7 @@ dependencies:
   drift: ^2.25.1
   drift_flutter: ^0.2.4
   local_notifier: ^0.1.6
+  tray_manager: ^0.3.2
 
 dev_dependencies:
   flutter_test:

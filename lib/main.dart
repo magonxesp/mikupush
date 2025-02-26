@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:miku_push/model/file_uploads_provider.dart';
 import 'package:miku_push/theme.dart';
@@ -6,6 +8,7 @@ import 'package:miku_push/widgets/upload_file_tab.dart';
 import 'package:miku_push/widgets/uploading_list_tab.dart';
 import 'package:miku_push/widgets/uploaded_list_tab.dart';
 import 'package:provider/provider.dart';
+import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:local_notifier/local_notifier.dart';
 
@@ -13,18 +16,12 @@ final appTitle = 'Miku Push!';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await windowManager.ensureInitialized();
 
-  await localNotifier.setup(
+  localNotifier.setup(
     appName: appTitle,
     // The parameter shortcutPolicy only works on Windows
     shortcutPolicy: ShortcutPolicy.requireCreate,
   );
-
-  windowManager.waitUntilReadyToShow().then((_) async {
-    await windowManager.setSize(const Size(500, 650));
-    await windowManager.setMinimumSize(const Size(500, 650));
-  });
 
   runApp(ChangeNotifierProvider(
     create: (context) => FileUploadsProvider(),
@@ -32,8 +29,18 @@ void main() async {
   ));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  @override
+  _MyApp createState() => _MyApp();
+}
+
+class _MyApp extends State<MyApp> with TrayListener {
+  @override
+  void initState() {
+    super.initState();
+    trayManager.addListener(this);
+    _initTray();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,6 +94,17 @@ class MyApp extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _initTray() async {
+    Menu menu = Menu(items: [
+      MenuItem(label: 'Mostrar', onClick: (_) => windowManager.show()),
+      MenuItem(label: 'Salir', onClick: (_) => windowManager.destroy()),
+    ]);
+
+    await trayManager.setIcon('assets/icons/app-icon.png'); // Agrega un ícono para el tray
+    await trayManager.setToolTip(appTitle);
+    await trayManager.setContextMenu(menu);
   }
 }
 
