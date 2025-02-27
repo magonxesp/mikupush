@@ -20,7 +20,7 @@ String _initialRequestedUploadFilePath = '';
 void main(List<String> args) async {
   final filePath = args.firstOrNull;
   if (filePath != null && await _sendUploadRequest(filePath)) {
-    return;
+    exit(0);
   }
 
   debugPrint('No file upload request made or it failed, launching gui');
@@ -153,12 +153,14 @@ class _MyApp extends State<MyApp> with TrayListener, WindowListener {
     await windowManager.setPreventClose(true);
   }
 
-  void _launchInitialUploadRequest() {
+  void _launchInitialUploadRequest() async {
     if (_initialRequestedUploadFilePath == '') {
       return;
     }
 
+    await Future.delayed(Duration(seconds: 1));
     debugPrint('Starrting initial file upload request');
+
     final provider = Provider.of<FileUploadsProvider>(context, listen: false);
     provider.uploadFile(_initialRequestedUploadFilePath);
   }
