@@ -1,26 +1,26 @@
 import 'dart:io';
+
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:local_notifier/local_notifier.dart';
 import 'package:miku_push/model/file_uploads_provider.dart';
+import 'package:miku_push/socket/socket_server.dart';
 import 'package:miku_push/theme.dart';
 import 'package:miku_push/widgets/badge_tab.dart';
 import 'package:miku_push/widgets/upload_file_tab.dart';
-import 'package:miku_push/widgets/uploading_list_tab.dart';
 import 'package:miku_push/widgets/uploaded_list_tab.dart';
+import 'package:miku_push/widgets/uploading_list_tab.dart';
 import 'package:provider/provider.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:local_notifier/local_notifier.dart';
-import 'package:miku_push/socket/socket_server.dart';
-import 'package:miku_push/socket/socket_client.dart';
-import 'package:collection/collection.dart';
 
 final appTitle = 'Miku Push!';
 String _initialRequestedUploadFilePath = '';
 
 void main(List<String> args) async {
   final filePath = args.firstOrNull;
-  if (filePath != null && await _sendUploadRequest(filePath)) {
-    exit(0);
+  if (filePath != null) {
+    _initialRequestedUploadFilePath = filePath;
   }
 
   debugPrint('No file upload request made or it failed, launching gui');
@@ -201,16 +201,5 @@ String _trayIcon() {
     return 'assets/icons/app-icon.ico';
   } else {
     return 'assets/icons/app-icon.png';
-  }
-}
-
-Future<bool> _sendUploadRequest(String filePath) async {
-  try {
-    _initialRequestedUploadFilePath = filePath;
-    await sendUploadRequest(filePath);
-    return true;
-  } catch (exception) {
-    debugPrint('Send file upload request failed: $exception');
-    return false;
   }
 }
