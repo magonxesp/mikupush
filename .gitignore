@@ -50,3 +50,7 @@ mikupush-server
 /data
 server/data
 server/.env
+
+# Helper
+miku-push-helper
+miku-push-helper.exe
