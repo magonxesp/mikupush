@@ -54,3 +54,6 @@ server/.env
 # Helper
 miku-push-helper
 miku-push-helper.exe
+
+# Installer distribution
+/dist
