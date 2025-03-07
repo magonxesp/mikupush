@@ -8,7 +8,7 @@ final socketPort = 4040;
 final socketAckMessage = 'ok';
 bool _isListeningSocket = false;
 
-void listenUploadRequests(BuildContext context) async {
+void listenSocketUploadRequests(BuildContext context) async {
   if (_isListeningSocket) return;
 
   final provider = Provider.of<FileUploadsProvider>(context, listen: false);

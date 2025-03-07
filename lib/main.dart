@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:local_notifier/local_notifier.dart';
+import 'package:miku_push/channels/upload_request_channel.dart';
 import 'package:miku_push/model/file_uploads_provider.dart';
 import 'package:miku_push/socket/socket_server.dart';
 import 'package:miku_push/theme.dart';
@@ -54,7 +55,8 @@ class _MyApp extends State<MyApp> with TrayListener, WindowListener {
   void initState() {
     super.initState();
 
-    listenUploadRequests(context);
+    listenSocketUploadRequests(context);
+    listenChannelUploadRequests(context);
     _launchInitialUploadRequest();
     windowManager.addListener(this);
     trayManager.addListener(this);

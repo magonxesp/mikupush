@@ -57,3 +57,5 @@ miku-push-helper.exe
 
 # Installer distribution
 /dist
+
+/Flutter
