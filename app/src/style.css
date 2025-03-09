@@ -1,0 +1,35 @@
+@font-face {
+  font-family: 'Fredoka';
+  src: url('assets/fonts/fredoka.ttf') format('truetype');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'Fredoka';
+  src: url('assets/fonts/fredoka_light.ttf') format('truetype');
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: 'Fredoka';
+  src: url('assets/fonts/fredoka_bold.ttf') format('truetype');
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: 'Fredoka';
+  src: url('assets/fonts/fredoka_medium.ttf') format('truetype');
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: 'Fredoka';
+  src: url('assets/fonts/fredoka_semibold.ttf') format('truetype');
+  font-weight: 600;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
