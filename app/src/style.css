@@ -28,8 +28,44 @@
   font-weight: 600;
 }
 
+:root {
+  --primary-color: #057073;
+  --secondary-color: #9AD5D5;
+  --background-color: #FFFFFF;
+  --foreground-color: #000000;
+  --secondary-background-color: #EAEAEB;
+
+  /* Material Web Components colors */
+  --md-sys-color-surface: var(--background-color);
+  --md-sys-color-on-surface: var(--foreground-color);
+  --md-sys-color-primary: var(--primary-color);
+  --md-sys-color-on-primary: var(--background-color);
+  --md-sys-color-secondary: var(--secondary-color);
+  --md-sys-color-on-secondary: var(--background-color);
+  --md-sys-color-primary-container: var(--primary-color);
+  --md-sys-color-on-primary-container: var(--background-color);
+  --md-sys-color-secondary-container: var(--secondary-color);
+  --md-sys-color-on-secondary-container: var(--foreground-color);
+  --md-sys-color-surface-container-highest: var(--secondary-background-color);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-color: #38B0B6;
+    --secondary-color: #020516;
+    --background-color: #1C1B1F;
+    --foreground-color: #FFFFFF;
+    --secondary-background-color: #000000;
+  }
+}
+
 body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background-color: var(--background-color);
+  color: var(--foreground-color);
 }

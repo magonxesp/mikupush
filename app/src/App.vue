@@ -1,18 +1,12 @@
 <script setup>
-import AppTabs from './components/AppTabs.vue';
+import AppTabs from './components/AppTabs.vue'
 import AppTitle from './components/AppTitle.vue'
-import FileUploadInput from './components/FileUploadInput.vue';
 </script>
 
 <template>
   <div class="drag-area"></div>
-  <v-app>
-    <v-container>
-      <AppTitle />
-      <AppTabs />
-      <FileUploadInput />
-    </v-container>
-  </v-app>
+  <AppTitle />
+  <AppTabs />
 </template>
 
 <style scoped>

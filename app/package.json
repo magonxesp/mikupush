@@ -5,8 +5,8 @@
   "type": "module",
   "main": "main.js",
   "scripts": {
-    "lint": "standard",
-    "lint:fix": "standard --fix",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
     "vite:dev": "vite",
     "vite:build": "vite build",
     "electron:dev": "electronmon . --dev-server",
@@ -25,8 +25,10 @@
     "concurrently": "^9.1.2",
     "electron": "^35.0.0",
     "electronmon": "^2.0.3",
+    "eslint": "^9.22.0",
+    "eslint-plugin-vue": "^10.0.0",
     "material-design-icons-iconfont": "^6.7.0",
-    "standard": "^17.1.2",
+    "neostandard": "^0.12.1",
     "vite": "^6.2.0",
     "wait-on": "^8.0.2"
   }
