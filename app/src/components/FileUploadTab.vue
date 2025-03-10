@@ -1,6 +1,7 @@
 <template>
-    <h1>new tab</h1>
+    <FileUploadInput />
 </template>
 
 <script setup>
+import FileUploadInput from './FileUploadInput.vue'
 </script>
