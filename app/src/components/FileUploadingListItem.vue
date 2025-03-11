@@ -5,26 +5,26 @@
         </div>
         <div slot="headline" class="name">{{ props.name }}</div>
         <div 
-            v-if="errorMessage == '' || errorMessage == null" 
+            v-if="!props.failed" 
             class="speed" 
             slot="supporting-text"
         >
-            {{ formatSpeed(speed) }}
+            {{ formatSpeed(props.speed) }}
         </div>
         <div 
-            v-if="errorMessage != '' && errorMessage != null"
+            v-if="props.failed"
             class="error" 
             slot="supporting-text"
         >
-            {{ errorMessage }}
+            {{ props.errorMessage }}
         </div>
-        <div v-if="failed" slot="end">
+        <div v-if="props.failed" slot="end">
             <md-icon-button @click="handleRetry">
                 <md-icon class="retry">refresh</md-icon>
             </md-icon-button>
         </div>
-        <div v-if="!failed" slot="end" class="actions">
-            <md-circular-progress class="progress" :value="progress"></md-circular-progress>
+        <div v-if="!props.failed" slot="end" class="actions">
+            <md-circular-progress class="progress" :value="props.progress"></md-circular-progress>
             <md-icon-button @click="handleCancel">
                 <md-icon class="cancel">close</md-icon>
             </md-icon-button>
@@ -64,16 +64,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['cancel', 'retry'])
-const speed = ref(props.speed)
-const progress = ref(props.progress)
-
-watch(props.speed, (newValue) => {
-    speed.value = newValue
-})
-
-watch(props.progress, (newValue) => {
-    progress.value = newValue
-})
 
 function handleCancel() {
     emit('cancel')
