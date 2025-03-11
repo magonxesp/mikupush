@@ -1,6 +1,7 @@
 <template>
-    <h1>In progress tab</h1>
+    <FilesUploadingList />
 </template>
 
 <script setup>
+import FilesUploadingList from './FilesUploadingList.vue';
 </script>

@@ -3,7 +3,16 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue({
+      template: {
+        compilerOptions: {
+          // treat all Material Design Web components as custom elements
+          isCustomElement: (tag) => tag.includes('md-')
+        }
+      }
+    })
+  ],
   base: '',
   server: {
     port: 5173
