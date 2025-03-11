@@ -15,7 +15,9 @@
 </template>
 
 <script setup>
-import { onMounted, ref, useTemplateRef } from 'vue'
+import { defineEmits, ref, useTemplateRef } from 'vue'
+
+const emit = defineEmits(['change'])
 
 const fileInput = useTemplateRef('file-input')
 const highlight = ref(false)
@@ -37,16 +39,28 @@ function hideHighlight(event) {
 }
 
 function handleSelectedFiles(event) {
-  console.log(event.target.files)
-  // TODO: dispatch event with the selected files
+  emit('change', Array.from(event.target.files))
 }
 
 function handleDroppedFiles(event) {
   event.preventDefault();
   event.stopPropagation();
-  console.log(event.dataTransfer.files)
-  // TODO: check is only file
-  // TODO: dispatch event with the selected files
+
+  const isFile = (item) => {
+    if (item.kind !== 'file') {
+      return false;
+    }
+
+    const entry = item.webkitGetAsEntry()
+    return entry.isFile
+  }
+
+  const files = Array.from(event.dataTransfer.items)
+      .filter(isFile)
+      .map(item => item.getAsFile())
+
+  emit('change', files)
+  highlight.value = false
 }
 </script>
 

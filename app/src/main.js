@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
@@ -30,4 +31,9 @@ const vuetify = createVuetify({
 
 document.adoptedStyleSheets.push(typescaleStyles.styleSheet)
 
-createApp(App).use(vuetify).mount('#app')
+const pinia = createPinia()
+const app = createApp(App)
+
+app.use(pinia)
+app.use(vuetify)
+app.mount('#app')
