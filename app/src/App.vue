@@ -4,7 +4,7 @@ import AppTitle from './components/AppTitle.vue'
 </script>
 
 <template>
-  <div class="drag-area"></div>
+  <div class="drag-area" />
   <AppTitle />
   <AppTabs />
 </template>

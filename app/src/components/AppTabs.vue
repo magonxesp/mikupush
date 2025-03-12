@@ -1,24 +1,24 @@
 <template>
   <div class="app-tabs">
     <md-tabs>
-      <md-primary-tab 
-        id="upload-tab" 
+      <md-primary-tab
+        id="upload-tab"
         aria-controls="upload-panel"
         @click="currentTab = 0"
       >
         <md-icon>upload</md-icon>
         Upload files
       </md-primary-tab>
-      <md-primary-tab 
-        id="uploads-in-progress-tab" 
+      <md-primary-tab
+        id="uploads-in-progress-tab"
         aria-controls="uploads-in-progress-panel"
         @click="currentTab = 1"
       >
         <md-icon>schedule</md-icon>
         Uploads in progress
       </md-primary-tab>
-      <md-primary-tab 
-        id="finished-uploads-tab" 
+      <md-primary-tab
+        id="finished-uploads-tab"
         aria-controls="finished-uploads-panel"
         @click="currentTab = 2"
       >
@@ -26,14 +26,15 @@
         Finished uploads
       </md-primary-tab>
     </md-tabs>
-    <div 
-      v-for="(tab, index) in tabs" 
-      :id="`${tab[0]}-panel`" 
+    <div
+      v-for="(tab, index) in tabs"
+      :id="`${tab[0]}-panel`"
+      :key="index"
       role="tabpanel"
       :aria-labelledby="`${tab[0]}-tab`"
       :hidden="currentTab != index"
     >
-      <component :is="tab[1]"></component>
+      <component :is="tab[1]" />
     </div>
   </div>
 </template>

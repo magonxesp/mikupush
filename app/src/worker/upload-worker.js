@@ -10,8 +10,8 @@ const uploadQueue = []
  *
  * @param {FileRequest} request
  */
-function handleRequest(request) {
-    uploadQueue.push(request)
+function handleRequest (request) {
+  uploadQueue.push(request)
 }
 
 addEventListener('message', handleRequest)

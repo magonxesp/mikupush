@@ -5,8 +5,8 @@
   "type": "module",
   "main": "main.js",
   "scripts": {
-    "lint": "eslint",
-    "lint:fix": "eslint --fix",
+    "lint": "eslint ./src ./main.ts",
+    "lint:fix": "eslint --fix ./src ./main.ts",
     "vite:dev": "vite",
     "vite:build": "vite build",
     "electron:dev": "tsc --outdir dist -p tsconfig.electron.json && electron dist/main.js --dev-server",

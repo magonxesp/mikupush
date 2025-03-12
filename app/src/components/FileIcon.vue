@@ -1,5 +1,8 @@
 <template>
-  <FontAwesomeIcon class="icon" :icon="icon" />
+  <FontAwesomeIcon
+    class="icon"
+    :icon="icon"
+  />
 </template>
 
 <script setup>
@@ -33,68 +36,68 @@ const icon = computed(() => resolveIcon(props.mimeType))
  *
  * @param {string} mimeType
  */
-function resolveIcon(mimeType) {
+function resolveIcon (mimeType) {
   const excelTypes = [
-    "application/vnd.ms-excel",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "application/vnd.oasis.opendocument.spreadsheet",
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.oasis.opendocument.spreadsheet',
   ]
 
   const wordTypes = [
-    "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    "application/rtf",
-    "application/vnd.oasis.opendocument.tex",
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/rtf',
+    'application/vnd.oasis.opendocument.tex',
   ]
 
   const powerPointTypes = [
-    "application/vnd.ms-powerpoint",
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-    "application/vnd.oasis.opendocument.presentation",
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/vnd.oasis.opendocument.presentation',
   ]
 
   const sourceCodeTypes = [
-    "text/x-java-source",
-    "text/x-c",
-    "text/x-c++",
-    "text/x-csharp",
-    "text/x-python",
-    "application/javascript",
-    "application/x-typescript",
-    "text/html",
-    "text/css",
-    "application/x-httpd-php",
-    "text/x-ruby",
-    "text/x-perl",
-    "application/x-sh",
-    "application/x-powershell",
-    "application/sql",
-    "text/x-go",
-    "text/x-rust",
-    "text/x-swift",
-    "text/x-kotlin",
-    "text/x-lua",
-    "text/x-r-source",
-    "text/x-matlab",
+    'text/x-java-source',
+    'text/x-c',
+    'text/x-c++',
+    'text/x-csharp',
+    'text/x-python',
+    'application/javascript',
+    'application/x-typescript',
+    'text/html',
+    'text/css',
+    'application/x-httpd-php',
+    'text/x-ruby',
+    'text/x-perl',
+    'application/x-sh',
+    'application/x-powershell',
+    'application/sql',
+    'text/x-go',
+    'text/x-rust',
+    'text/x-swift',
+    'text/x-kotlin',
+    'text/x-lua',
+    'text/x-r-source',
+    'text/x-matlab',
   ]
 
   const compressedTypes = [
-    "application/zip",
-    "application/x-7z-compressed",
-    "application/x-rar-compressed",
-    "application/gzip",
-    "application/x-tar",
-    "application/x-bzip2",
-    "application/x-xz",
-    "application/x-lzma",
-    "application/x-apple-diskimage",
+    'application/zip',
+    'application/x-7z-compressed',
+    'application/x-rar-compressed',
+    'application/gzip',
+    'application/x-tar',
+    'application/x-bzip2',
+    'application/x-xz',
+    'application/x-lzma',
+    'application/x-apple-diskimage',
   ]
 
-  if (mimeType.startsWith("image/")) {
+  if (mimeType.startsWith('image/')) {
     return faFileImage
-  } else if (mimeType.startsWith("audio/")) {
+  } else if (mimeType.startsWith('audio/')) {
     return faFileAudio
-  } else if (mimeType.startsWith("video/")) {
+  } else if (mimeType.startsWith('video/')) {
     return faFileVideo
   } else if (excelTypes.indexOf(mimeType) !== -1) {
     return faFileExcel
@@ -102,9 +105,9 @@ function resolveIcon(mimeType) {
     return faFileWord
   } else if (powerPointTypes.indexOf(mimeType) !== -1) {
     return faFilePowerpoint
-  } else if (mimeType == "application/pdf") {
+  } else if (mimeType === 'application/pdf') {
     return faFilePdf
-  } else if (mimeType == "text/plain") {
+  } else if (mimeType === 'text/plain') {
     return faFileLines
   } else if (sourceCodeTypes.indexOf(mimeType) !== -1) {
     return faFileCode

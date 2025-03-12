@@ -1,5 +1,5 @@
 <template>
-    <h1>Finished tab</h1>
+  <h1>Finished tab</h1>
 </template>
 
 <script setup>

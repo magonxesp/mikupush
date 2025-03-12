@@ -1,17 +1,17 @@
 <template>
-    <md-list>
-        <FileUploadingListItem
-            name="pekora.png"
-            mime-type="image/jpeg"
-            :speed="100"
-            :progress="0.5"
-        />
-        <md-divider></md-divider>
-    </md-list>
+  <md-list>
+    <FileUploadingListItem
+      name="pekora.png"
+      mime-type="image/jpeg"
+      :speed="100"
+      :progress="0.5"
+    />
+    <md-divider />
+  </md-list>
 </template>
 
 <script setup>
-import FileUploadingListItem from './FileUploadingListItem.vue';
+import FileUploadingListItem from './FileUploadingListItem.vue'
 </script>
 
 <style scoped>

@@ -1,7 +1,7 @@
 <template>
-    <FilesUploadingList />
+  <FilesUploadingList />
 </template>
 
 <script setup>
-import FilesUploadingList from './FilesUploadingList.vue';
+import FilesUploadingList from './FilesUploadingList.vue'
 </script>

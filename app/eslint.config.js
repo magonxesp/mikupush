@@ -5,4 +5,9 @@ import neostandard from 'neostandard'
 export default defineConfig([
   ...pluginVue.configs['flat/recommended'],
   ...neostandard(),
+  {
+    rules: {
+      'vue/no-deprecated-slot-attribute': 'off',
+    }
+  }
 ])

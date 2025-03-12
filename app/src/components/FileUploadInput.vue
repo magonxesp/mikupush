@@ -1,5 +1,5 @@
 <template>
-  <div 
+  <div
     class="area"
     :class="{'active': highlight}"
     @click="openFileDialog"
@@ -9,50 +9,57 @@
     @drop.prevent="handleDroppedFiles"
   >
     <md-icon>upload</md-icon>
-    <p class="md-typescale-body-large">Drop your file here to upload it, or click to select a file.</p>
-    <input type="file" hidden @change="handleSelectedFiles" ref="file-input" />
+    <p class="md-typescale-body-large">
+      Drop your file here to upload it, or click to select a file.
+    </p>
+    <input
+      ref="file-input"
+      type="file"
+      hidden
+      @change="handleSelectedFiles"
+    >
   </div>
 </template>
 
 <script setup>
 import { defineEmits, ref, useTemplateRef } from 'vue'
-import { FileRequest } from "../model/file-request.js";
+import { FileRequest } from '../model/file-request.js'
 
 const emit = defineEmits(['change'])
 
 const fileInput = useTemplateRef('file-input')
 const highlight = ref(false)
 
-function openFileDialog() {
+function openFileDialog () {
   fileInput.value.click()
 }
 
-function showHighlight(event) {
-  event.preventDefault();
-  event.stopPropagation();
+function showHighlight (event) {
+  event.preventDefault()
+  event.stopPropagation()
   highlight.value = true
 }
 
-function hideHighlight(event) {
-  event.preventDefault();
-  event.stopPropagation();
+function hideHighlight (event) {
+  event.preventDefault()
+  event.stopPropagation()
   highlight.value = false
 }
 
-function handleSelectedFiles(event) {
+function handleSelectedFiles (event) {
   const files = Array.from(event.target.files)
-      .map(file => FileRequest.fromFile(file))
+    .map(file => FileRequest.fromFile(file))
 
   emit('change', files)
 }
 
-function handleDroppedFiles(event) {
-  event.preventDefault();
-  event.stopPropagation();
+function handleDroppedFiles (event) {
+  event.preventDefault()
+  event.stopPropagation()
 
   const isFile = (item) => {
     if (item.kind !== 'file') {
-      return false;
+      return false
     }
 
     const entry = item.webkitGetAsEntry()
@@ -60,8 +67,8 @@ function handleDroppedFiles(event) {
   }
 
   const files = Array.from(event.dataTransfer.items)
-      .filter(isFile)
-      .map(item => FileRequest.fromFile(item.getAsFile()))
+    .filter(isFile)
+    .map(item => FileRequest.fromFile(item.getAsFile()))
 
   emit('change', files)
   highlight.value = false
