@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import {ref} from "vue";
+import { ref } from 'vue'
 
 export const useAppStore = defineStore('app', () => {
     const uploadQueue = ref([])
@@ -7,10 +7,11 @@ export const useAppStore = defineStore('app', () => {
     /**
      * Add to upload queue the files and run upload task
      *
-     * @param {File[]} files
+     * @param {FileRequest[]} requests
      */
-    function upload(files) {
-        uploadQueue.value.push(files)
+    function upload(requests) {
+        console.log(requests)
+        uploadQueue.value.push(requests)
     }
 
     return {

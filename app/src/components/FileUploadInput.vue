@@ -16,6 +16,7 @@
 
 <script setup>
 import { defineEmits, ref, useTemplateRef } from 'vue'
+import { FileRequest } from "../model/file-request.js";
 
 const emit = defineEmits(['change'])
 
@@ -39,7 +40,10 @@ function hideHighlight(event) {
 }
 
 function handleSelectedFiles(event) {
-  emit('change', Array.from(event.target.files))
+  const files = Array.from(event.target.files)
+      .map(file => FileRequest.fromFile(file))
+
+  emit('change', files)
 }
 
 function handleDroppedFiles(event) {
@@ -57,7 +61,7 @@ function handleDroppedFiles(event) {
 
   const files = Array.from(event.dataTransfer.items)
       .filter(isFile)
-      .map(item => item.getAsFile())
+      .map(item => FileRequest.fromFile(item.getAsFile()))
 
   emit('change', files)
   highlight.value = false
