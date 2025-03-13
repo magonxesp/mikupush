@@ -1,17 +1,17 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { Ref, ref } from 'vue'
+import { FileRequest } from './model/file-request'
 
 export const useAppStore = defineStore('app', () => {
-    const uploadQueue = ref([])
+    const uploadQueue: Ref<FileRequest[]> = ref([])
 
-    /**
-     * Add to upload queue the files and run upload task
-     *
-     * @param {FileRequest[]} requests
-     */
-    function upload(requests) {
+    function upload(requests: FileRequest[]) {
         console.log(requests)
-        uploadQueue.value.push(requests)
+        uploadQueue.value.push(...requests)
+    }
+
+    async function startUploading() {
+        
     }
 
     return {

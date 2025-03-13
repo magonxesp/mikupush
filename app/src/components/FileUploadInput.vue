@@ -21,11 +21,15 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { defineEmits, ref, useTemplateRef } from 'vue'
 import { FileRequest } from '../model/file-request.js'
 
-const emit = defineEmits(['change'])
+type Events = {
+  change: [value: FileRequest[]]
+}
+
+const emit = defineEmits<Events>()
 
 const fileInput = useTemplateRef('file-input')
 const highlight = ref(false)
@@ -34,30 +38,34 @@ function openFileDialog () {
   fileInput.value.click()
 }
 
-function showHighlight (event) {
+function showHighlight (event: DragEvent) {
   event.preventDefault()
   event.stopPropagation()
   highlight.value = true
 }
 
-function hideHighlight (event) {
+function hideHighlight (event: DragEvent) {
   event.preventDefault()
   event.stopPropagation()
   highlight.value = false
 }
 
-function handleSelectedFiles (event) {
-  const files = Array.from(event.target.files)
-    .map(file => FileRequest.fromFile(file))
+async function handleSelectedFiles (event: Event) {
+  const target = event.target as HTMLInputElement
+
+  const files = await Promise.all(
+    Array.from(target.files)
+      .map(file => FileRequest.fromFile(file))
+  )
 
   emit('change', files)
 }
 
-function handleDroppedFiles (event) {
+async function handleDroppedFiles (event: DragEvent) {
   event.preventDefault()
   event.stopPropagation()
 
-  const isFile = (item) => {
+  const isFile = (item: DataTransferItem) => {
     if (item.kind !== 'file') {
       return false
     }
@@ -66,9 +74,11 @@ function handleDroppedFiles (event) {
     return entry.isFile
   }
 
-  const files = Array.from(event.dataTransfer.items)
-    .filter(isFile)
-    .map(item => FileRequest.fromFile(item.getAsFile()))
+  const files = await Promise.all(
+    Array.from(event.dataTransfer.items)
+      .filter(isFile)
+      .map(item => FileRequest.fromFile(item.getAsFile()))
+  )
 
   emit('change', files)
   highlight.value = false
