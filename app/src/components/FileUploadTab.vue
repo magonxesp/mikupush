@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import FileUploadInput from './FileUploadInput.vue'
 import { useAppStore } from '../store.js'
-import { requestUploadForFile } from '../helpers/upload'
+import { requestUploadForFile } from '../service/upload'
 
 const store = useAppStore()
 
