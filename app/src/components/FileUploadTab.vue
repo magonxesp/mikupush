@@ -10,7 +10,7 @@ import { requestUploadForFile } from '../helpers/upload'
 const store = useAppStore()
 
 function handleSelectedFiles (files: File[]) {
-  for (let file of files) {
+  for (const file of files) {
     requestUploadForFile(file).then(progress => {
       store.uploadsInProgress.push(progress)
     })

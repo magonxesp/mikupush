@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { UploadProgress } from '../model/upload-progress';
+import { UploadProgress } from '../model/upload-progress'
 
 interface UploadRequest {
   file: File
@@ -9,7 +9,7 @@ interface UploadRequest {
 const uploadQueue: UploadRequest[] = []
 let isConsumingUploadQueue = false
 
-export async function requestUploadForFile(file: File) {
+export async function requestUploadForFile (file: File) {
   const progress = await UploadProgress.fromFile(file)
   uploadQueue.push({ file, progress })
   startConsumeUploadQueue()
@@ -17,7 +17,7 @@ export async function requestUploadForFile(file: File) {
   return progress
 }
 
-async function startConsumeUploadQueue() {
+async function startConsumeUploadQueue () {
   if (isConsumingUploadQueue) return
   isConsumingUploadQueue = true
 
@@ -26,7 +26,7 @@ async function startConsumeUploadQueue() {
     await upload(request)
   }
 
-  isConsumingUploadQueue = false  
+  isConsumingUploadQueue = false
 }
 
 async function upload (request: UploadRequest) {
@@ -42,7 +42,7 @@ async function upload (request: UploadRequest) {
     },
     onUploadProgress: (event) => {
       if (event.total) {
-        //const speed = progressEvent.loaded / elapsedTime // Bytes por segundo
+        // const speed = progressEvent.loaded / elapsedTime // Bytes por segundo
         progress.updateProgress(
           (event.loaded / event.total),
           0

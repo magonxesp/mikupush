@@ -1,4 +1,4 @@
-import { FileDetails } from "./file-details"
+import { FileDetails } from './file-details'
 
 export class UploadProgress {
   readonly details: FileDetails
@@ -8,56 +8,56 @@ export class UploadProgress {
   private error: string | null = null
   private observers: ((progress: UploadProgress) => void)[] = []
 
-  constructor(details: FileDetails) {
+  constructor (details: FileDetails) {
     this.details = details
   }
 
-  get progress() {
+  get progress () {
     return this._progress
   }
 
-  get speed() {
+  get speed () {
     return this._speed
   }
 
-  get isFinishedSuccess() {
+  get isFinishedSuccess () {
     return this.finished && this.error == null
   }
 
-  get isFinishedFailed() {
+  get isFinishedFailed () {
     return this.finished && this.error != null
   }
 
-  get isInProgress() {
+  get isInProgress () {
     return !this.finished
   }
 
-  finishWithError(error: string) {
+  finishWithError (error: string) {
     this.finished = true
     this.error = error
 
     this.notifyAll()
   }
 
-  finishSuccessful() {
+  finishSuccessful () {
     this.finished = true
     this.error = null
 
     this.notifyAll()
   }
 
-  onUpdate(observer: (progress: UploadProgress) => void) {
+  onUpdate (observer: (progress: UploadProgress) => void) {
     this.observers.push(observer)
   }
 
-  updateProgress(progress: number, speed: number) {
+  updateProgress (progress: number, speed: number) {
     this._progress = progress
     this._speed = speed
 
     this.notifyAll()
   }
 
-  private notifyAll() {
+  private notifyAll () {
     this.observers.forEach(observer => observer(this))
   }
 

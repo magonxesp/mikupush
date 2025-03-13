@@ -70,8 +70,8 @@ async function handleDroppedFiles (event: DragEvent) {
   }
 
   const files = Array.from(event.dataTransfer.items)
-      .filter(isFile)
-      .map(item => item.getAsFile())
+    .filter(isFile)
+    .map(item => item.getAsFile())
 
   emit('change', files)
   highlight.value = false

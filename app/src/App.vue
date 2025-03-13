@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import AppTabs from './components/AppTabs.vue'
 import AppTitle from './components/AppTitle.vue'
 </script>

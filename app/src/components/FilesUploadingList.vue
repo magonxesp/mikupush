@@ -10,7 +10,7 @@
   </md-list>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import FileUploadingListItem from './FileUploadingListItem.vue'
 </script>
 

@@ -39,7 +39,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import FileUploadTab from './FileUploadTab.vue'
 import FileUploadsTab from './FileUploadsTab.vue'

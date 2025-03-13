@@ -31,7 +31,7 @@ export class FileDetails {
     return new FileDetails(
       file.name,
       file.size,
-      mimeType,
+      mimeType
     )
   }
 }

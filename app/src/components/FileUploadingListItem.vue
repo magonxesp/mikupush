@@ -51,7 +51,7 @@
   </md-list-item>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { defineEmits, defineProps } from 'vue'
 import FileIcon from './FileIcon.vue'
 

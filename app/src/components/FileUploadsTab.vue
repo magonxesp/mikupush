@@ -2,6 +2,6 @@
   <FilesUploadingList />
 </template>
 
-<script setup>
+<script setup lang="ts">
 import FilesUploadingList from './FilesUploadingList.vue'
 </script>
