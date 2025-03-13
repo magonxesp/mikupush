@@ -1,17 +1,14 @@
 <template>
   <md-list-item>
-    <template #start>
-      <div>
-        <FileIcon mime-type="image/png" />
-      </div>
-    </template>
-    <template #headline>
-      <div
-        class="name"
-      >
-        {{ props.name }}
-      </div>
-    </template>
+    <div slot="start">
+      <FileIcon mime-type="image/png" />
+    </div>
+    <div
+      slot="headline"
+      class="name"
+    >
+      {{ props.name }}
+    </div>
     <div
       v-if="!props.failed"
       slot="supporting-text"
