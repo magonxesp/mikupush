@@ -1,21 +1,11 @@
 import { defineStore } from 'pinia'
 import { Ref, ref } from 'vue'
-import { FileRequest } from './model/file-request'
+import { UploadProgress } from './model/upload-progress'
 
 export const useAppStore = defineStore('app', () => {
-    const uploadQueue: Ref<FileRequest[]> = ref([])
-
-    function upload(requests: FileRequest[]) {
-        console.log(requests)
-        uploadQueue.value.push(...requests)
-    }
-
-    async function startUploading() {
-        
-    }
+    const uploadsInProgress: Ref<UploadProgress[]> = ref([])
 
     return {
-        uploadQueue,
-        upload
+        uploadsInProgress,
     }
 })

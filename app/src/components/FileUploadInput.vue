@@ -23,10 +23,9 @@
 
 <script setup lang="ts">
 import { defineEmits, ref, useTemplateRef } from 'vue'
-import { FileRequest } from '../model/file-request.js'
 
 type Events = {
-  change: [value: FileRequest[]]
+  change: [value: File[]]
 }
 
 const emit = defineEmits<Events>()
@@ -52,11 +51,7 @@ function hideHighlight (event: DragEvent) {
 
 async function handleSelectedFiles (event: Event) {
   const target = event.target as HTMLInputElement
-
-  const files = await Promise.all(
-    Array.from(target.files)
-      .map(file => FileRequest.fromFile(file))
-  )
+  const files = Array.from(target.files)
 
   emit('change', files)
 }
@@ -74,11 +69,9 @@ async function handleDroppedFiles (event: DragEvent) {
     return entry.isFile
   }
 
-  const files = await Promise.all(
-    Array.from(event.dataTransfer.items)
+  const files = Array.from(event.dataTransfer.items)
       .filter(isFile)
-      .map(item => FileRequest.fromFile(item.getAsFile()))
-  )
+      .map(item => item.getAsFile())
 
   emit('change', files)
   highlight.value = false

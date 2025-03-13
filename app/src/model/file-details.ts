@@ -1,20 +1,18 @@
-import { v4 as uuidv4 } from 'uuid'
 import { fileTypeFromBuffer } from 'file-type'
+import { v4 as uuidv4 } from 'uuid'
 import { MimeTypeResolutionError } from '../error/mime-type-resolution-error'
 
-export class FileRequest {
+export class FileDetails {
   readonly id: string
   readonly name: string
   readonly size: number
   readonly mimeType: string
-  readonly bytes: Uint8Array
 
-  constructor (name: string, size: number, mimeType: string, bytes: Uint8Array) {
+  constructor (name: string, size: number, mimeType: string) {
     this.id = uuidv4()
     this.name = name
     this.size = size
     this.mimeType = mimeType
-    this.bytes = bytes
   }
 
   static async fromFile (file: File) {
@@ -30,11 +28,10 @@ export class FileRequest {
       mimeType = result.mime
     }
 
-    return new FileRequest(
+    return new FileDetails(
       file.name,
       file.size,
       mimeType,
-      bytes
     )
   }
 }

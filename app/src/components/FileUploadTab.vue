@@ -5,11 +5,15 @@
 <script setup lang="ts">
 import FileUploadInput from './FileUploadInput.vue'
 import { useAppStore } from '../store.js'
-import { FileRequest } from '../model/file-request'
+import { requestUploadForFile } from '../helpers/upload'
 
 const store = useAppStore()
 
-function handleSelectedFiles (files: FileRequest[]) {
-  store.upload(files)
+function handleSelectedFiles (files: File[]) {
+  for (let file of files) {
+    requestUploadForFile(file).then(progress => {
+      store.uploadsInProgress.push(progress)
+    })
+  }
 }
 </script>
