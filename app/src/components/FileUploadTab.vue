@@ -12,7 +12,7 @@ const store = useAppStore()
 function handleSelectedFiles (files: File[]) {
   for (const file of files) {
     requestUploadForFile(file).then(progress => {
-      store.uploadsInProgress.push(progress)
+      store.addUploadProgress(progress)
     })
   }
 }

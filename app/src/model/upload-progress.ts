@@ -2,14 +2,15 @@ import { FileDetails } from './file-details'
 
 export class UploadProgress {
   readonly details: FileDetails
+  readonly file: File
   private _progress: number = 0
   private _speed: number = 0
   private _error: string | null = null
   private finished: boolean = false
-  private observers: ((progress: UploadProgress) => void)[] = []
 
-  constructor (details: FileDetails) {
+  constructor (details: FileDetails, file: File) {
     this.details = details
+    this.file = file
   }
 
   get progress () {
@@ -20,7 +21,7 @@ export class UploadProgress {
     return this._speed
   }
 
-  get error() {
+  get error () {
     return this._error
   }
 
@@ -37,35 +38,23 @@ export class UploadProgress {
   }
 
   finishWithError (error: string) {
+    console.log('upload error')
     this.finished = true
     this._error = error
-
-    this.notifyAll()
   }
 
   finishSuccessful () {
     this.finished = true
     this._error = null
-
-    this.notifyAll()
-  }
-
-  onUpdate (observer: (progress: UploadProgress) => void) {
-    this.observers.push(observer)
   }
 
   updateProgress (progress: number, speed: number) {
     this._progress = progress
     this._speed = speed
-
-    this.notifyAll()
-  }
-
-  private notifyAll () {
-    this.observers.forEach(observer => observer(this))
   }
 
   static async fromFile (file: File) {
-    return new UploadProgress(await FileDetails.fromFile(file))
+    const details = await FileDetails.fromFile(file)
+    return new UploadProgress(details, file)
   }
 }

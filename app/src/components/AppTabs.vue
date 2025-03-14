@@ -12,10 +12,13 @@
       <md-primary-tab
         id="uploads-in-progress-tab"
         aria-controls="uploads-in-progress-panel"
-        @click="currentTab = 1"
+        @click="currentTab = 1; newInProgressUploads = 0"
       >
         <md-icon>schedule</md-icon>
-        Uploads in progress
+        <span>
+          Uploads in progress
+          <span v-if="newInProgressUploads > 0">({{ newInProgressUploads }})</span>
+        </span>
       </md-primary-tab>
       <md-primary-tab
         id="finished-uploads-tab"
@@ -34,7 +37,7 @@
       :aria-labelledby="`${tab[0]}-tab`"
       :hidden="currentTab != index"
     >
-      <component :is="tab[1]" />
+      <component @count="newInProgressUploads = $event" :is="tab[1]" />
     </div>
   </div>
 </template>
@@ -52,6 +55,7 @@ const tabs = [
 ]
 
 const currentTab = ref(0)
+const newInProgressUploads = ref(0)
 </script>
 
 <style scoped>

@@ -40,7 +40,7 @@
     >
       <md-circular-progress
         class="progress"
-        :value="props.progress"
+        :value="progress.progress"
       />
       <md-icon-button @click="handleCancel">
         <md-icon class="cancel">
@@ -52,24 +52,38 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits, defineProps } from 'vue'
+import { defineEmits, defineProps, onMounted, ref } from 'vue'
 import FileIcon from './FileIcon.vue'
-import {UploadProgress} from "../model/upload-progress";
+import { UploadProgress } from '../model/upload-progress'
+import { BehaviorSubject } from 'rxjs'
 
 interface Props {
-  progress: UploadProgress
+  item: BehaviorSubject<UploadProgress>
+}
+
+interface Events {
+  retry: [value: UploadProgress],
+  cancel: [value: UploadProgress]
 }
 
 const props = defineProps<Props>()
+console.log(props)
+const emit = defineEmits<Events>()
+const progress = ref(props.item.getValue())
 
-const emit = defineEmits(['cancel', 'retry'])
+onMounted(() => {
+  props.item.subscribe((newValue) => {
+    console.log('new value from upload progress')
+    progress.value = newValue
+  })
+})
 
 function handleCancel () {
-  emit('cancel')
+  emit('cancel', progress.value as UploadProgress)
 }
 
 function handleRetry () {
-  emit('retry')
+  emit('retry', progress.value as UploadProgress)
 }
 
 function formatSpeed (speed: number) {

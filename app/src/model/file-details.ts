@@ -1,4 +1,4 @@
-import { fileTypeFromBuffer } from 'file-type'
+import { fileTypeFromBlob } from 'file-type'
 import { v4 as uuidv4 } from 'uuid'
 import { MimeTypeResolutionError } from '../error/mime-type-resolution-error'
 
@@ -17,10 +17,9 @@ export class FileDetails {
 
   static async fromFile (file: File) {
     let mimeType = file.type
-    const bytes = await file.bytes()
 
     if (!mimeType) {
-      const result = await fileTypeFromBuffer(bytes)
+      const result = await fileTypeFromBlob(file)
       if (typeof result === 'undefined') {
         throw MimeTypeResolutionError.forFile(file)
       }
