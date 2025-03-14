@@ -75,6 +75,7 @@ function App() {
       }}
     >
       <div className={styles.app}>
+        <div className={styles.dragArea} />
         <AppTitle />
         <AppTabs tabs={tabs} onTabSelected={handleTabSelected} />
         <div className={styles.tabView}>

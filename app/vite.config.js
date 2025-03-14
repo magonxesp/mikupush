@@ -9,5 +9,7 @@ export default defineConfig({
       localsConvention:"camelCase",
       generateScopedName:"[local]_[hash:base64:15]"
     }
-  }
+  },
+  base: '',
+  port: 5173
 })

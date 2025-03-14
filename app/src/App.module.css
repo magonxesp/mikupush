@@ -1,0 +1,18 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.tab-view {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.drag-area {
+  width: 100%;
+  background-color: red;
+  height: 2rem;
+  -webkit-app-region: drag;
+}
