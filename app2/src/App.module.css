@@ -1,0 +1,11 @@
+.app {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.tab-view {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
