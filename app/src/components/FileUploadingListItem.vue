@@ -7,24 +7,24 @@
       slot="headline"
       class="name"
     >
-      {{ props.name }}
+      {{ progress.details.name }}
     </div>
     <div
-      v-if="!props.failed"
+      v-if="progress.isInProgress"
       slot="supporting-text"
       class="speed"
     >
-      {{ formatSpeed(props.speed) }}
+      {{ formatSpeed(progress.speed) }}
     </div>
     <div
-      v-if="props.failed"
+      v-if="progress.isFinishedFailed"
       slot="supporting-text"
       class="error"
     >
-      {{ props.errorMessage }}
+      {{ progress.error }}
     </div>
     <div
-      v-if="props.failed"
+      v-if="progress.isFinishedFailed"
       slot="end"
     >
       <md-icon-button @click="handleRetry">
@@ -34,7 +34,7 @@
       </md-icon-button>
     </div>
     <div
-      v-if="!props.failed"
+      v-if="progress.isInProgress"
       slot="end"
       class="actions"
     >
@@ -54,33 +54,13 @@
 <script setup lang="ts">
 import { defineEmits, defineProps } from 'vue'
 import FileIcon from './FileIcon.vue'
+import {UploadProgress} from "../model/upload-progress";
 
-const props = defineProps({
-  name: {
-    type: String,
-    required: true
-  },
-  mimeType: {
-    type: String,
-    required: true
-  },
-  speed: {
-    type: Number,
-    default: 0
-  },
-  progress: {
-    type: Number,
-    default: 0
-  },
-  failed: {
-    type: Boolean,
-    default: false
-  },
-  errorMessage: {
-    type: String,
-    default: ''
-  }
-})
+interface Props {
+  progress: UploadProgress
+}
+
+const props = defineProps<Props>()
 
 const emit = defineEmits(['cancel', 'retry'])
 
@@ -92,12 +72,7 @@ function handleRetry () {
   emit('retry')
 }
 
-/**
- * Get bytes speed text
- *
- * @param {number} speed
- */
-function formatSpeed (speed) {
+function formatSpeed (speed: number) {
   const kb = speed / 1024
   const mb = kb / 1024
   const gb = mb / 1024

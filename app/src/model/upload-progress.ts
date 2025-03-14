@@ -4,8 +4,8 @@ export class UploadProgress {
   readonly details: FileDetails
   private _progress: number = 0
   private _speed: number = 0
+  private _error: string | null = null
   private finished: boolean = false
-  private error: string | null = null
   private observers: ((progress: UploadProgress) => void)[] = []
 
   constructor (details: FileDetails) {
@@ -20,12 +20,16 @@ export class UploadProgress {
     return this._speed
   }
 
+  get error() {
+    return this._error
+  }
+
   get isFinishedSuccess () {
     return this.finished && this.error == null
   }
 
   get isFinishedFailed () {
-    return this.finished && this.error != null
+    return this.finished && this._error != null
   }
 
   get isInProgress () {
@@ -34,14 +38,14 @@ export class UploadProgress {
 
   finishWithError (error: string) {
     this.finished = true
-    this.error = error
+    this._error = error
 
     this.notifyAll()
   }
 
   finishSuccessful () {
     this.finished = true
-    this.error = null
+    this._error = null
 
     this.notifyAll()
   }
