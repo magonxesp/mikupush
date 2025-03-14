@@ -5,6 +5,8 @@ import AppTitle from './components/AppTitle/AppTitle'
 import InputTab from './components/InputTab/InputTab'
 import UploadsFinishedTab from './components/UploadsFinishedTab/UploadsFinishedTab'
 import UploadsProgressTab from './components/UploadsProgressTab/UploadsProgressTab'
+import { UploadsContext } from './context'
+import { addToUploadQueue } from './upload'
 
 function App() {
   const tabs = [
@@ -26,19 +28,60 @@ function App() {
   ]
 
   const [currentTab, setCurrentTab] = useState(0)
+  const [inProgressUploads, setInProgressUploads] = useState([])
+  const [finishedUploads, setFinishedUploads] = useState([])
 
   const handleTabSelected = (index) => {
     setCurrentTab(index)
   }
 
+  const onUploadProgressUpdated = (upload) => {
+    const updateUploadItem = (previous) => {
+      return previous.map(item => {
+        if (item.id === upload.id) {
+          return upload
+        } else {
+          return item
+        }
+      })
+    }
+
+    setInProgressUploads(updateUploadItem)
+  }
+
+  const handleUploadRequest = (file) => {
+    addToUploadQueue(file, onUploadProgressUpdated).then((upload) => {
+      setInProgressUploads([...inProgressUploads, upload])
+    })
+  }
+
+  const handleCancelUpload = (upload) => {
+    console.log('cancel upload', upload)
+    setInProgressUploads(inProgressUploads.filter(item => item.id !== upload.id))
+  }
+
+  const handleRetryUpload = (upload) => {
+    console.log('on retry', upload)
+  }
+
   return (
-    <div className={styles.app}>
-      <AppTitle />
-      <AppTabs tabs={tabs} onTabSelected={handleTabSelected} />
-      <div className={styles.tabView}>
-        {tabs[currentTab].component}
+    <UploadsContext.Provider
+      value={{
+        inProgressUploads,
+        finishedUploads,
+        requestUpload: handleUploadRequest,
+        cancelUpload: handleCancelUpload,
+        retryUpload: handleRetryUpload
+      }}
+    >
+      <div className={styles.app}>
+        <AppTitle />
+        <AppTabs tabs={tabs} onTabSelected={handleTabSelected} />
+        <div className={styles.tabView}>
+          {tabs[currentTab].component}
+        </div>
       </div>
-    </div>
+    </UploadsContext.Provider>
   )
 } 
 
