@@ -1,21 +1,19 @@
 import { useContext } from "react";
-import { useDebounce } from 'use-debounce';
 import FileIcon from "../FileIcon/FileIcon";
 import { UploadsContext } from "../../context";
 import styles from "./UploadsProgressTab.module.css";
 
 export default function UploadsProgressTab() {
   const { inProgressUploads } = useContext(UploadsContext);
-  const [items] = useDebounce(inProgressUploads, 100)
 
   return (
     <md-list className={styles.list}>
-      {items.map((upload, index) => (
+      {inProgressUploads.map((upload, index) => (
         <UploadProgressItemWithDivider
           key={index}
           upload={upload}
           index={index}
-          totalItems={items.length}
+          totalItems={inProgressUploads.length}
         />
       ))}
     </md-list>

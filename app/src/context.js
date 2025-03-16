@@ -5,7 +5,7 @@ export const UploadsContext = createContext({
     inProgressUploadsCount: 0,
     finishedUploads: [],
     finishedUploadsCount: 0,
-    requestUpload: () => {},
+    requestUploads: () => {},
     cancelUpload: () => {},
     retryUpload: () => {},
     resetInProgressUploadsCount: () => {},

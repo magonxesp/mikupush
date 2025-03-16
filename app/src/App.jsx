@@ -1,80 +1,93 @@
-import { useRef, useState } from 'react'
-import styles from './App.module.css'
-import AppTabs from './components/AppTabs/AppTabs'
-import AppTitle from './components/AppTitle/AppTitle'
-import InputTab from './components/InputTab/InputTab'
-import UploadsFinishedTab from './components/UploadsFinishedTab/UploadsFinishedTab'
-import UploadsProgressTab from './components/UploadsProgressTab/UploadsProgressTab'
-import { UploadsContext } from './context'
-import { addToUploadQueue } from './helpers/upload'
+import { useRef, useState } from "react";
+import styles from "./App.module.css";
+import AppTabs from "./components/AppTabs/AppTabs";
+import AppTitle from "./components/AppTitle/AppTitle";
+import InputTab from "./components/InputTab/InputTab";
+import UploadsFinishedTab from "./components/UploadsFinishedTab/UploadsFinishedTab";
+import UploadsProgressTab from "./components/UploadsProgressTab/UploadsProgressTab";
+import { UploadsContext } from "./context";
+import { addToUploadQueue } from "./helpers/upload";
 
 function App() {
   const tabs = {
-    'upload': <InputTab />,
-    'uploads-in-progress': <UploadsProgressTab />,
-    'finished-uploads': <UploadsFinishedTab />
-  }
+    upload: <InputTab />,
+    "uploads-in-progress": <UploadsProgressTab />,
+    "finished-uploads": <UploadsFinishedTab />,
+  };
 
-  const [currentTab, setCurrentTab] = useState('upload')
-  const [inProgressUploads, setInProgressUploads] = useState([])
-  const [finishedUploads, setFinishedUploads] = useState([])
-  const [inProgressUploadsCount, setInProgressUploadsCount] = useState(0)
-  const [finishedUploadsCount, setFinishedUploadsCount] = useState(0)
+  const [currentTab, setCurrentTab] = useState("upload");
+  const [inProgressUploads, setInProgressUploads] = useState([]);
+  const [finishedUploads, setFinishedUploads] = useState([]);
+  const [inProgressUploadsCount, setInProgressUploadsCount] = useState(0);
+  const [finishedUploadsCount, setFinishedUploadsCount] = useState(0);
 
   const handleTabSelected = (index) => {
-    setCurrentTab(index)
-  }
+    setCurrentTab(index);
+  };
 
   const onUploadProgressUpdated = (upload) => {
-    if (upload.finished && upload.error === '') {
-      setInProgressUploads(previous => previous.filter(item => item.id !== upload.id))
-      setFinishedUploads(previous => [...previous, upload])
-      setInProgressUploadsCount(previous => (previous > 0) ? previous - 1 : previous)
+    if (upload.finished && upload.error === "") {
+      setInProgressUploads((previous) =>
+        previous.filter((item) => item.id !== upload.id)
+      );
+      setFinishedUploads((previous) => [...previous, upload]);
+      setInProgressUploadsCount((previous) =>
+        previous > 0 ? previous - 1 : previous
+      );
 
-      if (currentTab !== 'finished-uploads') {
-        setFinishedUploadsCount(previous => previous + 1)
+      if (currentTab !== "finished-uploads") {
+        setFinishedUploadsCount((previous) => previous + 1);
       }
     } else {
-      setInProgressUploads(previous => previous.map(item => (item.id === upload.id) ? upload : item))
+      setInProgressUploads((previous) =>
+        previous.map((item) => (item.id === upload.id ? upload : item))
+      );
     }
-  }
+  };
 
-  const handleUploadRequest = async (file) => {
-    try {
-      const upload = await addToUploadQueue(file, onUploadProgressUpdated)
-      setInProgressUploads(previous => [...previous, upload])
+  const handleUploadRequests = async (files) => {
+    let newUploads = [];
 
-      if (currentTab !== 'uploads-in-progress') {
-        setInProgressUploadsCount(previous => previous + 1)
+    for (let file of files) {
+      try {
+        const upload = await addToUploadQueue(file, onUploadProgressUpdated);
+        newUploads.push(upload);
+        console.log("added file to upload queue");
+      } catch (exception) {
+        console.error("unable to upload file", exception);
       }
-
-      console.log('added file to upload queue')
-    } catch (exception) {
-      console.error('unable to upload file', exception)
     }
-  }
+
+    setInProgressUploads((previous) => [...previous, ...newUploads]);
+
+    if (currentTab !== "uploads-in-progress") {
+      setInProgressUploadsCount((previous) => previous + newUploads.length);
+    }
+  };
 
   const handleCancelUpload = (upload) => {
-    console.log('cancel upload', upload)
-    setInProgressUploads(inProgressUploads.filter(item => item.id !== upload.id))
-  }
+    console.log("cancel upload", upload);
+    setInProgressUploads(
+      inProgressUploads.filter((item) => item.id !== upload.id)
+    );
+  };
 
   const handleRetryUpload = (upload) => {
-    console.log('on retry', upload)
-  }
+    console.log("on retry", upload);
+  };
 
   return (
     <UploadsContext.Provider
       value={{
         inProgressUploads,
         finishedUploads,
-        requestUpload: handleUploadRequest,
+        requestUploads: handleUploadRequests,
         cancelUpload: handleCancelUpload,
         retryUpload: handleRetryUpload,
         inProgressUploadsCount: inProgressUploadsCount,
         finishedUploadsCount: finishedUploadsCount,
         resetInProgressUploadsCount: () => setInProgressUploadsCount(0),
-        resetFinishedUploadsCount: () => setFinishedUploadsCount(0)
+        resetFinishedUploadsCount: () => setFinishedUploadsCount(0),
       }}
     >
       <div className={styles.app}>
@@ -83,12 +96,10 @@ function App() {
           <AppTitle />
           <AppTabs onTabSelected={handleTabSelected} />
         </div>
-        <div className={styles.content}>
-          {tabs[currentTab]}
-        </div>
+        <div className={styles.content}>{tabs[currentTab]}</div>
       </div>
     </UploadsContext.Provider>
-  )
-} 
+  );
+}
 
-export default App
+export default App;

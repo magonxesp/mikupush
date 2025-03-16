@@ -5,10 +5,10 @@ import { UploadsContext } from "../../context";
 export default function InputTab() {
   const [active, setActive] = useState(false);
   const fileInputRef = useRef(null);
-  const { requestUpload } = useContext(UploadsContext);
+  const { requestUploads } = useContext(UploadsContext);
 
   const openFileDialog = () => {
-    fileInputRef.current.click()
+    fileInputRef.current.click();
   };
 
   const handleDragOver = (event) => {
@@ -30,35 +30,33 @@ export default function InputTab() {
     event.stopPropagation();
 
     const isFile = (item) => {
-        if (item.kind !== "file") {
-          return false;
-        }
-  
-        const entry = item.webkitGetAsEntry();
-        return entry.isFile;
-      };
-  
-      Array.from(event.dataTransfer.items)
-        .filter(isFile)
-        .forEach((item) => requestUpload(item.getAsFile()));
-  
-      setActive(false);
+      if (item.kind !== "file") {
+        return false;
+      }
+
+      const entry = item.webkitGetAsEntry();
+      return entry.isFile;
+    };
+
+    const files = Array.from(event.dataTransfer.items)
+      .filter(isFile)
+      .map((item) => item.getAsFile());
+
+    requestUploads(files);
+    setActive(false);
   };
 
   const handleSelectedFiles = (event) => {
     event.preventDefault();
     event.stopPropagation();
 
-    for (let file of event.target.files) {
-        requestUpload(file)
-    }
-
+    requestUploads(event.target.files);
     setActive(false);
   };
 
   return (
     <div
-      className={`${styles.area} ${active ? styles.active : ''}`}
+      className={`${styles.area} ${active ? styles.active : ""}`}
       onClick={openFileDialog}
       onDragOver={handleDragOver}
       onDragEnter={handleDragOver}
@@ -69,7 +67,12 @@ export default function InputTab() {
       <p class="md-typescale-body-large">
         Drop your file here to upload it, or click to select a file.
       </p>
-      <input type="file" hidden onChange={handleSelectedFiles} ref={fileInputRef} />
+      <input
+        type="file"
+        hidden
+        onChange={handleSelectedFiles}
+        ref={fileInputRef}
+      />
     </div>
   );
 }

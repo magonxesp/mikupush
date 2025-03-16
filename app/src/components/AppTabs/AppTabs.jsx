@@ -1,6 +1,5 @@
 import { useContext } from "react";
 import { UploadsContext } from "../../context";
-import { useDebounce } from 'use-debounce';
 import styles from "./AppTabs.module.css";
 
 export default function AppTabs({ onTabSelected }) {
@@ -10,9 +9,6 @@ export default function AppTabs({ onTabSelected }) {
     resetInProgressUploadsCount,
     resetFinishedUploadsCount,
   } = useContext(UploadsContext);
-
-  const [inProgressCount] = useDebounce(inProgressUploadsCount, 100)
-  const [finishedCount] = useDebounce(finishedUploadsCount, 100)
 
   const handleTabSelected = (index) => {
     if (typeof onTabSelected !== "undefined") {
@@ -30,7 +26,7 @@ export default function AppTabs({ onTabSelected }) {
       <Tab
         text="Uploads in progresss"
         icon="schedule"
-        badge={inProgressCount}
+        badge={inProgressUploadsCount}
         onClick={() => {
           handleTabSelected("uploads-in-progress");
           resetInProgressUploadsCount();
@@ -39,7 +35,7 @@ export default function AppTabs({ onTabSelected }) {
       <Tab
         text="Finished uploads"
         icon="check_circle"
-        badge={finishedCount}
+        badge={finishedUploadsCount}
         onClick={() => {
           handleTabSelected("finished-uploads");
           resetFinishedUploadsCount();
