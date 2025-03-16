@@ -1,4 +1,19 @@
-export default function AppTabs({ tabs, onTabSelected }) {
+import { useContext } from "react";
+import { UploadsContext } from "../../context";
+import { useDebounce } from 'use-debounce';
+import styles from "./AppTabs.module.css";
+
+export default function AppTabs({ onTabSelected }) {
+  const {
+    inProgressUploadsCount,
+    finishedUploadsCount,
+    resetInProgressUploadsCount,
+    resetFinishedUploadsCount,
+  } = useContext(UploadsContext);
+
+  const [inProgressCount] = useDebounce(inProgressUploadsCount, 100)
+  const [finishedCount] = useDebounce(finishedUploadsCount, 100)
+
   const handleTabSelected = (index) => {
     if (typeof onTabSelected !== "undefined") {
       onTabSelected(index);
@@ -7,22 +22,43 @@ export default function AppTabs({ tabs, onTabSelected }) {
 
   return (
     <md-tabs>
-      {tabs.map((tab, index) => (
-        <Tab
-          text={tab.title}
-          icon={tab.icon}
-          onClick={() => handleTabSelected(index)}
-        />
-      ))}
+      <Tab
+        text="Upload files"
+        icon="upload"
+        onClick={() => handleTabSelected("upload")}
+      />
+      <Tab
+        text="Uploads in progresss"
+        icon="schedule"
+        badge={inProgressCount}
+        onClick={() => {
+          handleTabSelected("uploads-in-progress");
+          resetInProgressUploadsCount();
+        }}
+      />
+      <Tab
+        text="Finished uploads"
+        icon="check_circle"
+        badge={finishedCount}
+        onClick={() => {
+          handleTabSelected("finished-uploads");
+          resetFinishedUploadsCount();
+        }}
+      />
     </md-tabs>
   );
 }
 
-function Tab({ text, icon, onClick }) {
+function Tab({ text, icon, onClick, badge }) {
   return (
     <md-primary-tab onClick={onClick}>
-        <md-icon>{icon}</md-icon>
-        {text}
+      {badge > 0 ? (
+        <span className={styles.badge}>{badge > 99 ? "99+" : badge}</span>
+      ) : (
+        ""
+      )}
+      <md-icon>{icon}</md-icon>
+      {text}
     </md-primary-tab>
   );
 }

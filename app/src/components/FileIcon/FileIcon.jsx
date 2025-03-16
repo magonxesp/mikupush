@@ -95,5 +95,5 @@ export default function FileIcon({ mimeType }) {
     icon = faFileZipper;
   }
 
-  return <FontAwesomeIcon class={styles.icon} icon={icon} />;
+  return <FontAwesomeIcon className={styles.icon} icon={icon} />;
 }

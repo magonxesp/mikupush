@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path"
@@ -18,31 +18,36 @@ func UploadHandler(c *gin.Context) {
 
 	fileId := request.Header.Get("X-File-Id")
 	if fileId == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing X-File-Id header"})
+		log.Println("Missing X-File-Id header")
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	fileUuid, err := uuid.Parse(fileId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to parse file id: %s", err.Error())})
+		log.Println("Failed to parse file id:", err.Error())
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
 	fileName := request.Header.Get("X-File-Name")
 	if fileName == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing X-File-Name header"})
+		log.Println("Missing X-File-Name header")
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	mimeType := request.Header.Get("Content-Type")
 	if mimeType == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing Content-Type header"})
+		log.Println("Missing Content-Type header")
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	file, err := os.Create(path.Join(GetDataDir(), fileId))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Println("Failed creating data directory:", err.Error())
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
@@ -51,7 +56,8 @@ func UploadHandler(c *gin.Context) {
 	// Copiar el cuerpo del request directamente al archivo
 	_, err = io.Copy(file, request.Body)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Println("Failed saving uploaded file:", err.Error())
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
@@ -63,7 +69,12 @@ func UploadHandler(c *gin.Context) {
 		UploadedAt: time.Now(),
 	}
 
-	db.Create(&uploadedFile)
+	result := db.Create(&uploadedFile)
+	if result.Error != nil {
+		log.Println("Failed saving uploaded file data to database:", result.Error.Error())
+		c.Status(http.StatusInternalServerError)
+		return
+	}
 
 	c.Status(http.StatusCreated)
 }

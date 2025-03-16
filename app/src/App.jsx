@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import styles from './App.module.css'
 import AppTabs from './components/AppTabs/AppTabs'
 import AppTitle from './components/AppTitle/AppTitle'
@@ -6,53 +6,52 @@ import InputTab from './components/InputTab/InputTab'
 import UploadsFinishedTab from './components/UploadsFinishedTab/UploadsFinishedTab'
 import UploadsProgressTab from './components/UploadsProgressTab/UploadsProgressTab'
 import { UploadsContext } from './context'
-import { addToUploadQueue } from './upload'
+import { addToUploadQueue } from './helpers/upload'
 
 function App() {
-  const tabs = [
-    {
-      title: 'Upload files',
-      icon: 'upload',
-      component: <InputTab />
-    },
-    {
-      title: 'Uploads in progresss',
-      icon: 'schedule',
-      component: <UploadsProgressTab />
-    },
-    {
-      title: 'Finished uploads',
-      icon: 'check_circle',
-      component: <UploadsFinishedTab />
-    }
-  ]
+  const tabs = {
+    'upload': <InputTab />,
+    'uploads-in-progress': <UploadsProgressTab />,
+    'finished-uploads': <UploadsFinishedTab />
+  }
 
-  const [currentTab, setCurrentTab] = useState(0)
+  const [currentTab, setCurrentTab] = useState('upload')
   const [inProgressUploads, setInProgressUploads] = useState([])
   const [finishedUploads, setFinishedUploads] = useState([])
+  const [inProgressUploadsCount, setInProgressUploadsCount] = useState(0)
+  const [finishedUploadsCount, setFinishedUploadsCount] = useState(0)
 
   const handleTabSelected = (index) => {
     setCurrentTab(index)
   }
 
   const onUploadProgressUpdated = (upload) => {
-    const updateUploadItem = (previous) => {
-      return previous.map(item => {
-        if (item.id === upload.id) {
-          return upload
-        } else {
-          return item
-        }
-      })
-    }
+    if (upload.finished && upload.error === '') {
+      setInProgressUploads(previous => previous.filter(item => item.id !== upload.id))
+      setFinishedUploads(previous => [...previous, upload])
+      setInProgressUploadsCount(previous => (previous > 0) ? previous - 1 : previous)
 
-    setInProgressUploads(updateUploadItem)
+      if (currentTab !== 'finished-uploads') {
+        setFinishedUploadsCount(previous => previous + 1)
+      }
+    } else {
+      setInProgressUploads(previous => previous.map(item => (item.id === upload.id) ? upload : item))
+    }
   }
 
-  const handleUploadRequest = (file) => {
-    addToUploadQueue(file, onUploadProgressUpdated).then((upload) => {
-      setInProgressUploads([...inProgressUploads, upload])
-    })
+  const handleUploadRequest = async (file) => {
+    try {
+      const upload = await addToUploadQueue(file, onUploadProgressUpdated)
+      setInProgressUploads(previous => [...previous, upload])
+
+      if (currentTab !== 'uploads-in-progress') {
+        setInProgressUploadsCount(previous => previous + 1)
+      }
+
+      console.log('added file to upload queue')
+    } catch (exception) {
+      console.error('unable to upload file', exception)
+    }
   }
 
   const handleCancelUpload = (upload) => {
@@ -71,15 +70,21 @@ function App() {
         finishedUploads,
         requestUpload: handleUploadRequest,
         cancelUpload: handleCancelUpload,
-        retryUpload: handleRetryUpload
+        retryUpload: handleRetryUpload,
+        inProgressUploadsCount: inProgressUploadsCount,
+        finishedUploadsCount: finishedUploadsCount,
+        resetInProgressUploadsCount: () => setInProgressUploadsCount(0),
+        resetFinishedUploadsCount: () => setFinishedUploadsCount(0)
       }}
     >
       <div className={styles.app}>
-        <div className={styles.dragArea} />
-        <AppTitle />
-        <AppTabs tabs={tabs} onTabSelected={handleTabSelected} />
-        <div className={styles.tabView}>
-          {tabs[currentTab].component}
+        <div>
+          <div className={styles.dragArea} />
+          <AppTitle />
+          <AppTabs onTabSelected={handleTabSelected} />
+        </div>
+        <div className={styles.content}>
+          {tabs[currentTab]}
         </div>
       </div>
     </UploadsContext.Provider>

@@ -1,29 +1,43 @@
 import { useContext } from "react";
+import { useDebounce } from 'use-debounce';
 import FileIcon from "../FileIcon/FileIcon";
 import { UploadsContext } from "../../context";
 import styles from "./UploadsProgressTab.module.css";
 
 export default function UploadsProgressTab() {
-  const { inProgressUploads, cancelUpload, retryUpload } = useContext(UploadsContext);
+  const { inProgressUploads } = useContext(UploadsContext);
+  const [items] = useDebounce(inProgressUploads, 100)
 
   return (
-    <md-list>
-      {inProgressUploads.map((upload, index) => (
-        <>
-          <UploadProgressItem
-            key={index}
-            upload={upload}
-            onRetry={() => retryUpload(upload)}
-            onCancel={() => cancelUpload(upload)}
-          />
-          {index > 0 && index < inProgressUploads.length - 1 ? (
-            <md-divider />
-          ) : (
-            ""
-          )}
-        </>
+    <md-list className={styles.list}>
+      {items.map((upload, index) => (
+        <UploadProgressItemWithDivider
+          key={index}
+          upload={upload}
+          index={index}
+          totalItems={items.length}
+        />
       ))}
     </md-list>
+  );
+}
+
+function UploadProgressItemWithDivider({ index, upload, totalItems }) {
+  const { cancelUpload, retryUpload } = useContext(UploadsContext);
+
+  return (
+    <>
+      <UploadProgressItem
+        upload={upload}
+        onRetry={() => retryUpload(upload)}
+        onCancel={() => cancelUpload(upload)}
+      />
+      {index < totalItems - 1 ? (
+        <md-divider key={`divider-${index}`} />
+      ) : (
+        ""
+      )}
+    </>
   );
 }
 
@@ -34,7 +48,11 @@ function UploadProgressItem({ upload, onRetry, onCancel }) {
         <FileIcon mimeType={upload.mimeType} />
       </div>
 
-      {!upload.finished ? <InProgress upload={upload} onCancel={onCancel} /> : ""}
+      {!upload.finished ? (
+        <InProgress upload={upload} onCancel={onCancel} />
+      ) : (
+        ""
+      )}
 
       {upload.finished && upload.error !== "" ? (
         <Error upload={upload} onRetry={onRetry} onCancel={onCancel} />
@@ -47,6 +65,10 @@ function UploadProgressItem({ upload, onRetry, onCancel }) {
 
 function InProgress({ upload, onCancel }) {
   const formatSpeed = (speed) => {
+    if (typeof speed === "undefined" || speed <= 0) {
+      return `0 B/s`;
+    }
+
     const kb = speed / 1024;
     const mb = kb / 1024;
     const gb = mb / 1024;

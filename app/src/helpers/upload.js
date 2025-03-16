@@ -1,5 +1,5 @@
-import axios from 'axios'
-import { fileTypeFromBlob } from 'file-type'
+import { axiosInstance } from './http-client'
+import { resolveMimeType } from './mime-type'
 import { v4 as uuidv4 } from 'uuid'
 
 const uploadQueue = []
@@ -11,7 +11,7 @@ export async function addToUploadQueue(file, onUpdate) {
     id: uuidv4(),
     name: file.name,
     size: file.size,
-    mimeType: file.type ?? await fileTypeFromBlob(file),
+    mimeType: await resolveMimeType(file),
     progress: 0,
     error: '',
     finished: false,
@@ -51,16 +51,13 @@ async function performUpload (upload, onUpdate) {
   }
 
   const onUploadProgress = (event) => {
-    if (event.total) {
-      // const speed = progressEvent.loaded / elapsedTime // Bytes por segundo
-      upload.progress = event.loaded / event.total
-      upload.speed = 0
-      onUpdate(upload)
-    }
+    upload.progress = event.progress
+    upload.speed = event.rate
+    onUpdate(upload)
   }
 
   try {
-    const response = await axios.post('http://localhost:8080/upload', upload.file, {
+    const response = await axiosInstance.post('http://localhost:8080/upload', upload.file, {
       headers,
       onUploadProgress,
     })
