@@ -46,7 +46,7 @@ function App() {
   };
 
   const handleUploadRequests = async (files) => {
-    let newUploads = [];
+    const newUploads = [];
 
     for (let file of files) {
       try {
