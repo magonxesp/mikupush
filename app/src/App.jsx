@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import styles from "./App.module.css";
 import AppTabs from "./components/AppTabs/AppTabs";
 import AppTitle from "./components/AppTitle/AppTitle";
