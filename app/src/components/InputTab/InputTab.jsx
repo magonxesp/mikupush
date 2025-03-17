@@ -64,7 +64,7 @@ export default function InputTab() {
       onDrop={handleDrop}
     >
       <md-icon>upload</md-icon>
-      <p class="md-typescale-body-large">
+      <p className="md-typescale-body-large">
         Drop your file here to upload it, or click to select a file.
       </p>
       <input

@@ -1,5 +1,3 @@
 import axios from "axios";
 
-export const axiosInstance = axios.create({
-  timeout: 3000,
-});
+export const axiosInstance = axios.create();

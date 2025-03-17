@@ -1,14 +1,9 @@
-.speed,
-.retry {
-  color: var(--foreground-color);
-}
-
 .cancel,
 .error {
   color: red;
 }
 
-.speed,
+.uploaded-at,
 .error,
 .name {
   overflow: hidden;
@@ -22,8 +17,12 @@
   align-items: center;
 }
 
-.progress {
+.copy-link {
   margin-right: 1em;
+}
+
+.copy-link md-icon {
+  color: var(--foreground-color);
 }
 
 .empty-state {

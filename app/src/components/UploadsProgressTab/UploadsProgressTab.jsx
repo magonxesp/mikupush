@@ -6,14 +6,22 @@ import styles from "./UploadsProgressTab.module.css";
 export default function UploadsProgressTab() {
   const { inProgressUploads } = useContext(UploadsContext);
 
+  if (inProgressUploads.length > 0) {
+    return <UploadsProgressList items={inProgressUploads} />
+  } else {
+    return <EmptyState />
+  }
+}
+
+function UploadsProgressList({ items }) {
   return (
     <md-list className={styles.list}>
-      {inProgressUploads.map((upload, index) => (
+      {items.map((upload, index) => (
         <UploadProgressItemWithDivider
           key={index}
           upload={upload}
           index={index}
-          totalItems={inProgressUploads.length}
+          totalItems={items.length}
         />
       ))}
     </md-list>
@@ -117,4 +125,13 @@ function Error({ upload, onRetry, onCancel }) {
       </div>
     </>
   );
+}
+
+function EmptyState() {
+  return (
+    <div className={styles.emptyState}>
+      <md-icon>inventory_2</md-icon>
+      <p className="md-typescale-body-large">No uploads in progress yet. Try uploading a file!</p>
+    </div>
+  )
 }
