@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "main.js",
+  "main": "src/main.js",
   "scripts": {
     "dev": "electronmon . --dev-server",
     "preview": "electron ."
