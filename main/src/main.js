@@ -1,6 +1,9 @@
 import { app, BrowserWindow } from 'electron'
+import fs from 'fs'
+import { appDataDirectory } from './environment.js'
+import { database } from './database.js'
 
-const createWindow = () => {
+function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
@@ -22,6 +25,19 @@ const createWindow = () => {
   }
 }
 
+function ensureAppDataDirectoryIsCreated() {
+  const directory = appDataDirectory()
+
+  if (!fs.existsSync(directory)) {
+    fs.mkdirSync(directory, { recursive: true })
+  }
+}
+
 app.whenReady().then(() => {
+  ensureAppDataDirectoryIsCreated()
   createWindow()
+})
+
+app.on('quit', () => {
+  database.close()
 })

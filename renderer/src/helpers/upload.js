@@ -15,7 +15,8 @@ export async function addToUploadQueue(file, onUpdate) {
     progress: 0,
     error: '',
     finished: false,
-    speed: 0
+    speed: 0,
+    uploadedAt: new Date()
   }
 
   uploadQueue.push(upload)

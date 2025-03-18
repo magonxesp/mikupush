@@ -6,7 +6,9 @@
   "main": "src/main.js",
   "scripts": {
     "dev": "electronmon . --dev-server",
-    "preview": "electron ."
+    "preview": "electron .",
+    "lint": "standard ./src",
+    "lint:fix": "standard ./src --fix"
   },
   "dependencies": {
     "sequelize": "^6.37.6",
@@ -15,6 +17,7 @@
   },
   "devDependencies": {
     "electron": "^35.0.0",
-    "electronmon": "^2.0.3"
+    "electronmon": "^2.0.3",
+    "standard": "^17.1.2"
   }
 }
