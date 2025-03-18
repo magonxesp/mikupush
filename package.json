@@ -1,1 +1,28 @@
-{}
+{
+  "name": "mikupush",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=renderer\" \"wait-on http://localhost:5173 && npm run dev --workspace=main\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/magonxesp/mikupush.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/magonxesp/mikupush/issues"
+  },
+  "homepage": "https://github.com/magonxesp/mikupush#readme",
+  "description": "",
+  "workspaces": [
+    "renderer",
+    "main"
+  ],
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "wait-on": "^8.0.2"
+  }
+}
