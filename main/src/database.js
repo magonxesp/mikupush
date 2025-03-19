@@ -8,9 +8,23 @@ export const database = new Sequelize({
 });
 
 const Upload = database.define('Upload', {
-  id: DataTypes.UUIDV4,
+  id: {
+    type: DataTypes.UUIDV4,
+    primaryKey: true,
+  },
   name: DataTypes.STRING,
   size: DataTypes.BIGINT,
   mimeType: DataTypes.STRING,
   uploadedAt: DataTypes.DATE,
 })
+
+export async function insertUpload(upload) {
+  console.log('upload main process', upload)
+  await Upload.create({
+    id: upload.id,
+    name: upload.name,
+    size: upload.size,
+    mimeType: upload.mimeType,
+    uploadedAt: upload.uploadedAt,
+  })
+}

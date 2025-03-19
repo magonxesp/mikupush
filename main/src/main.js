@@ -2,6 +2,12 @@ import { app, BrowserWindow } from 'electron'
 import fs from 'fs'
 import { appDataDirectory } from './environment.js'
 import { database } from './database.js'
+import path from 'path'
+import './ipc.js'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -13,6 +19,9 @@ function createWindow() {
       color: 'rgba(0, 0, 0, 0)',
       symbolColor: '#ffffff',
       height: 32
+    },
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
     }
   })
 

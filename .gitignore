@@ -39,3 +39,4 @@ server/.env
 
 dist
 node_modules
+docker-compose.*.yml

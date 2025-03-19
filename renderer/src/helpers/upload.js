@@ -1,6 +1,7 @@
 import { axiosInstance } from './http-client'
 import { resolveMimeType } from './mime-type'
 import { v4 as uuidv4 } from 'uuid'
+import { createUpload } from './upload-api.js'
 
 const uploadQueue = []
 let isConsumingUploadQueue = false
@@ -78,4 +79,5 @@ async function performUpload (upload, onUpdate) {
 
   upload.finished = true
   onUpdate(upload)
+  createUpload(upload)
 }
