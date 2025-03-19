@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron'
-import { insertUpload } from './database.js'
+import { deleteUpload, findAllUploads, insertUpload } from './database.js'
 
-export const uploadCreateChannel = 'upload:create'
-
-ipcMain.on(uploadCreateChannel, (upload) => insertUpload(upload))
+ipcMain.on('upload:create', (_, upload) => insertUpload(upload).catch(error => console.error(error)))
+ipcMain.on('upload:delete', (_, uploadId) => deleteUpload(uploadId).catch(error => console.error(error)))
+ipcMain.handle('upload:findAll', findAllUploads)

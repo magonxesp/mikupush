@@ -1,7 +1,7 @@
 import { axiosInstance } from './http-client'
 import { resolveMimeType } from './mime-type'
 import { v4 as uuidv4 } from 'uuid'
-import { createUpload } from './upload-api.js'
+import { createUpload, deleteUpload as ipcDeleteUpload } from './upload-ipc-api'
 
 const uploadQueue = []
 let isConsumingUploadQueue = false
@@ -80,4 +80,9 @@ async function performUpload (upload, onUpdate) {
   upload.finished = true
   onUpdate(upload)
   createUpload(upload)
+}
+
+export async function deleteUpload(uploadId) {
+  await axiosInstance.delete(`http://localhost:8080/${uploadId}`)
+  ipcDeleteUpload(uploadId)
 }

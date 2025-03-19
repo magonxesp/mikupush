@@ -32,6 +32,8 @@ function createWindow() {
   } else {
     win.loadFile('dist/index.html')
   }
+
+  database.sync()
 }
 
 function ensureAppDataDirectoryIsCreated() {

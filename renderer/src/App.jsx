@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./App.module.css";
 import AppTabs from "./components/AppTabs/AppTabs";
 import AppTitle from "./components/AppTitle/AppTitle";
@@ -7,6 +7,7 @@ import UploadsFinishedTab from "./components/UploadsFinishedTab/UploadsFinishedT
 import UploadsProgressTab from "./components/UploadsProgressTab/UploadsProgressTab";
 import { UploadsContext } from "./context";
 import { addToUploadQueue } from "./helpers/upload";
+import { findAllUploads } from "./helpers/upload-ipc-api";
 
 function App() {
   const tabs = {
@@ -21,6 +22,10 @@ function App() {
   const [inProgressUploadsCount, setInProgressUploadsCount] = useState(0);
   const [finishedUploadsCount, setFinishedUploadsCount] = useState(0);
 
+  useEffect(() => {
+    findAllUploads().then(uploads => setFinishedUploads(uploads))
+  }, [])
+
   const handleTabSelected = (index) => {
     setCurrentTab(index);
   };
@@ -30,7 +35,7 @@ function App() {
       setInProgressUploads((previous) =>
         previous.filter((item) => item.id !== upload.id)
       );
-      setFinishedUploads((previous) => [...previous, upload]);
+      setFinishedUploads((previous) => [upload, ...previous]);
       setInProgressUploadsCount((previous) =>
         previous > 0 ? previous - 1 : previous
       );

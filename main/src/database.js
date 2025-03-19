@@ -19,12 +19,35 @@ const Upload = database.define('Upload', {
 })
 
 export async function insertUpload(upload) {
-  console.log('upload main process', upload)
   await Upload.create({
     id: upload.id,
     name: upload.name,
     size: upload.size,
     mimeType: upload.mimeType,
     uploadedAt: upload.uploadedAt,
+  })
+}
+
+export async function findAllUploads() {
+  const uploads = await Upload.findAll({
+    order: [
+      ['uploadedAt', 'DESC']
+    ]
+  })
+
+  return uploads.map(upload => ({
+    id: upload.id,
+    name: upload.name,
+    size: upload.size,
+    mimeType: upload.mimeType,
+    uploadedAt: upload.uploadedAt
+  }))
+}
+
+export async function deleteUpload(uploadId) {
+  await Upload.destroy({
+    where: {
+      id: uploadId
+    }
   })
 }
