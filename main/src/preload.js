@@ -11,3 +11,7 @@ contextBridge.exposeInMainWorld('uploadAPI', {
   delete: (uploadId) => ipcRenderer.send('upload:delete', uploadId),
   findAll: () => ipcRenderer.invoke('upload:findAll')
 })
+
+contextBridge.exposeInMainWorld('clipBoardAPI', {
+  writeToClipboard: (text) => ipcRenderer.send('clipboard:write', text)
+})

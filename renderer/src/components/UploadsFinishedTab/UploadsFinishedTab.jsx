@@ -2,6 +2,7 @@ import { useContext } from "react";
 import FileIcon from "../FileIcon/FileIcon";
 import { UploadsContext } from "../../context";
 import styles from "./UploadsFinishedTab.module.css";
+import { writeToClipboard } from '../../helpers/clipboard-ipc-api.js'
 
 export default function UploadsFinishedTab() {
   const { finishedUploads } = useContext(UploadsContext);
@@ -41,7 +42,18 @@ function UploadItemWithDivider({ index, upload, totalItems }) {
   );
 }
 
-function UploadItem({ upload, onCopyLink, onDelete }) {
+function UploadItem({ upload }) {
+  const { deleteUpload } = useContext(UploadsContext);
+
+  const handleCopyLink = () => {
+    console.log('copy to clipboard')
+    writeToClipboard(`http://localhost:8080/u/${upload.id}`)
+  }
+
+  const handleDelete = () => {
+    deleteUpload(upload.id);
+  }
+
   return (
     <md-list-item>
       <div slot="start">
@@ -55,10 +67,10 @@ function UploadItem({ upload, onCopyLink, onDelete }) {
         {''}
       </div>
       <div slot="end" className={styles.actions}>
-        <md-icon-button onClick={onCopyLink} className={styles.copyLink}>
+        <md-icon-button onClick={handleCopyLink} className={styles.copyLink}>
           <md-icon>link</md-icon>
         </md-icon-button>
-        <md-icon-button onClick={onDelete}>
+        <md-icon-button onClick={handleDelete}>
           <md-icon className={styles.cancel}>delete</md-icon>
         </md-icon-button>
       </div>

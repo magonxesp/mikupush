@@ -10,4 +10,5 @@ export const UploadsContext = createContext({
     retryUpload: () => {},
     resetInProgressUploadsCount: () => {},
     resetFinishedUploadsCount: () => {},
+    deleteUpload: () => {}
 })
