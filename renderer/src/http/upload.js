@@ -58,7 +58,7 @@ export async function upload(request, onProgress = () => {}) {
           state.update((state) =>
             state.updateProgress({
               progress: event.progress,
-              speed: event.speed,
+              speed: event.rate,
             })
           );
         },
