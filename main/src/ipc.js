@@ -5,4 +5,4 @@ ipcMain.on('upload:create', (_, upload) => insertUpload(upload).catch(error => c
 ipcMain.on('upload:delete', (_, uploadId) => deleteUpload(uploadId).catch(error => console.error(error)))
 ipcMain.handle('upload:findAll', findAllUploads)
 
-ipcMain.on('clipboard:write', (_, text) => clipboard.write(text))
+ipcMain.on('clipboard:write', (_, text) => clipboard.writeText(text))

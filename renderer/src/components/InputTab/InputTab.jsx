@@ -1,6 +1,6 @@
 import { useContext, useState, useRef } from "react";
 import styles from "./InputTab.module.css";
-import { UploadsContext } from "../../context";
+import { UploadsContext } from "../../context/upload";
 
 export default function InputTab() {
   const [active, setActive] = useState(false);

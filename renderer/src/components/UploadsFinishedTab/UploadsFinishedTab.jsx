@@ -1,8 +1,8 @@
 import { useContext } from "react";
 import FileIcon from "../FileIcon/FileIcon";
-import { UploadsContext } from "../../context";
+import { UploadsContext } from "../../context/upload";
 import styles from "./UploadsFinishedTab.module.css";
-import { writeToClipboard } from '../../helpers/clipboard-ipc-api.js'
+import { writeToClipboard } from '../../ipc/clipboard'
 
 export default function UploadsFinishedTab() {
   const { finishedUploads } = useContext(UploadsContext);
@@ -46,7 +46,6 @@ function UploadItem({ upload }) {
   const { deleteUpload } = useContext(UploadsContext);
 
   const handleCopyLink = () => {
-    console.log('copy to clipboard')
     writeToClipboard(`http://localhost:8080/u/${upload.id}`)
   }
 

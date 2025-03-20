@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { UploadsContext } from "../../context";
+import { UploadsContext } from "../../context/upload";
 import styles from "./AppTabs.module.css";
 
 export default function AppTabs({ onTabSelected }) {

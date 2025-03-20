@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import FileIcon from "../FileIcon/FileIcon";
-import { UploadsContext } from "../../context";
+import { UploadsContext } from "../../context/upload";
 import styles from "./UploadsProgressTab.module.css";
 
 export default function UploadsProgressTab() {
