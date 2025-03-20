@@ -6,7 +6,10 @@ import InputTab from "./components/InputTab/InputTab";
 import UploadsFinishedTab from "./components/UploadsFinishedTab/UploadsFinishedTab";
 import UploadsProgressTab from "./components/UploadsProgressTab/UploadsProgressTab";
 import { UploadsContext } from "./context/upload";
-import { useUploadsContextState } from "./context/upload";
+import { Uploader } from './services/uploader'
+import { UploadRequest } from './model/upload-request'
+
+const uploader = new Uploader()
 
 function App() {
   const tabs = {
@@ -16,14 +19,103 @@ function App() {
   };
 
   const [currentTab, setCurrentTab] = useState("upload");
-  const uploadContext = useUploadsContextState(currentTab);
+  const [inProgressUploads, setInProgressUploads] = useState([]);
+  const [finishedUploads, setFinishedUploads] = useState([]);
+  const [inProgressUploadsCount, setInProgressUploadsCount] = useState(0);
+  const [finishedUploadsCount, setFinishedUploadsCount] = useState(0);
+
+  /**
+   * Remove from in progress uploads and decrement in progress items count
+   * @param {UploadRequest} request 
+   */
+  const moveRequestAsFinished = (request) => {
+    setInProgressUploads((previous) =>
+      previous.filter((item) => item.id !== request.id)
+    );
+
+    setInProgressUploadsCount((count) => count > 0 ? count - 1 : count);
+    setFinishedUploads((previous) => [request.upload, ...previous]);
+
+    if (currentTab !== "finished-uploads") {
+      setFinishedUploadsCount((count) => count + 1);
+    }
+  }
+
+  /**
+   * Handle upload request progress update
+   * @param {UploadRequest} request 
+   */
+  const handleProgressUpdate = (request) => {
+    if (request.finishedSuccess) {
+      moveRequestAsFinished(request)
+    } else {
+      setInProgressUploads((previous) =>
+        previous.map((item) => item.id === request.id ? request : item)
+      );
+    }
+  }
+
+  /**
+   * Request file upload
+   * @param {File[]} files 
+   */
+  const requestUploads = async (files) => {
+    const newUploads = [];
+
+    for (let file of files) {
+      try {
+        newUploads.push(await uploader.enqueue(file, handleProgressUpdate));
+      } catch (exception) {
+        console.error("unable to upload file", exception);
+      }
+    }
+
+    setInProgressUploads((previous) => [...previous, ...newUploads]);
+
+    if (currentTab !== "uploads-in-progress") {
+      setInProgressUploadsCount((previous) => previous + newUploads.length);
+    }
+  }
+
+  /**
+   * Cancel upload request
+   * @param {UploadRequest} request 
+   */
+  const cancelUpload = (request) => {
+    console.log("cancel upload", request);
+    setInProgressUploads(
+      inProgressUploads.filter((item) => item.id !== request.id)
+    );
+  }
+
+  /**
+   * Retry upload request
+   * @param {UploadRequest} request 
+   */
+  const retryUpload = (request) => {
+    console.log("on retry", request);
+  }
+
+  const resetInProgressUploadsCount = () => setInProgressUploadsCount(0)
+  const resetFinishedUploadsCount = () => setFinishedUploadsCount(0)
+
 
   const handleTabSelected = (index) => {
     setCurrentTab(index);
   };
 
   return (
-    <UploadsContext.Provider value={uploadContext}>
+    <UploadsContext.Provider value={{
+      inProgressUploads,
+      finishedUploads,
+      inProgressUploadsCount,
+      finishedUploadsCount,
+      requestUploads,
+      cancelUpload,
+      retryUpload,
+      resetInProgressUploadsCount,
+      resetFinishedUploadsCount
+    }}>
       <div className={styles.app}>
         <div>
           <div className={styles.dragArea} />

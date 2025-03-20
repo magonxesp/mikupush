@@ -4,6 +4,14 @@ export class UploadProgress {
     #error
     #finished
 
+    /**
+     * Constructor
+     * @param {object} param0 
+     * @param {number} param0.progress 
+     * @param {number} param0.speed
+     * @param {string} param0.error
+     * @param {boolean} param0.finished
+     */
     constructor({ progress, speed, error, finished }) {
         this.#progress = progress
         this.#speed = speed

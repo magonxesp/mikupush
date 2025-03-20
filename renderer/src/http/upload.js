@@ -38,7 +38,7 @@ class UploadRequestState {
  * @param {UploadRequest} request
  * @param {OnProgressCallback} onProgress
  */
-export async function upload(request, onProgress) {
+export async function upload(request, onProgress = () => {}) {
   const state = new UploadRequestState(request, onProgress);
   if (!mimeTypeIsPresent(state)) {
     return;

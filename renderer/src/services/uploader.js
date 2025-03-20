@@ -3,34 +3,27 @@ import { UploadRequest } from "../model/upload-request"
 
 export class Uploader {
     /**
-     * @type {UploadRequest[]}
+     * @typedef {(request: UploadRequest) => void} OnProgressUpdateCallback
+     */
+
+    /**
+     * @type {[UploadRequest, OnProgressUpdateCallback][]}
      */
     #queue = []
     #isProcessingQueue = false
-    /**
-     * @type {((request: UploadRequest) => void)[]}
-     */
-    #progressListeners = []
 
     /**
      * Add file to upload queue
      * @param {File} file
+     * @param {OnProgressUpdateCallback} onProgressUpdate
      * @returns {Promise<UploadRequest>}
      */
-    async enqueue(file) {
+    async enqueue(file, onProgressUpdate = () => {}) {
         const request = await UploadRequest.createFromFile(file)
-        this.#queue.push(request)
+        this.#queue.push([request, onProgressUpdate])
 
         this.#startProcesingQueue()
         return request
-    }
-
-    /**
-     * Add progress listener
-     * @param {(request: UploadRequest) => void} listener 
-     */
-    addProgressListener(listener) {
-        this.#progressListeners.push(listener)
     }
 
     #startProcesingQueue() {
@@ -44,18 +37,10 @@ export class Uploader {
 
     async #processQueue() {
         while (this.#queue.length > 0) {
-            const request = this.#queue.shift()
-            await upload(request, (updated) => this.#notifyProgress(updated))
+            const [request, onProgressUpdateCallback] = this.#queue.shift()
+            await upload(request, onProgressUpdateCallback)
         }
 
         this.#isProcessingQueue = false
-    }
-
-    /**
-     * Notify all listeners to request updates
-     * @param {UploadRequest} request 
-     */
-    #notifyProgress(request) {
-        this.#progressListeners.forEach(listener => listener(request))
     }
 }
