@@ -5,6 +5,8 @@ import { database } from './database.js'
 import path from 'path'
 import './ipc.js'
 import { fileURLToPath } from 'url'
+import { appIcon64 } from './environment.js'
+import { appTray } from './tray.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -20,6 +22,7 @@ function createWindow() {
       symbolColor: '#ffffff',
       height: 32
     },
+    icon: appIcon64(),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
@@ -45,6 +48,7 @@ function ensureAppDataDirectoryIsCreated() {
 }
 
 app.whenReady().then(() => {
+  appTray()
   ensureAppDataDirectoryIsCreated()
   createWindow()
 })
