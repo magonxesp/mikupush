@@ -3,6 +3,7 @@ import FileIcon from "../FileIcon/FileIcon";
 import { UploadsContext } from "../../context/upload";
 import styles from "./UploadsFinishedTab.module.css";
 import { writeToClipboard } from '../../ipc/clipboard'
+import { showNotification } from "../../ipc/notification";
 
 export default function UploadsFinishedTab() {
   const { finishedUploads } = useContext(UploadsContext);
@@ -47,6 +48,11 @@ function UploadItem({ upload }) {
 
   const handleCopyLink = () => {
     writeToClipboard(`http://localhost:8080/u/${upload.id}`)
+
+    showNotification({
+      title: '📎Link copied to clipboard!',
+      body: `The link for ${upload.name} is in the clipboard`
+    })
   }
 
   const handleDelete = () => {
