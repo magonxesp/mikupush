@@ -15,3 +15,7 @@ contextBridge.exposeInMainWorld('uploadAPI', {
 contextBridge.exposeInMainWorld('clipBoardAPI', {
   writeToClipboard: (text) => ipcRenderer.send('clipboard:write', text)
 })
+
+contextBridge.exposeInMainWorld('notificationAPI', {
+  showNotification: (options) => ipcRenderer.send('notification:show', options)
+})

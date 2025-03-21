@@ -8,6 +8,7 @@ import UploadsProgressTab from "./components/UploadsProgressTab/UploadsProgressT
 import { UploadsContext } from "./context/upload";
 import { Uploader } from './services/uploader'
 import { UploadRequest } from './model/upload-request'
+import { showNotification } from "./ipc/notification";
 
 const uploader = new Uploader()
 
@@ -39,6 +40,11 @@ function App() {
     if (currentTab !== "finished-uploads") {
       setFinishedUploadsCount((count) => count + 1);
     }
+
+    showNotification({
+      title: `The file ${request.name} has been uploaded!`,
+      body: `Now, you can grab the link for share it!`
+    })
   }
 
   /**
@@ -74,6 +80,21 @@ function App() {
 
     if (currentTab !== "uploads-in-progress") {
       setInProgressUploadsCount((previous) => previous + newUploads.length);
+    }
+
+    if (newUploads.length == 1) {
+      const request = newUploads[0]
+      showNotification({ 
+        title: `Uploading file ${request.name} 🚀`, 
+        body: `The file ${request.name} is added to the upload queue`
+      })
+    }
+
+    if (newUploads.length > 1) {
+      showNotification({ 
+        title: `Uploading ${newUploads.length} files 🚀`, 
+        body: 'The files are added to the upload queue'
+      })
     }
   }
 

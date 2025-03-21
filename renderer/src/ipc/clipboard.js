@@ -2,14 +2,6 @@ const clipboardApiDefaults = {
   writeToClipboard: () => {},
 }
 
-function clipboardApi() {
-  if (Object.hasOwn(window, 'clipBoardAPI')) {
-    return window['clipBoardAPI']
-  }
+const clipboardApi = window.clipBoardAPI ?? clipboardApiDefaults
 
-  return clipboardApiDefaults
-}
-
-export function writeToClipboard(text) {
-  clipboardApi().writeToClipboard(text)
-}
+export const { writeToClipboard } = clipboardApi
