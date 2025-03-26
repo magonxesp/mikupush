@@ -1,3 +1,4 @@
+import { create } from "../http/create"
 import { upload } from "../http/upload"
 import { UploadRequest } from "../model/upload-request"
 
@@ -37,10 +38,57 @@ export class Uploader {
 
     async #processQueue() {
         while (this.#queue.length > 0) {
-            const [request, onProgressUpdateCallback] = this.#queue.shift()
-            await upload(request, onProgressUpdateCallback)
+            const item = this.#queue.shift()
+
+            if (typeof item === 'undefined') {
+                continue
+            }
+
+            const [request, onProgressUpdateCallback] = item
+            const state = new UploadRequestState(request, onProgressUpdateCallback)
+
+            try {
+                await create(request)
+                await upload(request, (progress) => {
+                    state.update(previous => previous.updateProgress(progress))
+                })
+
+                state.update(previous => previous.finishSuccess())
+            } catch (error) {
+                console.log('upload error', error)
+                state.update(previous => previous.finishWithError(error))
+            }
         }
 
         this.#isProcessingQueue = false
     }
+}
+
+/**
+ * @typedef {(request: UploadRequest) => void} OnProgressCallback
+ */
+
+class UploadRequestState {
+  #request;
+  #notifyProgress;
+
+  /**
+   * Constructor
+   * @param {UploadRequest} request
+   * @param {OnProgressCallback} notifyProgress
+   */
+  constructor(request, notifyProgress) {
+    this.#request = request;
+    this.#notifyProgress = notifyProgress;
+  }
+
+  /**
+   * Update request state
+   * @param {(state: UploadRequest) => UploadRequest} updater
+   */
+  update(updater) {
+    console.log('updating upload state')
+    this.#request = updater(this.#request);
+    this.#notifyProgress(this.#request);
+  }
 }

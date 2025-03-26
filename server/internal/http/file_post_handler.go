@@ -2,10 +2,11 @@ package http
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin"
 	"log"
-	"mikupush.io/internal/service"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"mikupush.io/internal/service"
 )
 
 func FileCreateHandler(context *gin.Context) {
@@ -22,6 +23,8 @@ func FileCreateHandler(context *gin.Context) {
 		log.Println("failed creating file:", err)
 		context.Status(http.StatusBadRequest)
 	}
+
+	context.Status(http.StatusOK)
 }
 
 func FileUploadHandler(context *gin.Context) {

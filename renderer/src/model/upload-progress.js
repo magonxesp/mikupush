@@ -48,7 +48,15 @@ export class UploadProgress {
     }
 
     finishWithError(error) {
-        return new UploadProgress({ ...this.#toPlainObject(), finished: true, error })
+        let errorMessage = 'an unknown error occurred during upload'
+
+        if (error instanceof Error) {
+            errorMessage = error.message
+        } else if (typeof error === 'string') {
+            errorMessage = error
+        }
+
+        return new UploadProgress({ ...this.#toPlainObject(), finished: true, error: errorMessage })
     }
 
     finishSuccess() {

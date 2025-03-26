@@ -17,11 +17,11 @@ func GetDatabase() *gorm.DB {
 
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
-		PostgresHost,
-		PostgresUser,
-		PostgresPassword,
-		PostgresDatabase,
-		PostgresPort,
+		GetPostgresHost(),
+		GetPostgresUser(),
+		GetPostgresPassword(),
+		GetPostgresDatabase(),
+		GetPostgresPort(),
 	)
 
 	var err error

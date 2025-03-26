@@ -1,4 +1,4 @@
-CREATE TABLE uploaded_files (
+CREATE TABLE file_uploads (
     _id BIGSERIAL NOT NULL PRIMARY KEY,
     uuid UUID NOT NULL,
     name VARCHAR(255) NOT NULL,
@@ -7,4 +7,4 @@ CREATE TABLE uploaded_files (
     uploaded_at TIMESTAMP NOT NULL
 );
 
-CREATE UNIQUE INDEX uploaded_files_uuid ON uploaded_files(uuid);
+CREATE UNIQUE INDEX file_uploads_uuid ON file_uploads(uuid);

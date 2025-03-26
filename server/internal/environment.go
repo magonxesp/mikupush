@@ -30,8 +30,22 @@ func GetServerPort() string {
 	return ":" + port
 }
 
-var PostgresUser = os.Getenv("POSTGRESQL_USER")
-var PostgresPassword = os.Getenv("POSTGRESQL_PASSWORD")
-var PostgresDatabase = os.Getenv("POSTGRESQL_DATABASE")
-var PostgresHost = os.Getenv("POSTGRESQL_HOST")
-var PostgresPort = os.Getenv("POSTGRESQL_PORT")
+func GetPostgresUser() string {
+	return os.Getenv("POSTGRESQL_USER")
+}
+
+func GetPostgresPassword() string {
+	return os.Getenv("POSTGRESQL_PASSWORD")
+}
+
+func GetPostgresDatabase() string {
+	return os.Getenv("POSTGRESQL_DATABASE")
+}
+
+func GetPostgresHost() string {
+	return os.Getenv("POSTGRESQL_HOST")
+}
+
+func GetPostgresPort() string {
+	return os.Getenv("POSTGRESQL_PORT")
+}
