@@ -51,6 +51,10 @@ export class UploadRequest {
         return this.#progress.error
     }
 
+    get isInProgress() {
+        return this.#progress.isInProgress
+    }
+
     get finishedSuccess() {
         return this.#progress.finishedSuccess
     }

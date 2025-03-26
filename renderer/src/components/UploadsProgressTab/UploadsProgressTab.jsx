@@ -2,6 +2,7 @@ import { useContext } from "react";
 import FileIcon from "../FileIcon/FileIcon";
 import { UploadsContext } from "../../context/upload";
 import styles from "./UploadsProgressTab.module.css";
+import { UploadRequest } from "../../model/upload-request";
 
 export default function UploadsProgressTab() {
   const { inProgressUploads } = useContext(UploadsContext);
@@ -54,13 +55,13 @@ function UploadProgressItem({ upload, onRetry, onCancel }) {
         <FileIcon mimeType={upload.mimeType} />
       </div>
 
-      {!upload.finished ? (
+      {upload.isInProgress ? (
         <InProgress upload={upload} onCancel={onCancel} />
       ) : (
         ""
       )}
 
-      {upload.finished && upload.error !== "" ? (
+      {upload.finishedFailed ? (
         <Error upload={upload} onRetry={onRetry} onCancel={onCancel} />
       ) : (
         ""

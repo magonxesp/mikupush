@@ -52,6 +52,7 @@ function App() {
    * @param {UploadRequest} request 
    */
   const handleProgressUpdate = (request) => {
+    console.log('progress update handled', request)
     if (request.finishedSuccess) {
       moveRequestAsFinished(request)
     } else {
