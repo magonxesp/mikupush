@@ -1,5 +1,6 @@
 import { create } from "../http/create"
 import { upload } from "../http/upload"
+import { createUpload } from "../ipc/upload"
 import { UploadRequest } from "../model/upload-request"
 
 export class Uploader {
@@ -53,6 +54,7 @@ export class Uploader {
                     state.update(previous => previous.updateProgress(progress))
                 })
 
+                await createUpload(request.upload)
                 state.update(previous => previous.finishSuccess())
             } catch (error) {
                 console.log('upload error', error)

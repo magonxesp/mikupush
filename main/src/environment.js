@@ -6,14 +6,22 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 export function appDataDirectory() {
+  let appDataDir
+
   switch (process.platform) {
     case 'darwin':
-      return `${process.env.HOME}/Library/Application Support/io.mikupush.app`
+      appDataDir = `${process.env.HOME}/Library/Application Support/io.mikupush.MikuPush`
+      break;
     case 'win32':
-      return `${process.env.APPDATA}\\Miku Push`
+      appDataDir = `${process.env.APPDATA}\\Miku Push`
+      break;
     default:
-      return `${process.env.HOME}/.mikupush`
+      appDataDir = `${process.env.HOME}/.mikupush`
+      break;
   }
+
+  console.log('application data directory', appDataDir)
+  return appDataDir
 }
 
 export function appIcon64() {

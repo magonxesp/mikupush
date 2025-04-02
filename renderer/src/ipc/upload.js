@@ -1,3 +1,5 @@
+import { Upload } from '../model/upload.js'
+
 const uploadApiDefaults = {
   create: () => {},
   delete: () => {},
@@ -6,6 +8,14 @@ const uploadApiDefaults = {
 
 const uploadApi = window.uploadAPI ?? uploadApiDefaults
 
-export const createUpload = uploadApi.create
+/**
+ * Save upload to local database
+ * @param {Upload} upload
+ */
+export const createUpload = (upload) => uploadApi.create(upload.toPlainObject())
 export const deleteUpload = uploadApi.delete
-export const findAllUploads = uploadApi.findAll
+/**
+ * Find all uploads
+ * @returns {Promise<Upload[]>}
+ */
+export const findAllUploads = async () => (await uploadApi.findAll())?.map(item => new Upload(item))

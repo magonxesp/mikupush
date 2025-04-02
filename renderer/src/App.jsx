@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from 'react'
 import styles from "./App.module.css";
 import AppTabs from "./components/AppTabs/AppTabs";
 import AppTitle from "./components/AppTitle/AppTitle";
@@ -9,8 +9,11 @@ import { UploadsContext } from "./context/upload";
 import { Uploader } from './services/uploader'
 import { UploadRequest } from './model/upload-request'
 import { showNotification } from "./ipc/notification";
+import { Deleter } from './services/deleter.js'
+import { findAllUploads } from './ipc/upload.js'
 
 const uploader = new Uploader()
+const deleter = new Deleter()
 
 function App() {
   const tabs = {
@@ -24,6 +27,10 @@ function App() {
   const [finishedUploads, setFinishedUploads] = useState([]);
   const [inProgressUploadsCount, setInProgressUploadsCount] = useState(0);
   const [finishedUploadsCount, setFinishedUploadsCount] = useState(0);
+
+  useEffect(() => {
+    findAllUploads().then(uploads => setFinishedUploads(uploads))
+  }, [])
 
   /**
    * Remove from in progress uploads and decrement in progress items count
@@ -52,7 +59,6 @@ function App() {
    * @param {UploadRequest} request 
    */
   const handleProgressUpdate = (request) => {
-    console.log('progress update handled', request)
     if (request.finishedSuccess) {
       moveRequestAsFinished(request)
     } else {
@@ -83,7 +89,7 @@ function App() {
       setInProgressUploadsCount((previous) => previous + newUploads.length);
     }
 
-    if (newUploads.length == 1) {
+    if (newUploads.length === 1) {
       const request = newUploads[0]
       showNotification({ 
         title: `Uploading file ${request.name} 🚀`, 
@@ -121,9 +127,16 @@ function App() {
   const resetInProgressUploadsCount = () => setInProgressUploadsCount(0)
   const resetFinishedUploadsCount = () => setFinishedUploadsCount(0)
 
-
   const handleTabSelected = (index) => {
     setCurrentTab(index);
+  };
+
+  const deleteUpload = async (id) => {
+    await deleter.delete(id);
+
+    setFinishedUploads((previous) =>
+      previous.filter((item) => item.id !== id)
+    );
   };
 
   return (
@@ -136,7 +149,8 @@ function App() {
       cancelUpload,
       retryUpload,
       resetInProgressUploadsCount,
-      resetFinishedUploadsCount
+      resetFinishedUploadsCount,
+      deleteUpload
     }}>
       <div className={styles.app}>
         <div>

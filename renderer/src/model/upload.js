@@ -45,6 +45,16 @@ export class Upload {
         return this.#mimeType
     }
 
+    toPlainObject() {
+        return {
+            id: this.id,
+            name: this.name,
+            size: this.size,
+            mimeType: this.mimeType,
+            uploadedAt: this.uploadedAt
+        }
+    }
+
     static async fromFile(file) {
         return new Upload({
             id: uuidv4(),

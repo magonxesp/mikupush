@@ -23,6 +23,12 @@ func SetupCORS(engine *gin.Engine) {
 			"Content-Type",
 			"Accept",
 		},
+		AllowMethods: []string{
+			"POST",
+			"GET",
+			"OPTIONS",
+			"DELETE",
+		},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
