@@ -11,6 +11,12 @@ import { appTray } from './tray.js'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+const isDevMode = process.argv.indexOf('--dev-server') !== -1
+
+if (isDevMode) {
+  app.commandLine.appendSwitch("ignore-certificate-errors", "true");
+}
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
@@ -28,7 +34,7 @@ function createWindow() {
     }
   })
 
-  if (process.argv.indexOf('--dev-server') !== -1) {
+  if (isDevMode) {
     console.log('using vite dev server')
     win.webContents.openDevTools()
     win.loadURL('http://localhost:5173/')

@@ -34,6 +34,8 @@ export class Uploader {
      * @param {OnProgressUpdateCallback} onProgressUpdate
      */
     retry(request, onProgressUpdate = () => {}) {
+        request.retry()
+
         this.#queue.push([request, onProgressUpdate])
         this.#startProcesingQueue()
     }
@@ -59,7 +61,16 @@ export class Uploader {
             const state = new UploadRequestState(request, onProgressUpdateCallback)
 
             try {
-                await create(request)
+                if (request.isRetried) {
+                  try {
+                    await create(request)
+                  } catch (exception) {
+                    console.warn('(retried request) failed create file on server', exception)
+                  }
+                } else {
+                    await create(request)
+                }
+
                 await upload(request, (progress) => {
                     state.update(previous => previous.updateProgress(progress))
                 })
@@ -99,7 +110,6 @@ class UploadRequestState {
    * @param {(state: UploadRequest) => UploadRequest} updater
    */
   update(updater) {
-    console.log('updating upload state')
     this.#request = updater(this.#request);
     this.#notifyProgress(this.#request);
   }

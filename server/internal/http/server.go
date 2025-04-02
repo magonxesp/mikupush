@@ -11,6 +11,7 @@ func SetupHandlers(engine *gin.Engine) {
 	engine.POST("/api/file/:uuid/upload", FileUploadHandler)
 	engine.DELETE("/api/file/:uuid", FileDeleteHandler)
 	engine.GET("/u/:uuid", FileGetContentHandler)
+	engine.GET("/health", HealthGetHandler)
 }
 
 func SetupCORS(engine *gin.Engine) {

@@ -40,3 +40,5 @@ server/.env
 dist
 node_modules
 docker-compose.*.yml
+server/key.pem
+server/cert.pem

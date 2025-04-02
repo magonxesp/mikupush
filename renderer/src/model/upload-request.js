@@ -5,6 +5,8 @@ export class UploadRequest {
     #file
     #upload
     #progress
+    #controller
+    #retry
 
     /**
      * Constructor
@@ -12,11 +14,14 @@ export class UploadRequest {
      * @param {File} param0.file
      * @param {Upload} param0.upload
      * @param {UploadProgress} param0.progress
+     * @param {AbortController|undefined} param0.controller
      */
-    constructor({ file, upload, progress }) {
+    constructor({ file, upload, progress, controller }) {
         this.#file = file
         this.#upload = upload
         this.#progress = progress
+        this.#controller = controller ?? new AbortController()
+        this.#retry = false
     }
 
     get file() {
@@ -63,6 +68,14 @@ export class UploadRequest {
         return this.#progress.finishedFailed
     }
 
+    get controller() {
+        return this.#controller
+    }
+
+    get isRetried() {
+        return this.#retry
+    }
+
     updateProgress(newValue) {
         const updated = this.#progress.update(newValue)
         return new UploadRequest({ ...this.#toPlainObject(), progress: updated })
@@ -82,12 +95,22 @@ export class UploadRequest {
         })
     }
 
+    abort() {
+        this.#controller.abort()
+    }
+
+    retry() {
+        this.#controller = new AbortController()
+        this.#retry = true
+    }
+
     #toPlainObject() {
         return {
             file: this.#file,
             upload: this.#upload,
             progress: this.#progress,
-
+            controller: this.#controller,
+            retry: this.#retry,
         }
     }
 

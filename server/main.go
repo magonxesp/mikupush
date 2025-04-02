@@ -1,10 +1,9 @@
 package main
 
 import (
-	"log"
-
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"log"
 	"mikupush.io/internal"
 	"mikupush.io/internal/http"
 )

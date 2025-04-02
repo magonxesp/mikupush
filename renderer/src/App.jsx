@@ -110,7 +110,8 @@ function App() {
    * @param {UploadRequest} request 
    */
   const cancelUpload = (request) => {
-    console.log("cancel upload", request);
+    request.abort();
+
     setInProgressUploads(
       inProgressUploads.filter((item) => item.id !== request.id)
     );

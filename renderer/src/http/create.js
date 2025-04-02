@@ -1,5 +1,5 @@
 import { UploadRequest } from '../model/upload-request'
-import { axiosInstance } from './client'
+import { axiosInstance, serverBaseUrl } from './client'
 
 /**
  * Create file upload.
@@ -13,7 +13,7 @@ export async function create(request) {
     'size': request.file.size
   }
 
-  const response = await axiosInstance.post('http://localhost:8080/api/file', data, {
+  const response = await axiosInstance.post(`${serverBaseUrl}/api/file`, data, {
     headers: {
       "Accept": "application/json",
       "Content-Type": "application/json",

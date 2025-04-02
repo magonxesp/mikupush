@@ -1,10 +1,11 @@
 import { UploadRequest } from "../model/upload-request";
-import { axiosInstance } from "./client";
+import { axiosInstance, serverBaseUrl } from './client'
 
 /**
  * Upload file
  * @param {UploadRequest} request
  * @param {({progress: number, speed: number}) => void} onProgress
+ * @returns {Promise<void>}
  */
 export async function upload(request, onProgress = () => {}) {
   if (request.mimeType == null) {
@@ -12,14 +13,13 @@ export async function upload(request, onProgress = () => {}) {
   }
 
   const response = await axiosInstance.post(
-    `http://localhost:8080/api/file/${request.id}/upload`,
+    `${serverBaseUrl}/api/file/${request.id}/upload`,
     request.file,
     {
       headers: {
-        "X-File-Id": request.id,
-        "X-File-Name": request.name,
         "Content-Type": request.mimeType,
       },
+      signal: request.controller.signal,
       onUploadProgress: (event) => {
         onProgress({ progress: event.progress, speed: event.rate })
       },
