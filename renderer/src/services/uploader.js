@@ -28,6 +28,16 @@ export class Uploader {
         return request
     }
 
+    /**
+     * Retry upload request
+     * @param {UploadRequest} request
+     * @param {OnProgressUpdateCallback} onProgressUpdate
+     */
+    retry(request, onProgressUpdate = () => {}) {
+        this.#queue.push([request, onProgressUpdate])
+        this.#startProcesingQueue()
+    }
+
     #startProcesingQueue() {
         if (this.#isProcessingQueue) {
             return

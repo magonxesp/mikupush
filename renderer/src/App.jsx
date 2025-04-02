@@ -121,7 +121,7 @@ function App() {
    * @param {UploadRequest} request 
    */
   const retryUpload = (request) => {
-    console.log("on retry", request);
+    uploader.retry(request, handleProgressUpdate);
   }
 
   const resetInProgressUploadsCount = () => setInProgressUploadsCount(0)
