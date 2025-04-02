@@ -1,10 +1,11 @@
 package http
 
 import (
-	"github.com/gin-gonic/gin"
 	"log"
-	"mikupush.io/internal/service"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"mikupush.io/internal/service"
 )
 
 func FileDeleteHandler(context *gin.Context) {
@@ -12,6 +13,8 @@ func FileDeleteHandler(context *gin.Context) {
 	err := service.DeleteFile(uuid)
 	if err != nil {
 		log.Println("failed deleting file:", err)
-		context.Status(http.StatusBadRequest)
+		context.Status(http.StatusInternalServerError)
 	}
+
+	context.Status(http.StatusOK)
 }

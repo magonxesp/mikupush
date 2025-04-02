@@ -1,24 +1,28 @@
 package http
 
 import (
+	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"log"
-	"mikupush.io/internal/service"
 	"net/http"
+
+	"gorm.io/gorm"
+
+	"github.com/gin-gonic/gin"
+	"mikupush.io/internal/service"
 )
 
 func FileGetContentHandler(context *gin.Context) {
 	fileId := context.Param("uuid")
 	fileContent, err := service.GetFileContents(fileId)
-	if err != nil {
-		log.Printf("failed getting file contents: %v", err)
-		context.Status(http.StatusInternalServerError)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		context.Status(http.StatusNotFound)
 		return
 	}
 
-	if fileContent == nil {
-		context.Status(http.StatusNotFound)
+	if err != nil {
+		log.Printf("failed getting file contents: %v", err)
+		context.Status(http.StatusInternalServerError)
 		return
 	}
 

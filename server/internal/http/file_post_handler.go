@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"mikupush.io/internal/service"
 )
 
@@ -31,7 +32,7 @@ func FileUploadHandler(context *gin.Context) {
 	uuid := context.Param("uuid")
 	err := service.SaveFileContents(uuid, context.Request.Body)
 
-	if err != nil && errors.Is(err, service.FileNotFoundError) {
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		log.Println("failed uploading file:", err)
 		context.Status(http.StatusBadRequest)
 		return

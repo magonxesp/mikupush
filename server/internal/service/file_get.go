@@ -2,9 +2,10 @@ package service
 
 import (
 	"fmt"
-	"mikupush.io/internal"
 	"os"
 	"path"
+
+	"mikupush.io/internal"
 )
 
 type FileUploadContent struct {
@@ -17,14 +18,10 @@ type FileUploadContent struct {
 func GetFileContents(uuid string) (*FileUploadContent, error) {
 	db := internal.GetDatabase()
 
-	var fileUpload *internal.FileUpload
+	var fileUpload internal.FileUpload
 	result := db.Where("uuid = ?", uuid).First(&fileUpload)
 	if result.Error != nil {
 		return nil, result.Error
-	}
-
-	if fileUpload == nil {
-		return nil, nil
 	}
 
 	filePath := path.Join(internal.GetDataDir(), uuid)

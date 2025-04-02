@@ -1,8 +1,9 @@
 package internal
 
 import (
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type FileUpload struct {
@@ -13,4 +14,8 @@ type FileUpload struct {
 	Size     uint      `gorm:"column:size"`
 	// UploadedAt is the uploaded date in unix epoch milliseconds
 	UploadedAt time.Time `gorm:"column:uploaded_at"`
+}
+
+func (FileUpload) TableName() string {
+	return "file_uploads"
 }

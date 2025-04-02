@@ -3,12 +3,14 @@ package service
 import (
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
 	"io"
-	"mikupush.io/internal"
 	"os"
 	"path"
 	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+	"mikupush.io/internal"
 )
 
 type FileCreateRequest struct {
@@ -18,22 +20,22 @@ type FileCreateRequest struct {
 	Size     uint      `json:"size"`
 }
 
-var FileExistsError = errors.New("file exists")
+var ErrFileExists = errors.New("file exists")
 
 func CreateFile(request *FileCreateRequest) error {
 	db := internal.GetDatabase()
 
-	var fileUpload *internal.FileUpload
+	var fileUpload internal.FileUpload
 	result := db.Where("uuid = ?", request.Uuid).First(&fileUpload)
-	if result.Error != nil {
+	if result.Error != nil && !errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return result.Error
 	}
 
-	if fileUpload != nil {
-		return FileExistsError
+	if result.RowsAffected > 0 {
+		return ErrFileExists
 	}
 
-	fileUpload = &internal.FileUpload{
+	fileUpload = internal.FileUpload{
 		Uuid:       request.Uuid,
 		Name:       request.Name,
 		MimeType:   request.MimeType,
@@ -41,21 +43,17 @@ func CreateFile(request *FileCreateRequest) error {
 		UploadedAt: time.Now(),
 	}
 
-	result = db.Create(fileUpload)
+	result = db.Create(&fileUpload)
 	return result.Error
 }
 
 func SaveFileContents(uuid string, reader io.ReadCloser) error {
 	db := internal.GetDatabase()
 
-	var fileUpload *internal.FileUpload
+	var fileUpload internal.FileUpload
 	result := db.Where("uuid = ?", uuid).First(&fileUpload)
 	if result.Error != nil {
 		return result.Error
-	}
-
-	if fileUpload == nil {
-		return FileNotFoundError
 	}
 
 	file, err := os.Create(path.Join(internal.GetDataDir(), uuid))
