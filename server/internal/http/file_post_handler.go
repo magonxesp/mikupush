@@ -2,7 +2,9 @@ package http
 
 import (
 	"errors"
+	"io"
 	"log"
+	"mikupush.io/internal"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -13,6 +15,7 @@ import (
 func FileCreateHandler(context *gin.Context) {
 	var request *service.FileCreateRequest
 	err := context.ShouldBindJSON(&request)
+
 	if err != nil {
 		log.Println("failed creating file:", err)
 		context.Status(http.StatusBadRequest)
@@ -20,9 +23,17 @@ func FileCreateHandler(context *gin.Context) {
 	}
 
 	err = service.CreateFile(request)
+
+	if err != nil && errors.Is(err, service.ErrFileSizeExceedLimit) {
+		log.Println("failed uploading file:", err)
+		context.Status(http.StatusBadRequest)
+		return
+	}
+
 	if err != nil {
 		log.Println("failed creating file:", err)
-		context.Status(http.StatusBadRequest)
+		context.Status(http.StatusInternalServerError)
+		return
 	}
 
 	context.Status(http.StatusOK)
@@ -30,7 +41,15 @@ func FileCreateHandler(context *gin.Context) {
 
 func FileUploadHandler(context *gin.Context) {
 	uuid := context.Param("uuid")
-	err := service.SaveFileContents(uuid, context.Request.Body)
+
+	var reader io.ReadCloser
+	if internal.IsUploadSizeLimited() {
+		reader = http.MaxBytesReader(context.Writer, context.Request.Body, int64(internal.GetUploadLimit()))
+	} else {
+		reader = context.Request.Body
+	}
+
+	err := service.SaveFileContents(uuid, reader)
 
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		log.Println("failed uploading file:", err)

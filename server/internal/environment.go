@@ -3,6 +3,7 @@ package internal
 import (
 	"log"
 	"os"
+	"strconv"
 )
 
 func GetDataDir() string {
@@ -48,4 +49,23 @@ func GetPostgresHost() string {
 
 func GetPostgresPort() string {
 	return os.Getenv("POSTGRESQL_PORT")
+}
+
+func GetUploadLimit() uint {
+	limitStr := os.Getenv("MIKUPUSH_UPLOAD_LIMIT_BYTES")
+	if limitStr == "" {
+		return UnlimitedUploadSize
+	}
+
+	limit, err := strconv.ParseUint(limitStr, 10, 32)
+	if err != nil {
+		return UnlimitedUploadSize
+	}
+
+	return uint(limit)
+}
+
+func IsUploadSizeLimited() bool {
+	limit := GetUploadLimit()
+	return limit > 1
 }

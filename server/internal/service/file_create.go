@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"mikupush.io/internal/utils"
 	"os"
 	"path"
 	"time"
@@ -21,6 +22,7 @@ type FileCreateRequest struct {
 }
 
 var ErrFileExists = errors.New("file exists")
+var ErrFileSizeExceedLimit = errors.New("file size exceeds limit")
 
 func CreateFile(request *FileCreateRequest) error {
 	db := internal.GetDatabase()
@@ -41,6 +43,10 @@ func CreateFile(request *FileCreateRequest) error {
 		MimeType:   request.MimeType,
 		Size:       request.Size,
 		UploadedAt: time.Now(),
+	}
+
+	if utils.ExceedsUploadSizeLimit(fileUpload.Size) {
+		return ErrFileSizeExceedLimit
 	}
 
 	result = db.Create(&fileUpload)
