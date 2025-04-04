@@ -23,7 +23,6 @@
     "cross-env": "^7.0.3",
     "electron": "^35.0.0",
     "rollup": "^4.39.0",
-    "rollup-plugin-copy": "^3.5.0",
     "standard": "^17.1.2",
     "typescript": "^5.8.2"
   }

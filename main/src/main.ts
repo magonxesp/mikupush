@@ -35,7 +35,7 @@ function createWindow() {
     window.webContents.openDevTools()
     window.loadURL('http://localhost:5173/')
   } else {
-    window.loadFile('dist/index.html')
+    window.loadFile('../renderer/index.html')
   }
 
   window.on('close', function (evt) {

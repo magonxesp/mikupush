@@ -19,7 +19,7 @@ export default {
         copy({
             targets: [
                 { src: 'src/assets', dest: 'dist' },
-            ]
-        })
-    ]
+            ],
+        }),
+    ],
 };

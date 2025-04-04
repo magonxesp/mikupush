@@ -26,6 +26,7 @@
   ],
   "devDependencies": {
     "concurrently": "^9.1.2",
+    "rollup-plugin-empty-dir": "^1.0.5",
     "wait-on": "^8.0.2"
   }
 }
