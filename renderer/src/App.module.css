@@ -13,7 +13,6 @@
 
 .drag-area {
   width: 100%;
-  background-color: red;
   height: 2rem;
   -webkit-app-region: drag;
 }

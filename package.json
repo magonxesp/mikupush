@@ -2,8 +2,10 @@
   "name": "mikupush",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=renderer\" \"wait-on http://localhost:5173 && npm run dev --workspace=main\""
+    "dev": "concurrently \"npm run dev --workspace=renderer\" \"wait-on http://localhost:5173 && npm run dev --workspace=main\"",
+    "package": "npm run package --workspace=package"
   },
   "repository": {
     "type": "git",
@@ -19,7 +21,8 @@
   "description": "",
   "workspaces": [
     "renderer",
-    "main"
+    "main",
+    "package"
   ],
   "devDependencies": {
     "concurrently": "^9.1.2",
