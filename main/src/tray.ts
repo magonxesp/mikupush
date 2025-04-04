@@ -1,13 +1,20 @@
-import { Tray, Menu, nativeImage, BrowserWindow } from 'electron'
+import { Tray, Menu, nativeImage, BrowserWindow, app } from 'electron'
 import path from 'path'
 
-const contextMenu = Menu.buildFromTemplate([
-    { label: 'Item1', type: 'radio' },
-    { label: 'Item2', type: 'radio' },
-    { label: 'Item3', type: 'radio', checked: true },
-    { label: 'Item4', type: 'radio' }
-])
 
-export const appTray = (window: BrowserWindow) => {
-    return new Tray(nativeImage.createFromPath(path.join(__dirname, '/assets/tray_icon.png')))
+
+export const setupTray = (window: BrowserWindow) => {
+    const tray = new Tray(nativeImage.createFromPath(path.join(__dirname, '/assets/tray_icon.png')))
+
+    const contextMenu = Menu.buildFromTemplate([
+        { label: 'Open', click: () => window.show() },
+        { label: 'Exit', click: () => app.exit() },
+    ])
+
+    tray.setToolTip('Miku Push!')
+    tray.setContextMenu(contextMenu)
+    
+    tray.addListener('double-click', () => {
+        window.show()
+    })
 }

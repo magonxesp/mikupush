@@ -4,7 +4,7 @@ import { appDataDirectory } from './environment'
 import { database } from './database'
 import path from 'path'
 import './ipc'
-import { appTray } from './tray'
+import { setupTray } from './tray'
 
 const isDevMode = (process.env.ELECTRON_ENV ?? 'prod') === 'dev'
 
@@ -60,7 +60,7 @@ function ensureAppDataDirectoryIsCreated() {
 app.whenReady().then(() => {
   ensureAppDataDirectoryIsCreated()
   const window = createWindow()
-  appTray(window)  
+  setupTray(window)  
 })
 
 app.on('quit', () => {
