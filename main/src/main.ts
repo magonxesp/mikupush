@@ -1,24 +1,21 @@
 import { app, BrowserWindow } from 'electron'
 import fs from 'fs'
-import { appDataDirectory } from './environment.js'
-import { database } from './database.js'
+import { appDataDirectory } from './environment'
+import { database } from './database'
 import path from 'path'
-import './ipc.js'
-import { fileURLToPath } from 'url'
-import { appIcon64 } from './environment.js'
-import { appTray } from './tray.js'
+import './ipc'
+import { appTray } from './tray'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
-const isDevMode = process.argv.indexOf('--dev-server') !== -1
+const isDevMode = (process.env.ELECTRON_ENV ?? 'prod') === 'dev'
 
 if (isDevMode) {
   app.commandLine.appendSwitch("ignore-certificate-errors", "true");
 }
 
+let isAppQuitting = false
+
 function createWindow() {
-  const win = new BrowserWindow({
+  const window = new BrowserWindow({
     width: 800,
     height: 600,
     frame: false, // Oculta la barra de título
@@ -28,7 +25,6 @@ function createWindow() {
       symbolColor: '#ffffff',
       height: 32
     },
-    icon: appIcon64(),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
@@ -36,13 +32,21 @@ function createWindow() {
 
   if (isDevMode) {
     console.log('using vite dev server')
-    win.webContents.openDevTools()
-    win.loadURL('http://localhost:5173/')
+    window.webContents.openDevTools()
+    window.loadURL('http://localhost:5173/')
   } else {
-    win.loadFile('dist/index.html')
+    window.loadFile('dist/index.html')
   }
 
+  window.on('close', function (evt) {
+    if (!isAppQuitting) {
+        evt.preventDefault();
+        window.hide()
+    }
+  });
+
   database.sync()
+  return window
 }
 
 function ensureAppDataDirectoryIsCreated() {
@@ -54,11 +58,15 @@ function ensureAppDataDirectoryIsCreated() {
 }
 
 app.whenReady().then(() => {
-  appTray()
   ensureAppDataDirectoryIsCreated()
-  createWindow()
+  const window = createWindow()
+  appTray(window)  
 })
 
 app.on('quit', () => {
   database.close()
 })
+
+app.on('before-quit', function (evt) {
+    isAppQuitting = true
+});

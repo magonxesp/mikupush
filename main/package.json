@@ -5,12 +5,11 @@
   "author": "MagonxESP",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
-  "main": "src/main.js",
+  "main": "dist/main.js",
   "scripts": {
-    "build": "",
-    "dev": "electronmon . --dev-server",
-    "preview": "electron .",
+    "build": "tsc && rollup -c",
+    "dev": "npm run build && cross-env ELECTRON_ENV=dev electron .",
+    "preview": "npm run build && electron .",
     "lint": "standard ./src",
     "lint:fix": "standard ./src --fix"
   },
@@ -20,8 +19,12 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "@rollup/plugin-typescript": "^12.1.2",
+    "cross-env": "^7.0.3",
     "electron": "^35.0.0",
-    "electronmon": "^2.0.3",
-    "standard": "^17.1.2"
+    "rollup": "^4.39.0",
+    "rollup-plugin-copy": "^3.5.0",
+    "standard": "^17.1.2",
+    "typescript": "^5.8.2"
   }
 }

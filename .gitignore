@@ -43,3 +43,5 @@ docker-compose.*.yml
 server/key.pem
 server/cert.pem
 /package/target
+.rollup-cache
+tsconfig.tsbuildinfo
