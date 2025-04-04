@@ -1,10 +1,8 @@
 {
   "name": "package",
   "version": "1.0.0",
-  "main": "dist.js",
-  "type": "module",
   "scripts": {
-    "dist": "npm run build --workspace=renderer && npm run build --workspace=main && node dist.js",
+    "dist": "npm run build --workspace=renderer && npm run build --workspace=main && node dist.mjs",
     "package:macos": "npx @electron/packager dist --platform=darwin --arch=x64,arm64 --asar --out=target --overwrite --icon=resources/macOS/AppIcon.icns --app-bundle-id=io.mikupush.MikuPush",
     "package:windows": "npx @electron/packager dist --platform=win32 --arch=x64,arm64 --asar --out=target --overwrite --icon=resources/windows/icon.ico",
     "package:linux": "npx @electron/packager dist --platform=linux --arch=x64,arm64 --asar --out=target --overwrite --icon=resources/linux/icon.png",
