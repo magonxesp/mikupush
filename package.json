@@ -5,8 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace=renderer\" \"wait-on http://localhost:5173 && npm run dev --workspace=main\"",
-    "build": "npm run build --workspace=main",
-    "package": "npm run package --workspace=main"
+    "build": "npm run build --workspace=main && rollup -c && cd build && npm install --production",
+    "package:macos": "electron-packager build --platform=darwin --arch=x64,arm64 --out=target --overwrite --icon=resources/macOS/AppIcon.icns --app-bundle-id=io.mikupush.MikuPush --asar",
+    "package:windows": "electron-packager build --platform=win32 --arch=x64,arm64 --out=target --overwrite --icon=resources/windows/icon.ico --asar",
+    "package:linux": "electron-packager build --platform=linux --arch=x64,arm64 --out=target --overwrite --icon=resources/linux/icon.png --asar",
+    "package": "npm run package:macos && npm run package:windows && npm run package:linux",
+    "preview": "npm run preview --workspace=main"
   },
   "repository": {
     "type": "git",
@@ -25,7 +29,11 @@
     "main"
   ],
   "devDependencies": {
+    "@electron/packager": "^18.3.6",
     "concurrently": "^9.1.2",
+    "rollup": "^4.39.0",
+    "rollup-plugin-copy": "^3.5.0",
+    "rollup-plugin-delete": "^3.0.1",
     "wait-on": "^8.0.2"
   }
 }

@@ -1,5 +1,6 @@
 import typescript from '@rollup/plugin-typescript'
 import copy from 'rollup-plugin-copy'
+import externals from 'rollup-plugin-node-externals'
 
 /**
  * @type {import('rollup').RollupOptions}
@@ -15,6 +16,7 @@ export default {
         sourcemap: true
 	},
 	plugins: [
+        externals(),
         typescript(),
         copy({
             targets: [
