@@ -7,9 +7,10 @@
   "version": "0.0.0",
   "main": "dist/main.js",
   "scripts": {
-    "build": "npm run build --workspace=renderer && tsc && rollup -c",
-    "dev": "npm run build && cross-env ELECTRON_ENV=dev electron .",
-    "preview": "npm run build && cross-env ELECTRON_ENV=preview electron .",
+    "build:prod": "npm run build:prod --workspace=renderer && tsc && rollup -c",
+    "build:dev": "npm run build:dev --workspace=renderer && tsc && rollup -c",
+    "dev": "npm run build:dev && cross-env ELECTRON_ENV=dev electron .",
+    "preview": "npm run build:prod && cross-env ELECTRON_ENV=preview electron .",
     "lint": "standard ./src",
     "lint:fix": "standard ./src --fix"
   },
