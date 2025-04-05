@@ -9,7 +9,7 @@
   "scripts": {
     "build": "npm run build --workspace=renderer && tsc && rollup -c",
     "dev": "npm run build && cross-env ELECTRON_ENV=dev electron .",
-    "preview": "npm run build && electron .",
+    "preview": "npm run build && cross-env ELECTRON_ENV=preview electron .",
     "lint": "standard ./src",
     "lint:fix": "standard ./src --fix"
   },

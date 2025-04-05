@@ -6,7 +6,9 @@ import path from 'path'
 import './ipc'
 import { setupTray } from './tray'
 
-const isDevMode = (process.env.ELECTRON_ENV ?? 'prod') === 'dev'
+const appEnv = process.env.ELECTRON_ENV ?? 'prod'
+const isDevMode = appEnv === 'dev'
+const isPreviewMode = appEnv === 'preview'
 
 if (isDevMode) {
   app.commandLine.appendSwitch("ignore-certificate-errors", "true");
@@ -26,7 +28,8 @@ function createWindow() {
       height: 32
     },
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
+      devTools: isDevMode || isPreviewMode,
     }
   })
 
