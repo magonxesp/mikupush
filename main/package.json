@@ -7,9 +7,13 @@
   "version": "0.0.0",
   "main": "dist/main.js",
   "scripts": {
-    "build": "tsc && rollup -c",
+    "build": "npm run build --workspace=renderer && tsc && rollup -c",
     "dev": "npm run build && cross-env ELECTRON_ENV=dev electron .",
     "preview": "npm run build && electron .",
+    "package:macos": "npx @electron/packager . --platform=darwin --arch=x64,arm64 --asar --out=target --overwrite --icon=../resources/macOS/AppIcon.icns --app-bundle-id=io.mikupush.MikuPush",
+    "package:windows": "npx @electron/packager . --platform=win32 --arch=x64,arm64 --asar --out=target --overwrite --icon=../resources/windows/icon.ico",
+    "package:linux": "npx @electron/packager . --platform=linux --arch=x64,arm64 --asar --out=target --overwrite --icon=../resources/linux/icon.png",
+    "package": "npm run package:macos && npm run package:windows && npm run package:linux",
     "lint": "standard ./src",
     "lint:fix": "standard ./src --fix"
   },
@@ -19,6 +23,7 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "@electron/packager": "^18.3.6",
     "@rollup/plugin-typescript": "^12.1.2",
     "cross-env": "^7.0.3",
     "electron": "^35.0.0",
