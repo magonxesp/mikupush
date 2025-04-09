@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { UploadModel } from './database'
-import type { NotificationOptions } from './notification'
+import type { UploadModel } from '../main/database'
+import type { NotificationOptions } from '../main/notification'
 
 contextBridge.exposeInMainWorld('uploadAPI', {
   create: (upload: UploadModel) => ipcRenderer.send('upload:create', upload),

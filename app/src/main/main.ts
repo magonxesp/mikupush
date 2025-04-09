@@ -33,12 +33,12 @@ function createWindow() {
     }
   })
 
-  if (isDevMode) {
+  if (process.env.VITE_DEV_SERVER_URL) {
     console.log('using vite dev server')
     window.webContents.openDevTools()
-    window.loadURL('http://localhost:5173/')
+    window.loadURL(process.env.VITE_DEV_SERVER_URL)
   } else {
-    window.loadFile(path.join(__dirname, '../renderer/dist/index.html'))
+    window.loadFile(path.join(__dirname, '../dist/index.html'))
   }
 
   window.on('close', function (evt) {
@@ -70,6 +70,6 @@ app.on('quit', () => {
   database.close()
 })
 
-app.on('before-quit', function (evt) {
+app.on('before-quit', function () {
     isAppQuitting = true
 });
