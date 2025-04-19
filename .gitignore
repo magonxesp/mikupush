@@ -45,6 +45,6 @@ server/cert.pem
 .rollup.cache
 tsconfig.tsbuildinfo
 /build
-/target
+target
 /server/server
 /server/server.exe

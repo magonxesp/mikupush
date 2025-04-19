@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build:dev": "tsc -b && vite build --mode development",
-    "build:prod": "tsc -b vite build",
+    "build:prod": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "package:macos": "electron-packager . --platform=darwin --arch=x64,arm64 --out=target --overwrite --icon=resources/macOS/AppIcon.icns --app-bundle-id=io.mikupush.MikuPush --asar",
