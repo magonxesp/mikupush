@@ -8,6 +8,8 @@ ensuring privacy and ease of use from the very first moment.
 
 You can download the latest version on the releases page.
 
+👉 [Latest version downloads](https://github.com/magonxesp/mikupush/releases/latest)
+
 ## Server
 
 ### Build
