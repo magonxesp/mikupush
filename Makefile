@@ -2,7 +2,11 @@
 SHELL := bash
 .SHELLFLAGS := -e -o pipefail -c
 
-.PHONY: build-server build-app build
+.PHONY: \
+	build-server \
+	build-app \
+	build-app-windows-installer \
+	build
 
 build-server:
 	cd server
@@ -28,4 +32,11 @@ build-app:
 	zip -r 'Miku Push-linux-arm64.zip' 'Miku Push-linux-arm64'
 	zip -r 'Miku Push-linux-x64.zip' 'Miku Push-linux-x64'
 
-build: build-server build-app
+build-app-windows-installer:
+	docker run --rm -i -v "$$PWD:/work" amake/innosetup app/installer/windows/installer-x64.iss
+	docker run --rm -i -v "$$PWD:/work" amake/innosetup app/installer/windows/installer-arm64.iss
+
+build: \
+	build-server \
+	build-app \
+	build-app-windows-installer
