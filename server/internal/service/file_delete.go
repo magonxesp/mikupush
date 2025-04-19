@@ -4,7 +4,7 @@ import (
 	"os"
 	"path"
 
-	"mikupush.io/internal"
+	"mikupush.io/server/internal"
 )
 
 func DeleteFile(uuid string) error {

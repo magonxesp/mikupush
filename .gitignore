@@ -46,3 +46,5 @@ server/cert.pem
 tsconfig.tsbuildinfo
 /build
 /target
+/server/server
+/server/server.exe

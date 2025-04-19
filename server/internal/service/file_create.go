@@ -4,14 +4,15 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"mikupush.io/internal/utils"
 	"os"
 	"path"
 	"time"
 
+	"mikupush.io/server/internal/utils"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"mikupush.io/internal"
+	"mikupush.io/server/internal"
 )
 
 type FileCreateRequest struct {

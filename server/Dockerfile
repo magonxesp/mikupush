@@ -1,13 +1,12 @@
-FROM golang:1.24.0-alpine AS builder
+FROM golang:1.24-alpine AS builder
 
 WORKDIR /build
 
 COPY . .
 
-RUN go mod tidy
 RUN go build -o mikupush-server
 
-FROM golang:1.24.0-alpine
+FROM golang:1.24-alpine
 
 WORKDIR /server
 

@@ -5,7 +5,7 @@ import (
 	"os"
 	"path"
 
-	"mikupush.io/internal"
+	"mikupush.io/server/internal"
 )
 
 type FileUploadContent struct {

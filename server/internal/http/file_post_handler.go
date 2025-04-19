@@ -4,12 +4,13 @@ import (
 	"errors"
 	"io"
 	"log"
-	"mikupush.io/internal"
 	"net/http"
+
+	"mikupush.io/server/internal"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"mikupush.io/internal/service"
+	"mikupush.io/server/internal/service"
 )
 
 func FileCreateHandler(context *gin.Context) {

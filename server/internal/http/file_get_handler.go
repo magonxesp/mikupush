@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"
-	"mikupush.io/internal/service"
+	"mikupush.io/server/internal/service"
 )
 
 func FileGetContentHandler(context *gin.Context) {
