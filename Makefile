@@ -7,7 +7,8 @@ SHELL := bash
 	build-app-macos \
 	build-app-windows \
 	build-app-linux \
-	build
+	build \
+	clean
 
 build-server:
 	cd server
@@ -62,3 +63,9 @@ build: \
 	build-app-macos \
 	build-app-windows \
 	build-app-linux
+
+clean:
+	rm -r app/dist
+	rm -r app/dist-electron
+	rm -r app/target
+	rm -r server/target
