@@ -1,4 +1,4 @@
-# Miku push
+# Miku push!
 
 Miku Push! is a simple, fast, and open-source alternative to WeTransfer, available for Windows, macOS, and Linux. 
 It doesn't require registration and allows anonymous file sharing by default, 
