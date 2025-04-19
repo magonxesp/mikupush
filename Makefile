@@ -1,10 +1,12 @@
 .ONESHELL:
-SHELL := /bin/bash 
+SHELL := bash
+.SHELLFLAGS := -e -o pipefail -c
 
 .PHONY: build-server build-app build
 
 build-server:
 	cd server
+	[[ -d target ]] && rm -r target
 	GOOS=windows GOARCH=arm64 go build -o target/server-windows-arm64.exe
 	GOOS=windows GOARCH=amd64 go build -o target/server-windows-amd64.exe
 	GOOS=darwin GOARCH=arm64 go build -o target/server-darwin-arm64
@@ -14,15 +16,16 @@ build-server:
 
 build-app:
 	cd app
-	if [[ ! -d node_modules ]]; then npm install; fi
+	[[ -d target ]] && rm -r target
+	[[ ! -d node_modules ]] && npm install
 	npm run build:prod
 	npm run package
 	cd target
 	zip -r 'Miku Push-darwin-arm64.zip' 'Miku Push-darwin-arm64'
-	zip -r 'Miku Push-darwin-amd64.zip' 'Miku Push-darwin-amd64'
+	zip -r 'Miku Push-darwin-x64.zip' 'Miku Push-darwin-x64'
 	zip -r 'Miku Push-win32-arm64.zip' 'Miku Push-win32-arm64'
-	zip -r 'Miku Push-win32-amd64.zip' 'Miku Push-win32-amd64'
+	zip -r 'Miku Push-win32-x64.zip' 'Miku Push-win32-x64'
 	zip -r 'Miku Push-linux-arm64.zip' 'Miku Push-linux-arm64'
-	zip -r 'Miku Push-linux-amd64.zip' 'Miku Push-linux-amd64'
+	zip -r 'Miku Push-linux-x64.zip' 'Miku Push-linux-x64'
 
 build: build-server build-app
