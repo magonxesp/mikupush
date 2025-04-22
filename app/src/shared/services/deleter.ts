@@ -1,4 +1,4 @@
-import { deleteUpload as ipcDeleteUpload } from '../ipc/upload'
+import { deleteUpload as ipcDeleteUpload } from '../../renderer/ipc/upload'
 import { deleteUpload as httpDeleteUpload } from '../http/delete.js'
 
 export class Deleter {

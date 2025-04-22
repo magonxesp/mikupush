@@ -1,7 +1,7 @@
-import { create } from '../http/create'
-import { upload } from '../http/upload'
-import { createUpload } from '../ipc/upload'
-import { UploadRequest } from '../model/upload-request'
+import { create } from '../http/create.ts'
+import { upload } from '../http/upload.ts'
+import { createUpload } from '../../renderer/ipc/upload'
+import { UploadRequest } from '../model/upload-request.ts'
 
 type OnProgressUpdateCallback = (request: UploadRequest) => void
 type QueueItem = [UploadRequest, OnProgressUpdateCallback]

@@ -2,7 +2,7 @@ import { useContext } from 'react'
 import FileIcon from '../FileIcon/FileIcon'
 import { UploadsContext } from '../../context/upload'
 import styles from './UploadsProgressTab.module.css'
-import { UploadRequest } from '../../model/upload-request'
+import { UploadRequest } from '../../../shared/model/upload-request.ts'
 
 export default function UploadsProgressTab() {
 	const { inProgressUploads } = useContext(UploadsContext)

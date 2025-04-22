@@ -1,9 +1,9 @@
-import { Upload } from '../model/upload.js'
+import { Upload } from '../../shared/model/upload.ts'
 
 const uploadApiDefaults = {
-  create: () => {},
-  delete: () => {},
-  findAll: () => {}
+	create: () => {},
+	delete: () => {},
+	findAll: () => {}
 }
 
 const uploadApi = window.uploadAPI ?? uploadApiDefaults

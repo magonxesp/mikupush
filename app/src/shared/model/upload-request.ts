@@ -1,5 +1,5 @@
-import { Upload } from './upload'
-import { UploadProgress, UploadProgressObject } from './upload-progress'
+import { Upload } from './upload.ts'
+import { UploadProgress, UploadProgressObject } from './upload-progress.ts'
 
 export interface UploadRequestObject {
     file: File

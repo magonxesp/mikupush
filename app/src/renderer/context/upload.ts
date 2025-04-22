@@ -1,6 +1,6 @@
 import { createContext } from 'react'
-import { Upload } from '../model/upload'
-import { UploadRequest } from '../model/upload-request'
+import { Upload } from '../../shared/model/upload.ts'
+import { UploadRequest } from '../../shared/model/upload-request.ts'
 
 interface UploadsContextProps {
   inProgressUploads: UploadRequest[]

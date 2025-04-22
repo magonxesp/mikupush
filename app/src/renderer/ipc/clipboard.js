@@ -1,5 +1,5 @@
 const clipboardApiDefaults = {
-  writeToClipboard: () => {},
+	writeToClipboard: () => {},
 }
 
 const clipboardApi = window.clipBoardAPI ?? clipboardApiDefaults

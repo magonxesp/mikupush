@@ -6,12 +6,12 @@ import InputTab from './components/InputTab/InputTab'
 import UploadsFinishedTab from './components/UploadsFinishedTab/UploadsFinishedTab'
 import UploadsProgressTab from './components/UploadsProgressTab/UploadsProgressTab'
 import { UploadsContext } from './context/upload'
-import { Uploader } from './services/uploader'
-import { UploadRequest } from './model/upload-request'
+import { Uploader } from '../shared/services/uploader.ts'
+import { UploadRequest } from '../shared/model/upload-request.ts'
 import { showNotification } from './ipc/notification'
-import { Deleter } from './services/deleter.js'
+import { Deleter } from '../shared/services/deleter.js'
 import { findAllUploads } from './ipc/upload.js'
-import { Upload } from './model/upload'
+import { Upload } from '../shared/model/upload.ts'
 
 const uploader = new Uploader()
 const deleter = new Deleter()

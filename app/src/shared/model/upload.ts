@@ -1,4 +1,4 @@
-import { resolveMimeType } from '../helpers/mime-type'
+import { resolveMimeType } from '../helpers/mime-type.ts'
 import { v4 as uuidv4 } from 'uuid'
 
 interface UploadObject {

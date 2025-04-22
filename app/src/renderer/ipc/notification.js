@@ -1,5 +1,5 @@
 const notificationApiDefaults = {
-    showNotification: () => {}
+	showNotification: () => {}
 }
 
 const notificationsApi = window.notificationAPI ?? notificationApiDefaults
