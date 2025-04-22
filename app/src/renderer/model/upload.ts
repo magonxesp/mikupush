@@ -10,11 +10,11 @@ interface UploadObject {
 }
 
 export class Upload {
-    private readonly id: string
-    private readonly name: string
-    private readonly size: number
-    private readonly mimeType: string
-    private readonly uploadedAt: Date
+    public readonly id: string
+    public readonly name: string
+    public readonly size: number
+    public readonly mimeType: string
+    public readonly uploadedAt: Date
 
     constructor({ id, name, size, mimeType, uploadedAt }: UploadObject) {
         this.id = id
