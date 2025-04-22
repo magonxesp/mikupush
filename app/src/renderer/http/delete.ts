@@ -1,6 +1,6 @@
 import { axiosInstance, serverBaseUrl } from './client.js'
 
-export async function deleteUpload(id) {
+export async function deleteUpload(id: string) {
   const response = await axiosInstance.delete(`${serverBaseUrl}/api/file/${id}`, {
     headers: {
       "Accept": "application/json",

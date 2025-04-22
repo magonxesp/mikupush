@@ -2,8 +2,10 @@ import {useContext} from "react";
 import {UploadsContext} from "../../context/upload";
 import styles from "./AppTabs.module.css";
 
+type Tab = "upload" | "uploads-in-progress" | "finished-uploads"
+
 interface AppTabsProps {
-    onTabSelected?: (tab: string) => void
+    onTabSelected?: (tab: Tab) => void
 }
 
 export default function AppTabs({onTabSelected}: AppTabsProps) {
@@ -14,7 +16,7 @@ export default function AppTabs({onTabSelected}: AppTabsProps) {
         resetFinishedUploadsCount,
     } = useContext(UploadsContext);
 
-    const handleTabSelected = (index: string) => {
+    const handleTabSelected = (index: Tab) => {
         if (typeof onTabSelected !== "undefined") {
             onTabSelected(index)
         }

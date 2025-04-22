@@ -1,57 +1,68 @@
-import { useContext, useState, useRef } from "react";
+import {useContext, useState, useRef, DragEvent, ChangeEvent} from "react";
 import styles from "./InputTab.module.css";
 import { UploadsContext } from "../../context/upload";
 
 export default function InputTab() {
   const [active, setActive] = useState(false);
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { requestUploads } = useContext(UploadsContext);
 
   const openFileDialog = () => {
-    fileInputRef.current.click();
+    if (fileInputRef.current != null) {
+      fileInputRef.current.click();
+    }
   };
 
-  const handleDragOver = (event) => {
+  const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.stopPropagation();
 
     setActive(true);
   };
 
-  const handleDragLeave = (event) => {
+  const handleDragLeave = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.stopPropagation();
 
     setActive(false);
   };
 
-  const handleDrop = (event) => {
+  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.stopPropagation();
 
-    const isFile = (item) => {
+    const isFile = (item: DataTransferItem) => {
       if (item.kind !== "file") {
         return false;
       }
 
       const entry = item.webkitGetAsEntry();
-      return entry.isFile;
+      return entry?.isFile ?? false;
     };
+
+    if (event.dataTransfer == null) {
+      return
+    }
 
     const files = Array.from(event.dataTransfer.items)
       .filter(isFile)
-      .map((item) => item.getAsFile());
+      .map((item) => item.getAsFile())
+      .filter((item) => item !== null);
 
     requestUploads(files);
     setActive(false);
   };
 
-  const handleSelectedFiles = (event) => {
+  const handleSelectedFiles = (event: ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
     event.stopPropagation();
 
-    requestUploads(event.target.files);
-    setActive(false);
+    const input = event.target
+
+    if (input instanceof HTMLInputElement && input.files != null) {
+      requestUploads(Array.from(input.files));
+      setActive(false);
+    }
   };
 
   return (

@@ -1,6 +1,6 @@
 import { fileTypeFromBlob } from 'file-type'
 
-export async function resolveMimeType(file) {
+export async function resolveMimeType(file: File) {
     if (typeof file.type !== 'undefined' && file.type !== '') {
         return file.type
     }

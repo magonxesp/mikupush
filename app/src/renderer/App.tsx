@@ -11,6 +11,7 @@ import { UploadRequest } from './model/upload-request'
 import { showNotification } from "./ipc/notification";
 import { Deleter } from './services/deleter.js'
 import { findAllUploads } from './ipc/upload.js'
+import {Upload} from "./model/upload";
 
 const uploader = new Uploader()
 const deleter = new Deleter()
@@ -22,9 +23,9 @@ function App() {
     "finished-uploads": <UploadsFinishedTab />,
   };
 
-  const [currentTab, setCurrentTab] = useState("upload");
-  const [inProgressUploads, setInProgressUploads] = useState([]);
-  const [finishedUploads, setFinishedUploads] = useState([]);
+  const [currentTab, setCurrentTab] = useState<keyof typeof tabs>("upload");
+  const [inProgressUploads, setInProgressUploads] = useState<UploadRequest[]>([]);
+  const [finishedUploads, setFinishedUploads] = useState<Upload[]>([]);
   const [inProgressUploadsCount, setInProgressUploadsCount] = useState(0);
   const [finishedUploadsCount, setFinishedUploadsCount] = useState(0);
 
@@ -32,11 +33,7 @@ function App() {
     findAllUploads().then(uploads => setFinishedUploads(uploads))
   }, [])
 
-  /**
-   * Remove from in progress uploads and decrement in progress items count
-   * @param {UploadRequest} request 
-   */
-  const moveRequestAsFinished = (request) => {
+  const moveRequestAsFinished = (request: UploadRequest) => {
     setInProgressUploads((previous) =>
       previous.filter((item) => item.id !== request.id)
     );
@@ -54,11 +51,7 @@ function App() {
     })
   }
 
-  /**
-   * Handle upload request progress update
-   * @param {UploadRequest} request 
-   */
-  const handleProgressUpdate = (request) => {
+  const handleProgressUpdate = (request: UploadRequest) => {
     if (request.finishedSuccess) {
       moveRequestAsFinished(request)
     } else {
@@ -68,14 +61,10 @@ function App() {
     }
   }
 
-  /**
-   * Request file upload
-   * @param {File[]} files 
-   */
-  const requestUploads = async (files) => {
-    const newUploads = [];
+  const requestUploads = async (files: File[]) => {
+    const newUploads: UploadRequest[] = [];
 
-    for (let file of files) {
+    for (const file of files) {
       try {
         newUploads.push(await uploader.enqueue(file, handleProgressUpdate));
       } catch (exception) {
@@ -105,11 +94,7 @@ function App() {
     }
   }
 
-  /**
-   * Cancel upload request
-   * @param {UploadRequest} request 
-   */
-  const cancelUpload = (request) => {
+  const cancelUpload = (request: UploadRequest) => {
     request.abort();
 
     setInProgressUploads(
@@ -117,22 +102,18 @@ function App() {
     );
   }
 
-  /**
-   * Retry upload request
-   * @param {UploadRequest} request 
-   */
-  const retryUpload = (request) => {
+  const retryUpload = (request: UploadRequest) => {
     uploader.retry(request, handleProgressUpdate);
   }
 
   const resetInProgressUploadsCount = () => setInProgressUploadsCount(0)
   const resetFinishedUploadsCount = () => setFinishedUploadsCount(0)
 
-  const handleTabSelected = (index) => {
+  const handleTabSelected = (index: keyof typeof tabs) => {
     setCurrentTab(index);
   };
 
-  const deleteUpload = async (id) => {
+  const deleteUpload = async (id: string) => {
     await deleter.delete(id);
 
     setFinishedUploads((previous) =>

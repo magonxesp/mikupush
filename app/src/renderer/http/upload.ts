@@ -1,13 +1,10 @@
 import { UploadRequest } from "../model/upload-request";
 import { axiosInstance, serverBaseUrl } from './client'
 
-/**
- * Upload file
- * @param {UploadRequest} request
- * @param {({progress: number, speed: number}) => void} onProgress
- * @returns {Promise<void>}
- */
-export async function upload(request, onProgress = () => {}) {
+export async function upload(
+    request: UploadRequest,
+    onProgress: (event: {progress: number, speed: number}) => void = () => {}
+) {
   if (request.mimeType == null) {
     throw new Error('unknown file type');
   }
@@ -21,7 +18,9 @@ export async function upload(request, onProgress = () => {}) {
       },
       signal: request.controller.signal,
       onUploadProgress: (event) => {
-        onProgress({ progress: event.progress, speed: event.rate })
+          if (event.progress != null && event.rate != null) {
+              onProgress({ progress: event.progress, speed: event.rate })
+          }
       },
     }
   );

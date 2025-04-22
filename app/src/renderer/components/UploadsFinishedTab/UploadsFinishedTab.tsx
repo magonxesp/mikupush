@@ -5,6 +5,7 @@ import styles from "./UploadsFinishedTab.module.css";
 import { writeToClipboard } from '../../ipc/clipboard'
 import { showNotification } from "../../ipc/notification";
 import { serverBaseUrl } from '../../http/client'
+import {Upload} from "../../model/upload";
 
 export default function UploadsFinishedTab() {
   const { finishedUploads } = useContext(UploadsContext);
@@ -16,7 +17,11 @@ export default function UploadsFinishedTab() {
   }
 }
 
-function FinishedUploadList({ items }) {
+interface FinishedUploadListProps {
+    items: Upload[]
+}
+
+function FinishedUploadList({ items }: FinishedUploadListProps) {
   return (
     <md-list className={styles.list}>
       {items.map((upload, index) => (
@@ -31,7 +36,13 @@ function FinishedUploadList({ items }) {
   );
 }
 
-function UploadItemWithDivider({ index, upload, totalItems }) {
+interface UploadItemWithDividerProps {
+    index: number
+    upload: Upload
+    totalItems: number
+}
+
+function UploadItemWithDivider({ index, upload, totalItems }: UploadItemWithDividerProps) {
   return (
     <>
       <UploadItem upload={upload} />
@@ -44,7 +55,11 @@ function UploadItemWithDivider({ index, upload, totalItems }) {
   );
 }
 
-function UploadItem({ upload }) {
+interface UploadItemProps {
+    upload: Upload
+}
+
+function UploadItem({ upload }: UploadItemProps) {
   const { deleteUpload } = useContext(UploadsContext);
 
   const handleCopyLink = () => {

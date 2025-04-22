@@ -1,8 +1,8 @@
-import { useContext } from "react";
+import {useContext} from "react";
 import FileIcon from "../FileIcon/FileIcon";
-import { UploadsContext } from "../../context/upload";
+import {UploadsContext} from "../../context/upload";
 import styles from "./UploadsProgressTab.module.css";
-import { UploadRequest } from "../../model/upload-request";
+import {UploadRequest} from "../../model/upload-request";
 
 export default function UploadsProgressTab() {
   const { inProgressUploads } = useContext(UploadsContext);
@@ -14,7 +14,11 @@ export default function UploadsProgressTab() {
   }
 }
 
-function UploadsProgressList({ items }) {
+interface UploadsProgressListProps {
+    items: UploadRequest[]
+}
+
+function UploadsProgressList({ items }: UploadsProgressListProps) {
   return (
     <md-list className={styles.list}>
       {items.map((upload, index) => (
@@ -29,7 +33,13 @@ function UploadsProgressList({ items }) {
   );
 }
 
-function UploadProgressItemWithDivider({ index, upload, totalItems }) {
+interface UploadProgressItemWithDividerProps {
+    index: number
+    upload: UploadRequest
+    totalItems: number
+}
+
+function UploadProgressItemWithDivider({ index, upload, totalItems }: UploadProgressItemWithDividerProps) {
   const { cancelUpload, retryUpload } = useContext(UploadsContext);
 
   return (
@@ -48,7 +58,13 @@ function UploadProgressItemWithDivider({ index, upload, totalItems }) {
   );
 }
 
-function UploadProgressItem({ upload, onRetry, onCancel }) {
+interface UploadProgressItemProps {
+    upload: UploadRequest
+    onRetry: () => void
+    onCancel: () => void
+}
+
+function UploadProgressItem({ upload, onRetry, onCancel }: UploadProgressItemProps) {
   return (
     <md-list-item>
       <div slot="start">
@@ -70,8 +86,13 @@ function UploadProgressItem({ upload, onRetry, onCancel }) {
   );
 }
 
-function InProgress({ upload, onCancel }) {
-  const formatSpeed = (speed) => {
+interface InProgressProps {
+    upload: UploadRequest
+    onCancel: () => void
+}
+
+function InProgress({ upload, onCancel }: InProgressProps) {
+  const formatSpeed = (speed: number | undefined) => {
     if (typeof speed === "undefined" || speed <= 0) {
       return `0 B/s`;
     }
@@ -107,7 +128,13 @@ function InProgress({ upload, onCancel }) {
   );
 }
 
-function Error({ upload, onRetry, onCancel }) {
+interface ErrorProps {
+    upload: UploadRequest
+    onRetry: () => void
+    onCancel: () => void
+}
+
+function Error({ upload, onRetry, onCancel }: ErrorProps) {
   return (
     <>
       <div slot="headline" className={styles.name}>

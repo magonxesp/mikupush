@@ -1,11 +1,7 @@
 import { UploadRequest } from '../model/upload-request'
 import { axiosInstance, serverBaseUrl } from './client'
 
-/**
- * Create file upload.
- * @param {UploadRequest} request 
- */
-export async function create(request) {
+export async function create(request: UploadRequest) {
   const data = {
     'uuid': request.id,
     'name': request.name,

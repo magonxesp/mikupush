@@ -70,7 +70,11 @@ const compressedTypes = [
   "application/x-apple-diskimage",
 ];
 
-export default function FileIcon({ mimeType }) {
+interface FileIconProps {
+  mimeType: string
+}
+
+export default function FileIcon({ mimeType }: FileIconProps) {
   let icon = faFile;
 
   if (mimeType.startsWith("image/")) {
