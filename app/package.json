@@ -11,6 +11,7 @@
     "build:dev": "tsc -b && vite build --mode development",
     "build:prod": "tsc -b && vite build",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "preview": "vite preview",
     "package:macos": "electron-packager . --platform=darwin --arch=x64,arm64 --out=target --overwrite --icon=resources/macOS/AppIcon.icns --app-bundle-id=io.mikupush.MikuPush --asar",
     "package:windows": "electron-packager . --platform=win32 --arch=x64,arm64 --out=target --overwrite --icon=resources/windows/icon.ico --asar",
