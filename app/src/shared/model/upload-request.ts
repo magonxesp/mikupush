@@ -1,5 +1,5 @@
-import { Upload } from './upload.ts'
-import { UploadProgress, UploadProgressObject } from './upload-progress.ts'
+import { Upload } from './upload'
+import { UploadProgress, UploadProgressObject } from './upload-progress'
 
 export interface UploadRequestObject {
     file: File
@@ -13,13 +13,13 @@ export class UploadRequest {
 	public readonly file: File
 	public readonly upload: Upload
 	private readonly _progress: UploadProgress
-	private controller: AbortController|undefined
+	private _controller: AbortController
 	private _retry: boolean
 
 	constructor({ file, upload, progress, controller }: UploadRequestObject) {
 		this.file = file
 		this.upload = upload
-		this.controller = controller ?? new AbortController()
+		this._controller = controller ?? new AbortController()
 		this._progress = progress
 		this._retry = false
 	}
@@ -60,6 +60,10 @@ export class UploadRequest {
 		return this._progress.finishedFailed
 	}
 
+	get controller() {
+		return this._controller
+	}
+
 	get isRetried() {
 		return this._retry
 	}
@@ -90,7 +94,7 @@ export class UploadRequest {
 	}
 
 	retry() {
-		this.controller = new AbortController()
+		this._controller = new AbortController()
 		this._retry = true
 	}
 

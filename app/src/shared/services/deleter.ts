@@ -1,5 +1,5 @@
 import { deleteUpload as ipcDeleteUpload } from '../../renderer/ipc/upload'
-import { deleteUpload as httpDeleteUpload } from '../http/delete.js'
+import { deleteUpload as httpDeleteUpload } from '../http/delete'
 
 export class Deleter {
 	async delete(id: string) {

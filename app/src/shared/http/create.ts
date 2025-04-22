@@ -1,5 +1,5 @@
-import { UploadRequest } from '../model/upload-request.ts'
-import { axiosInstance, serverBaseUrl } from './client.ts'
+import { UploadRequest } from '../model/upload-request'
+import { axiosInstance, serverBaseUrl } from './client'
 
 export async function create(request: UploadRequest) {
 	const data = {
