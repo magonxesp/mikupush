@@ -2,17 +2,17 @@ import { Tray, Menu, nativeImage, BrowserWindow, app } from 'electron'
 import path from 'path'
 
 export const setupTray = (window: BrowserWindow) => {
-    const tray = new Tray(nativeImage.createFromPath(path.join(__dirname, '/assets/tray_icon.png')))
+	const tray = new Tray(nativeImage.createFromPath(path.join(__dirname, '/assets/tray_icon.png')))
 
-    const contextMenu = Menu.buildFromTemplate([
-        { label: 'Open', click: () => window.show() },
-        { label: 'Exit', click: () => app.exit() },
-    ])
+	const contextMenu = Menu.buildFromTemplate([
+		{ label: 'Open', click: () => window.show() },
+		{ label: 'Exit', click: () => app.exit() },
+	])
 
-    tray.setToolTip('Miku Push!')
-    tray.setContextMenu(contextMenu)
+	tray.setToolTip('Miku Push!')
+	tray.setContextMenu(contextMenu)
     
-    tray.addListener('double-click', () => {
-        window.show()
-    })
+	tray.addListener('double-click', () => {
+		window.show()
+	})
 }

@@ -8,7 +8,7 @@ import { styles as typescaleStyles } from '@material/web/typography/md-typescale
 document.adoptedStyleSheets.push(typescaleStyles.styleSheet!)
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+	<StrictMode>
+		<App />
+	</StrictMode>,
 )

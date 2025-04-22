@@ -1,4 +1,4 @@
-import { Notification } from "electron";
+import { Notification } from 'electron'
 
 export interface NotificationOptions {
   title: string;
@@ -6,10 +6,10 @@ export interface NotificationOptions {
 }
 
 export function notify(options: NotificationOptions) {
-  const notification = new Notification({
-    title: options.title,
-    body: options.body,
-  });
+	const notification = new Notification({
+		title: options.title,
+		body: options.body,
+	})
 
-  notification.show();
+	notification.show()
 }
