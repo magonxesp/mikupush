@@ -18,5 +18,5 @@ create-dmg \
   --icon "Miku Push.app" 200 190 \
   --hide-extension "Miku Push.app" \
   --app-drop-link 600 185 \
-  "target/Miku Push Installer x64.dmg" \
+  "target/Miku Push Installer Intel.dmg" \
   "target/Miku Push-darwin-x64-dmg-content"

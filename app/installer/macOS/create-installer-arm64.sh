@@ -18,5 +18,5 @@ create-dmg \
   --icon "Miku Push.app" 200 190 \
   --hide-extension "Miku Push.app" \
   --app-drop-link 600 185 \
-  "target/Miku Push Installer arm64.dmg" \
+  "target/Miku Push Installer Apple Silicon.dmg" \
   "target/Miku Push-darwin-arm64-dmg-content"
