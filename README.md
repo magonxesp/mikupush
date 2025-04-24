@@ -133,3 +133,44 @@ npm run package
 ```
 
 You can find the binaries on the `target` directory.
+
+### Build the installer
+
+> ⚠ Cross compilation is working but the app doesn't run because there are native node modules
+> as dependencies, build the app on the target platform for avoid execution issues.
+
+> ℹ️ Remember to build the app before build the installer.
+
+#### Windows
+
+Requirements:
+* [Inno Setup](https://jrsoftware.org/isinfo.php)
+
+Open the `app/installer/windows/installer-x64.iss` for build the x64 installer or the
+`app/installer/windows/installer-arm64.iss` for build for arm64 machines with Inno Setup
+and launch the build.
+
+#### Mac OS
+
+Requirements:
+* [create-dmg](https://github.com/create-dmg/create-dmg)
+
+Go to the `app` directory.
+
+```sh
+cd app
+```
+
+And run the script for build the Apple Silicon installer
+
+```sh
+./installer/macOS/create-installer-arm64.sh
+```
+
+or run the script for build for Intel machines
+
+```sh
+./installer/macOS/create-installer-x64.sh
+```
+
+Then you should find the `.dmg` file in the `target` directory.
