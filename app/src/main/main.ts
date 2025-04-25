@@ -1,14 +1,20 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, nativeImage } from 'electron'
 import fs from 'fs'
 import { appDataDirectory } from './environment'
 import { database } from './database'
 import path from 'path'
 import './ipc'
 import { setupTray } from './tray'
+import started from 'electron-squirrel-startup'
+import { UploadIpc } from './ipc/upload.ts'
 
 const appEnv = process.env.ELECTRON_ENV ?? 'prod'
 const isDevMode = appEnv === 'dev'
 const isPreviewMode = appEnv === 'preview'
+
+if (started) {
+	app.quit()
+}
 
 if (isDevMode) {
 	app.commandLine.appendSwitch('ignore-certificate-errors', 'true')
@@ -27,6 +33,8 @@ function createWindow() {
 			symbolColor: '#ffffff',
 			height: 32
 		},
+		title: 'Miku Push!',
+		icon: nativeImage.createFromPath(path.join(__dirname, 'assets/icon.png')),
 		webPreferences: {
 			preload: path.join(__dirname, 'preload.js'),
 			devTools: isDevMode || isPreviewMode,
@@ -61,9 +69,14 @@ function ensureAppDataDirectoryIsCreated() {
 }
 
 app.whenReady().then(() => {
+	app.setAppUserModelId('io.mikupush.MikuPush')
+
 	ensureAppDataDirectoryIsCreated()
 	const window = createWindow()
-	setupTray(window)  
+
+	UploadIpc.listenIpcEvents(window)
+
+	setupTray(window)
 })
 
 app.on('quit', () => {

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { ClipBoardAPI, NotificationAPI, UploadAPI } from '../shared/ipc.ts'
 
 declare module 'react' {
     namespace JSX {
@@ -8,4 +9,12 @@ declare module 'react' {
             'md-circular-progress': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & { value: number }
         }
     }
+}
+
+declare global {
+	interface Window {
+		uploadAPI: UploadAPI;
+		clipBoardAPI: ClipBoardAPI;
+		notificationAPI: NotificationAPI;
+	}
 }

@@ -1,7 +1,8 @@
 import { create } from '../http/create.ts'
 import { upload } from '../http/upload.ts'
-import { createUpload } from '../../renderer/ipc/upload'
 import { UploadRequest } from '../model/upload-request'
+import { FileDetails } from '../model/file-details.ts'
+import { UploadRepository } from '../repository/upload-repository.ts'
 
 type OnProgressUpdateCallback = (request: UploadRequest) => void
 type QueueItem = [UploadRequest, OnProgressUpdateCallback]
@@ -9,9 +10,14 @@ type QueueItem = [UploadRequest, OnProgressUpdateCallback]
 export class Uploader {
 	private queue: QueueItem[] = []
 	private isProcessingQueue = false
+	private readonly uploadRepository: UploadRepository
 
-	async enqueue(file: File, onProgressUpdate: OnProgressUpdateCallback = () => {}) {
-		const request = await UploadRequest.createFromFile(file)
+	constructor(uploadRepository: UploadRepository) {
+		this.uploadRepository = uploadRepository
+	}
+
+	async enqueue(fileDetails: FileDetails, onProgressUpdate: OnProgressUpdateCallback = () => {}) {
+		const request = await UploadRequest.fromFileDetails(fileDetails)
 		this.queue.push([request, onProgressUpdate])
 
 		this.startProcesingQueue()
@@ -60,7 +66,7 @@ export class Uploader {
 					state.update(previous => previous.updateProgress(progress))
 				})
 
-				await createUpload(request.upload)
+				await this.uploadRepository.save(request.upload)
 				state.update(previous => previous.finishSuccess())
 			} catch (error) {
 				console.log('upload error', error)

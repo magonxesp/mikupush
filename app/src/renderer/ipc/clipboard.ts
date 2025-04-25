@@ -1,4 +1,6 @@
-const clipboardApiDefaults = {
+import { ClipBoardAPI } from '../../shared/ipc'
+
+const clipboardApiDefaults: ClipBoardAPI = {
 	writeToClipboard: () => {},
 }
 

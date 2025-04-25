@@ -1,17 +1,21 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { UploadModel } from '../main/database'
 import type { NotificationOptions } from '../main/notification'
+import { ClipBoardAPI, NotificationAPI, UploadAPI } from '../shared/ipc.ts'
 
-contextBridge.exposeInMainWorld('uploadAPI', {
+const uploadAPI: UploadAPI = {
 	create: (upload: UploadModel) => ipcRenderer.send('upload:create', upload),
 	delete: (uploadId: string) => ipcRenderer.send('upload:delete', uploadId),
-	findAll: () => ipcRenderer.invoke('upload:findAll')
-})
+	findAll: (): Promise<UploadModel[]> => ipcRenderer.invoke('upload:findAll')
+}
 
-contextBridge.exposeInMainWorld('clipBoardAPI', {
+const clipBoardAPI: ClipBoardAPI = {
 	writeToClipboard: (text: string) => ipcRenderer.send('clipboard:write', text)
-})
+}
 
-contextBridge.exposeInMainWorld('notificationAPI', {
+const notificationAPI: NotificationAPI = {
 	showNotification: (options: NotificationOptions) => ipcRenderer.send('notification:show', options)
-})
+}
+
+contextBridge.exposeInMainWorld('uploadAPI', uploadAPI)
+contextBridge.exposeInMainWorld('clipBoardAPI', clipBoardAPI)
+contextBridge.exposeInMainWorld('notificationAPI', notificationAPI)

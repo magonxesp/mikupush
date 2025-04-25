@@ -1,4 +1,6 @@
-const notificationApiDefaults = {
+import { NotificationAPI } from '../../shared/ipc.ts'
+
+const notificationApiDefaults: NotificationAPI = {
 	showNotification: () => {}
 }
 

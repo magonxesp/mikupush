@@ -6,6 +6,10 @@ export interface NotificationOptions {
 }
 
 export function notify(options: NotificationOptions) {
+	if (!Notification.isSupported()) {
+		return
+	}
+
 	const notification = new Notification({
 		title: options.title,
 		body: options.body,

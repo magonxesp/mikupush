@@ -1,8 +1,9 @@
 import { Upload } from './upload'
 import { UploadProgress, UploadProgressObject } from './upload-progress'
+import { FileDetails } from './file-details.ts'
 
 export interface UploadRequestObject {
-    file: File
+    file: FileDetails
     upload: Upload
     progress: UploadProgress
     controller?: AbortController
@@ -10,7 +11,7 @@ export interface UploadRequestObject {
 }
 
 export class UploadRequest {
-	public readonly file: File
+	public readonly file: FileDetails
 	public readonly upload: Upload
 	private readonly _progress: UploadProgress
 	private _controller: AbortController
@@ -70,19 +71,19 @@ export class UploadRequest {
 
 	updateProgress(newValue: Partial<UploadProgressObject>) {
 		const updated = this._progress.update(newValue)
-		return new UploadRequest({ ...this.#toPlainObject(), progress: updated })
+		return new UploadRequest({ ...this.toPlainObject(), progress: updated })
 	}
 
 	finishWithError(error: Error | string | unknown) {
 		return new UploadRequest({ 
-			...this.#toPlainObject(), 
+			...this.toPlainObject(),
 			progress: this._progress.finishWithError(error)
 		})
 	}
 
 	finishSuccess() {
 		return new UploadRequest({ 
-			...this.#toPlainObject(), 
+			...this.toPlainObject(),
 			progress: this._progress.finishSuccess()
 		})
 	}
@@ -98,7 +99,7 @@ export class UploadRequest {
 		this._retry = true
 	}
 
-	#toPlainObject(): UploadRequestObject {
+	toPlainObject(): UploadRequestObject {
 		return {
 			file: this.file,
 			upload: this.upload,
@@ -108,10 +109,10 @@ export class UploadRequest {
 		}
 	}
 
-	static async createFromFile(file: File) {
+	static async fromFileDetails(file: FileDetails) {
 		return new UploadRequest({
 			file,
-			upload: await Upload.fromFile(file),
+			upload: await Upload.fromFileDetails(file),
 			progress: UploadProgress.create()
 		})
 	}

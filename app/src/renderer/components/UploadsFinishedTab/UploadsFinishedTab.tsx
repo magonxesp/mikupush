@@ -4,8 +4,8 @@ import { UploadsContext } from '../../context/upload'
 import styles from './UploadsFinishedTab.module.css'
 import { writeToClipboard } from '../../ipc/clipboard'
 import { showNotification } from '../../ipc/notification'
-import { serverBaseUrl } from '../../../shared/http/client.ts'
-import { Upload } from '../../../shared/model/upload.ts'
+import { serverBaseUrl } from '../../../shared/http/client'
+import { Upload } from '../../../shared/model/upload'
 
 export default function UploadsFinishedTab() {
 	const { finishedUploads } = useContext(UploadsContext)

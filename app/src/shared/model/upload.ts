@@ -1,7 +1,7 @@
-import { resolveMimeType } from '../helpers/mime-type'
 import { v4 as uuidv4 } from 'uuid'
+import { FileDetails } from './file-details.ts'
 
-interface UploadObject {
+export interface UploadObject {
     id: string
     name: string
     size: number
@@ -34,12 +34,12 @@ export class Upload {
 		}
 	}
 
-	static async fromFile(file: File) {
+	static async fromFileDetails(file: FileDetails) {
 		return new Upload({
 			id: uuidv4(),
 			name: file.name,
 			size: file.size,
-			mimeType: await resolveMimeType(file),
+			mimeType: file.mimeType,
 			uploadedAt: new Date()
 		})
 	}
