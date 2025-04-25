@@ -1,7 +1,7 @@
 import { UploadRepository } from '../../shared/repository/upload-repository.ts'
 import { Upload } from '../../shared/model/upload.ts'
 import { DataTypes, type InferAttributes, type InferCreationAttributes, Model } from 'sequelize'
-import { database } from '../database.ts'
+import { database } from '../helpers/database.ts'
 
 export class SequelizeUploadRepository implements UploadRepository {
 	async findById(id: string): Promise<Upload | null> {

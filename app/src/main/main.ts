@@ -1,12 +1,12 @@
 import { app, BrowserWindow, nativeImage } from 'electron'
 import fs from 'fs'
-import { appDataDirectory } from './environment'
-import { database } from './database'
+import { appDataDirectory } from './helpers/file-system.ts'
+import { database } from './helpers/database.ts'
 import path from 'path'
-import './ipc'
 import { setupTray } from './tray'
 import started from 'electron-squirrel-startup'
-import { UploadIpc } from './ipc/upload.ts'
+import { UploadChannelsBinder } from './ipc/upload-binder.ts'
+import { SystemChannelsBinder } from './ipc/system-binder.ts'
 
 const appEnv = process.env.ELECTRON_ENV ?? 'prod'
 const isDevMode = appEnv === 'dev'
@@ -70,11 +70,12 @@ function ensureAppDataDirectoryIsCreated() {
 
 app.whenReady().then(() => {
 	app.setAppUserModelId('io.mikupush.MikuPush')
-
 	ensureAppDataDirectoryIsCreated()
+
 	const window = createWindow()
 
-	UploadIpc.listenIpcEvents(window)
+	SystemChannelsBinder.bind()
+	UploadChannelsBinder.bind(window)
 
 	setupTray(window)
 })

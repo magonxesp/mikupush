@@ -6,15 +6,8 @@ import InputTab from './components/InputTab/InputTab'
 import UploadsFinishedTab from './components/UploadsFinishedTab/UploadsFinishedTab'
 import UploadsProgressTab from './components/UploadsProgressTab/UploadsProgressTab'
 import { UploadsContext } from './context/upload'
-import { Uploader } from '../shared/services/uploader.ts'
 import { UploadRequest } from '../shared/model/upload-request.ts'
-import { showNotification } from './ipc/notification'
-import { Deleter } from '../shared/services/deleter.js'
-import { findAllUploads } from './ipc/upload.js'
 import { Upload } from '../shared/model/upload.ts'
-
-const uploader = new Uploader()
-const deleter = new Deleter()
 
 function App() {
 	const tabs = {
@@ -23,6 +16,8 @@ function App() {
 		'finished-uploads': <UploadsFinishedTab />,
 	}
 
+	const uploadChannels = window.uploadChannels
+	const systemChannels = window.systemChannels
 	const [currentTab, setCurrentTab] = useState<keyof typeof tabs>('upload')
 	const [inProgressUploads, setInProgressUploads] = useState<UploadRequest[]>([])
 	const [finishedUploads, setFinishedUploads] = useState<Upload[]>([])
@@ -30,7 +25,7 @@ function App() {
 	const [finishedUploadsCount, setFinishedUploadsCount] = useState(0)
 
 	useEffect(() => {
-		findAllUploads().then(uploads => setFinishedUploads(uploads))
+		uploadChannels.findAll().then(uploads => setFinishedUploads(uploads))
 	}, [])
 
 	const moveRequestAsFinished = (request: UploadRequest) => {
@@ -45,7 +40,7 @@ function App() {
 			setFinishedUploadsCount((count) => count + 1)
 		}
 
-		showNotification({
+		systemChannels.showNotification({
 			title: `The file ${request.name} has been uploaded!`,
 			body: 'Now, you can grab the link for share it!'
 		})
@@ -66,7 +61,9 @@ function App() {
 
 		for (const file of files) {
 			try {
-				newUploads.push(await uploader.enqueue(file, handleProgressUpdate))
+				const request = await uploadChannels.enqueue(file.path)
+				uploadChannels.onUploadProgress(handleProgressUpdate)
+				newUploads.push(request)
 			} catch (exception) {
 				console.error('unable to upload file', exception)
 			}
@@ -78,16 +75,18 @@ function App() {
 			setInProgressUploadsCount((previous) => previous + newUploads.length)
 		}
 
+		// TODO: do in main process
+
 		if (newUploads.length === 1) {
 			const request = newUploads[0]
-			showNotification({ 
+			systemChannels.showNotification({
 				title: `Uploading file ${request.name} 🚀`, 
 				body: `The file ${request.name} is added to the upload queue`
 			})
 		}
 
 		if (newUploads.length > 1) {
-			showNotification({ 
+			systemChannels.showNotification({
 				title: `Uploading ${newUploads.length} files 🚀`, 
 				body: 'The files are added to the upload queue'
 			})
@@ -103,7 +102,8 @@ function App() {
 	}
 
 	const retryUpload = (request: UploadRequest) => {
-		uploader.retry(request, handleProgressUpdate)
+		uploadChannels.retry(request)
+		uploadChannels.onUploadProgress(handleProgressUpdate)
 	}
 
 	const resetInProgressUploadsCount = () => setInProgressUploadsCount(0)
@@ -114,7 +114,7 @@ function App() {
 	}
 
 	const deleteUpload = async (id: string) => {
-		await deleter.delete(id)
+		//await deleter.delete(id)
 
 		setFinishedUploads((previous) =>
 			previous.filter((item) => item.id !== id)

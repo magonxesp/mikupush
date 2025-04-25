@@ -1,11 +1,7 @@
 import { Notification } from 'electron'
+import { NotificationOptions } from '../../shared/model/notification.ts'
 
-export interface NotificationOptions {
-  title: string;
-  body: string;
-}
-
-export function notify(options: NotificationOptions) {
+export function showNotify(options: NotificationOptions) {
 	if (!Notification.isSupported()) {
 		return
 	}
