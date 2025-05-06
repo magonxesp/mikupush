@@ -2,8 +2,6 @@ import { useContext } from 'react'
 import FileIcon from '../FileIcon/FileIcon'
 import { UploadsContext } from '../../context/upload'
 import styles from './UploadsFinishedTab.module.css'
-import { writeToClipboard } from '../../ipc/clipboard'
-import { showNotification } from '../../ipc/notification'
 import { serverBaseUrl } from '../../../shared/http/client'
 import { Upload } from '../../../shared/model/upload'
 
@@ -63,9 +61,9 @@ function UploadItem({ upload }: UploadItemProps) {
 	const { deleteUpload } = useContext(UploadsContext)
 
 	const handleCopyLink = () => {
-		writeToClipboard(`${serverBaseUrl}/u/${upload.id}`)
+		window.systemChannels.copyToClipboard(`${serverBaseUrl}/u/${upload.id}`)
 
-		showNotification({
+		window.systemChannels.showNotification({
 			title: '📎Link copied to clipboard!',
 			body: `The link for ${upload.name} is in the clipboard`
 		})
