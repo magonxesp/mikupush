@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getEnvironment } from '../environment.ts'
+import { getEnvironment } from '../helpers/environment.ts'
 
 const env = getEnvironment()
 
