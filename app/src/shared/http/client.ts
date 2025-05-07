@@ -1,7 +1,11 @@
 import axios from 'axios'
-import { getEnvironment } from '../helpers/environment.ts'
-
-const env = getEnvironment()
+import { appEnv } from '../helpers/environment.ts'
 
 export const axiosInstance = axios.create()
-export const serverBaseUrl = env.VITE_SERVER_BASE_URL
+export const serverBaseUrl = () => {
+	if (appEnv() === 'dev') {
+		return 'http://localhost:8080'
+	} else {
+		return 'https://mikupush.io'
+	}
+}

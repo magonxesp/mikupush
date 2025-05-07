@@ -7,17 +7,17 @@ import { setupTray } from './tray'
 import started from 'electron-squirrel-startup'
 import { UploadChannelsBinder } from './ipc/upload-binder.ts'
 import { SystemChannelsBinder } from './ipc/system-binder.ts'
+import { appEnv } from '../shared/helpers/environment.ts'
 
-const appEnv = process.env.ELECTRON_ENV ?? 'prod'
-const isDevMode = appEnv === 'dev'
-const isPreviewMode = appEnv === 'preview'
+const isDevMode = appEnv() === 'dev'
+const isPreviewMode = appEnv() === 'preview'
 
 if (started) {
 	app.quit()
 }
 
 if (isDevMode) {
-	app.commandLine.appendSwitch('ignore-certificate-errors', 'true')
+	console.info('dev mode enabled')
 }
 
 let isAppQuitting = false

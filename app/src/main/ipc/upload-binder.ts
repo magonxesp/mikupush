@@ -22,12 +22,20 @@ export class UploadChannelsBinder {
 		this.uploader = uploader
 	}
 
-	public async enqueue(filePath: string) {
-		const details = fileDetails(filePath)
+	public async enqueue(filePaths: string[]): Promise<UploadRequest[]> {
+		const details = filePaths.map(fileDetails)
 
-		return await this.uploader.enqueue(details, (request) => {
+		const progressCallback = (request: UploadRequest) => {
 			this.window.webContents.send(uploadOnProgressChannel, request)
-		})
+		}
+
+		if (details.length === 1) {
+			return [await this.uploader.enqueue(details[0], progressCallback)]
+		} else if (details.length > 1) {
+			return await this.uploader.enqueueMany(details, progressCallback)
+		}
+
+		return []
 	}
 
 	public retry(request: UploadRequest) {
@@ -43,8 +51,8 @@ export class UploadChannelsBinder {
 	static bind(window: BrowserWindow) {
 		const uploadIpc = new UploadChannelsBinder(window, uploadRepository, uploader)
 
-		ipcMain.handle(uploadEnqueueChannel, async (_, filePath: string) => {
-			return await uploadIpc.enqueue(filePath)
+		ipcMain.handle(uploadEnqueueChannel, async (_, filePaths: string[]) => {
+			return await uploadIpc.enqueue(filePaths)
 		})
 
 		ipcMain.on(uploadRetryChannel, async (_, request: UploadRequest) => {

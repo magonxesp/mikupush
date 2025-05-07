@@ -9,7 +9,7 @@ export async function create(request: UploadRequest) {
 		'size': request.file.size
 	}
 
-	const response = await axiosInstance.post(`${serverBaseUrl}/api/file`, data, {
+	const response = await axiosInstance.post(`${serverBaseUrl()}/api/file`, data, {
 		headers: {
 			'Accept': 'application/json',
 			'Content-Type': 'application/json',

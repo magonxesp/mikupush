@@ -1,11 +1,12 @@
 import { UploadRequest } from '../model/upload-request.ts'
 import { Upload } from '../model/upload.ts'
+import { ClassProperties } from '../model/properties.ts'
 
 export interface UploadChannels {
-	enqueue(filePath: string): Promise<UploadRequest>
+	enqueue(filePaths: string[]): Promise<UploadRequest[]>
 	retry(request: UploadRequest): void
 	findAll(): Promise<Upload[]>
-	onUploadProgress(callback: (request: UploadRequest) => void): void
+	onUploadProgress(callback: (request: ClassProperties<UploadRequest>) => void): void
 }
 
 export const uploadChannelsName = 'uploadChannels'

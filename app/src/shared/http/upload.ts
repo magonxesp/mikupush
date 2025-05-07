@@ -10,7 +10,7 @@ export async function upload(
 	}
 
 	const response = await axiosInstance.post(
-		`${serverBaseUrl}/api/file/${request.id}/upload`,
+		`${serverBaseUrl()}/api/file/${request.id}/upload`,
 		request.file,
 		{
 			headers: {

@@ -17,6 +17,8 @@ export class UploadRequest {
 	private _controller: AbortController
 	private _retry: boolean
 
+	constructor(object?: UploadRequestObject)
+
 	constructor({ file, upload, progress, controller }: UploadRequestObject) {
 		this.file = file
 		this.upload = upload

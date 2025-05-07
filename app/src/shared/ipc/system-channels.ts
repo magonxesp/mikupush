@@ -3,6 +3,7 @@ import { NotificationOptions } from '../model/notification.ts'
 export interface SystemChannels {
 	showNotification(options: NotificationOptions): void
 	copyToClipboard(text: string): void
+	resolveWebFilePath(file: File): string
 }
 
 export const systemChannelsName = 'systemChannels'

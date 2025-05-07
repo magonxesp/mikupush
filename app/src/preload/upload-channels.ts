@@ -7,10 +7,11 @@ import {
 import { UploadRequest } from '../shared/model/upload-request.ts'
 import { contextBridge, ipcRenderer } from 'electron'
 import { Upload } from '../shared/model/upload.ts'
+import { ClassProperties } from '../shared/model/properties.ts'
 
 const uploadChannel: UploadChannels = {
-	enqueue: (filePath: string): Promise<UploadRequest> => {
-		return ipcRenderer.invoke(uploadEnqueueChannel, filePath)
+	enqueue: (filePaths: string[]): Promise<UploadRequest[]> => {
+		return ipcRenderer.invoke(uploadEnqueueChannel, filePaths)
 	},
 	retry: (request: UploadRequest) => {
 		ipcRenderer.send(uploadRetryChannel, request)
@@ -18,8 +19,8 @@ const uploadChannel: UploadChannels = {
 	findAll: (): Promise<Upload[]> => {
 		return ipcRenderer.invoke(uploadFindAllChannel)
 	},
-	onUploadProgress: (callback: (request: UploadRequest) => void) => {
-		ipcRenderer.on(uploadOnProgressChannel, (_, request: UploadRequest) => {
+	onUploadProgress: (callback: (request: ClassProperties<UploadRequest>) => void) => {
+		ipcRenderer.on(uploadOnProgressChannel, (_, request: ClassProperties<UploadRequest>) => {
 			callback(request)
 		})
 	},

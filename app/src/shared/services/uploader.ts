@@ -3,6 +3,7 @@ import { upload } from '../http/upload.ts'
 import { UploadRequest } from '../model/upload-request'
 import { FileDetails } from '../model/file-details.ts'
 import { UploadRepository } from '../repository/upload-repository.ts'
+import { Notifier } from './notifier.ts'
 
 type OnProgressUpdateCallback = (request: UploadRequest) => void
 type QueueItem = [UploadRequest, OnProgressUpdateCallback]
@@ -11,17 +12,37 @@ export class Uploader {
 	private queue: QueueItem[] = []
 	private isProcessingQueue = false
 	private readonly uploadRepository: UploadRepository
+	private readonly notifier: Notifier
 
-	constructor(uploadRepository: UploadRepository) {
+	constructor(uploadRepository: UploadRepository, notifier: Notifier) {
 		this.uploadRepository = uploadRepository
+		this.notifier = notifier
 	}
 
 	async enqueue(fileDetails: FileDetails, onProgressUpdate: OnProgressUpdateCallback = () => {}) {
 		const request = await UploadRequest.fromFileDetails(fileDetails)
 		this.queue.push([request, onProgressUpdate])
 
+		this.notifier.showNotification({
+			title: `Uploading file ${request.name} 🚀`,
+			body: `The file ${request.name} is added to the upload queue`
+		})
+
 		this.startProcesingQueue()
 		return request
+	}
+
+	async enqueueMany(fileDetails: FileDetails[], onProgressUpdate: OnProgressUpdateCallback = () => {}) {
+		const requests = await Promise.all(fileDetails.map((details) => UploadRequest.fromFileDetails(details)))
+		this.queue.push(...requests.map((request) => [request, onProgressUpdate] as QueueItem))
+
+		this.notifier.showNotification({
+			title: `Uploading ${fileDetails.length} files 🚀`,
+			body: 'The files are added to the upload queue'
+		})
+
+		this.startProcesingQueue()
+		return requests
 	}
 
 	retry(request: UploadRequest, onProgressUpdate: OnProgressUpdateCallback = () => {}) {

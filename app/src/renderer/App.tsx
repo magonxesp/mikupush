@@ -8,6 +8,7 @@ import UploadsProgressTab from './components/UploadsProgressTab/UploadsProgressT
 import { UploadsContext } from './context/upload'
 import { UploadRequest } from '../shared/model/upload-request.ts'
 import { Upload } from '../shared/model/upload.ts'
+import { ClassProperties } from '../shared/model/properties.ts'
 
 function App() {
 	const tabs = {
@@ -46,27 +47,29 @@ function App() {
 		})
 	}
 
-	const handleProgressUpdate = (request: UploadRequest) => {
+	const handleProgressUpdate = (request: ClassProperties<UploadRequest>) => {
+		const uploadRequest = Object.assign(new UploadRequest(), request)
+		console.log('progress update', uploadRequest)
+		// TODO: send serializable objects through IPC
 		if (request.finishedSuccess) {
-			moveRequestAsFinished(request)
+			moveRequestAsFinished(uploadRequest)
 		} else {
 			setInProgressUploads((previous) =>
-				previous.map((item) => item.id === request.id ? request : item)
+				previous.map((item) => item.id === uploadRequest.id ? uploadRequest : item)
 			)
 		}
 	}
 
 	const requestUploads = async (files: File[]) => {
-		const newUploads: UploadRequest[] = []
+		let newUploads: UploadRequest[] = []
 
-		for (const file of files) {
-			try {
-				const request = await uploadChannels.enqueue(file.path)
-				uploadChannels.onUploadProgress(handleProgressUpdate)
-				newUploads.push(request)
-			} catch (exception) {
-				console.error('unable to upload file', exception)
-			}
+		try {
+			const filePaths = files.map((file) => systemChannels.resolveWebFilePath(file))
+			console.log(filePaths)
+			newUploads = await uploadChannels.enqueue(filePaths)
+			uploadChannels.onUploadProgress(handleProgressUpdate)
+		} catch (exception) {
+			console.error('unable to upload file', exception)
 		}
 
 		setInProgressUploads((previous) => [...previous, ...newUploads])
@@ -74,31 +77,11 @@ function App() {
 		if (currentTab !== 'uploads-in-progress') {
 			setInProgressUploadsCount((previous) => previous + newUploads.length)
 		}
-
-		// TODO: do in main process
-
-		if (newUploads.length === 1) {
-			const request = newUploads[0]
-			systemChannels.showNotification({
-				title: `Uploading file ${request.name} 🚀`, 
-				body: `The file ${request.name} is added to the upload queue`
-			})
-		}
-
-		if (newUploads.length > 1) {
-			systemChannels.showNotification({
-				title: `Uploading ${newUploads.length} files 🚀`, 
-				body: 'The files are added to the upload queue'
-			})
-		}
 	}
 
 	const cancelUpload = (request: UploadRequest) => {
 		request.abort()
-
-		setInProgressUploads(
-			inProgressUploads.filter((item) => item.id !== request.id)
-		)
+		setInProgressUploads(inProgressUploads.filter((item) => item.id !== request.id))
 	}
 
 	const retryUpload = (request: UploadRequest) => {
