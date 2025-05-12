@@ -1,12 +1,11 @@
-import { Upload } from './upload'
-import { UploadProgress, UploadProgressObject } from './upload-progress'
+import { SerializableUpload, Upload } from './upload'
+import { UploadProgress, SerializableUploadProgress } from './upload-progress'
 import { FileDetails } from './file-details.ts'
 
-export interface UploadRequestObject {
+export interface SerializableUploadRequest {
     file: FileDetails
-    upload: Upload
-    progress: UploadProgress
-    controller?: AbortController
+    upload: SerializableUpload
+    progress: SerializableUploadProgress
     retry?: boolean
 }
 
@@ -17,14 +16,18 @@ export class UploadRequest {
 	private _controller: AbortController
 	private _retry: boolean
 
-	constructor(object?: UploadRequestObject)
-
-	constructor({ file, upload, progress, controller }: UploadRequestObject) {
-		this.file = file
-		this.upload = upload
-		this._controller = controller ?? new AbortController()
-		this._progress = progress
-		this._retry = false
+	constructor(params: {
+		file: FileDetails
+		upload: Upload
+		progress: UploadProgress
+		controller?: AbortController
+		retry?: boolean
+	}) {
+		this.file = params.file
+		this.upload = params.upload
+		this._controller = params.controller ?? new AbortController()
+		this._progress = params.progress
+		this._retry = params.retry ?? false
 	}
 
 	get id() {
@@ -71,23 +74,16 @@ export class UploadRequest {
 		return this._retry
 	}
 
-	updateProgress(newValue: Partial<UploadProgressObject>) {
-		const updated = this._progress.update(newValue)
-		return new UploadRequest({ ...this.toPlainObject(), progress: updated })
+	updateProgress(progress: number, speed: number) {
+		this._progress.update(progress, speed)
 	}
 
 	finishWithError(error: Error | string | unknown) {
-		return new UploadRequest({ 
-			...this.toPlainObject(),
-			progress: this._progress.finishWithError(error)
-		})
+		this._progress.finishWithError(error)
 	}
 
 	finishSuccess() {
-		return new UploadRequest({ 
-			...this.toPlainObject(),
-			progress: this._progress.finishSuccess()
-		})
+		this._progress.finishSuccess()
 	}
 
 	abort() {
@@ -101,12 +97,11 @@ export class UploadRequest {
 		this._retry = true
 	}
 
-	toPlainObject(): UploadRequestObject {
+	toSerializable(): SerializableUploadRequest {
 		return {
 			file: this.file,
-			upload: this.upload,
-			progress: this._progress,
-			controller: this.controller,
+			upload: this.upload.toSerializable(),
+			progress: this._progress.toSerializable(),
 			retry: this._retry,
 		}
 	}
@@ -116,6 +111,15 @@ export class UploadRequest {
 			file,
 			upload: await Upload.fromFileDetails(file),
 			progress: UploadProgress.create()
+		})
+	}
+
+	static fromSerializable(serializable: SerializableUploadRequest) {
+		return new UploadRequest({
+			file: serializable.file,
+			upload: Upload.fromSerializable(serializable.upload),
+			progress: UploadProgress.fromSerializable(serializable.progress),
+			retry: serializable.retry ?? false
 		})
 	}
 }

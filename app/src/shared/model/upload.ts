@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import { FileDetails } from './file-details.ts'
 
-export interface UploadObject {
+export interface SerializableUpload {
     id: string
     name: string
     size: number
@@ -16,15 +16,21 @@ export class Upload {
 	public readonly mimeType: string
 	public readonly uploadedAt: Date
 
-	constructor({ id, name, size, mimeType, uploadedAt }: UploadObject) {
-		this.id = id
-		this.name = name
-		this.size = size
-		this.mimeType = mimeType
-		this.uploadedAt = uploadedAt
+	constructor(params: {
+		id: string
+		name: string
+		size: number
+		mimeType: string
+		uploadedAt: Date
+	}) {
+		this.id = params.id
+		this.name = params.name
+		this.size = params.size
+		this.mimeType = params.mimeType
+		this.uploadedAt = params.uploadedAt
 	}
 
-	toPlainObject(): UploadObject {
+	toSerializable(): SerializableUpload {
 		return {
 			id: this.id,
 			name: this.name,
@@ -42,5 +48,9 @@ export class Upload {
 			mimeType: file.mimeType,
 			uploadedAt: new Date()
 		})
+	}
+
+	static fromSerializable(serializable: SerializableUpload) {
+		return new Upload(serializable)
 	}
 }

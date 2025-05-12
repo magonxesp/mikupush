@@ -38,11 +38,11 @@ export class SequelizeUploadRepository implements UploadRepository {
 		const existing = this.findById(upload.id)
 
 		if (existing != null) {
-			await UploadDao.update(upload.toPlainObject(), {
+			await UploadDao.update(upload.toSerializable(), {
 				where: { id: upload.id }
 			})
 		} else {
-			await UploadDao.create(upload.toPlainObject())
+			await UploadDao.create(upload.toSerializable())
 		}
 	}
 

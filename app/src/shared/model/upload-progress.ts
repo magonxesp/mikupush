@@ -1,4 +1,4 @@
-export interface UploadProgressObject {
+export interface SerializableUploadProgress {
     progress: number
     speed: number
     error: string
@@ -6,16 +6,33 @@ export interface UploadProgressObject {
 }
 
 export class UploadProgress {
-	public readonly progress: number
-	public readonly speed: number
-	public readonly error: string
-	public readonly finished: boolean
+	private _progress: number
+	private _speed: number
+	private _error: string
+	private finished: boolean
 
-	constructor({ progress, speed, error, finished }: UploadProgressObject) {
-		this.progress = progress
-		this.speed = speed
-		this.error = error
-		this.finished = finished
+	constructor(params: {
+		progress: number
+		speed: number
+		error: string
+		finished: boolean
+	}) {
+		this._progress = params.progress
+		this._speed = params.speed
+		this._error = params.error
+		this.finished = params.finished
+	}
+
+	get progress() {
+		return this._progress
+	}
+
+	get speed() {
+		return this._speed
+	}
+
+	get error() {
+		return this._error
 	}
 
 	get isInProgress() {
@@ -30,27 +47,29 @@ export class UploadProgress {
 		return this.finished && this.error !== ''
 	}
 
-	update(newValues: Partial<UploadProgressObject>) {
-		return new UploadProgress({ ...this.toPlainObject(), ...newValues })
+	update(progress: number, speed: number) {
+		this._progress = progress
+		this._speed = speed
 	}
 
 	finishWithError(error: Error | string | unknown) {
-		let errorMessage = 'an unknown error occurred during upload'
-
 		if (error instanceof Error) {
-			errorMessage = error.message
+			this._error = error.message
 		} else if (typeof error === 'string') {
-			errorMessage = error
+			this._error = error
+		} else {
+			this._error = 'an unknown error occurred during upload'
 		}
 
-		return new UploadProgress({ ...this.toPlainObject(), finished: true, error: errorMessage })
+		this.finished = true
 	}
 
 	finishSuccess() {
-		return new UploadProgress({ ...this.toPlainObject(), finished: true, error: '' })
+		this._error = ''
+		this.finished = true
 	}
 
-	toPlainObject(): UploadProgressObject {
+	toSerializable(): SerializableUploadProgress {
 		return {
 			progress: this.progress,
 			speed: this.speed,
@@ -66,5 +85,9 @@ export class UploadProgress {
 			error: '',
 			finished: false
 		})
+	}
+
+	static fromSerializable(serializable: SerializableUploadProgress) {
+		return new UploadProgress(serializable)
 	}
 }

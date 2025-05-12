@@ -61,7 +61,7 @@ function UploadItem({ upload }: UploadItemProps) {
 	const { deleteUpload } = useContext(UploadsContext)
 
 	const handleCopyLink = () => {
-		window.systemChannels.copyToClipboard(`${serverBaseUrl}/u/${upload.id}`)
+		window.systemChannels.copyToClipboard(`${serverBaseUrl()}/u/${upload.id}`)
 
 		window.systemChannels.showNotification({
 			title: '📎Link copied to clipboard!',

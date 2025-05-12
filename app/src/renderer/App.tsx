@@ -6,9 +6,8 @@ import InputTab from './components/InputTab/InputTab'
 import UploadsFinishedTab from './components/UploadsFinishedTab/UploadsFinishedTab'
 import UploadsProgressTab from './components/UploadsProgressTab/UploadsProgressTab'
 import { UploadsContext } from './context/upload'
-import { UploadRequest } from '../shared/model/upload-request.ts'
+import { SerializableUploadRequest, UploadRequest } from '../shared/model/upload-request.ts'
 import { Upload } from '../shared/model/upload.ts'
-import { ClassProperties } from '../shared/model/properties.ts'
 
 function App() {
 	const tabs = {
@@ -26,7 +25,9 @@ function App() {
 	const [finishedUploadsCount, setFinishedUploadsCount] = useState(0)
 
 	useEffect(() => {
-		uploadChannels.findAll().then(uploads => setFinishedUploads(uploads))
+		uploadChannels.findAll().then(uploads => {
+			setFinishedUploads(uploads.map(upload => Upload.fromSerializable(upload)))
+		})
 	}, [])
 
 	const moveRequestAsFinished = (request: UploadRequest) => {
@@ -47,15 +48,14 @@ function App() {
 		})
 	}
 
-	const handleProgressUpdate = (request: ClassProperties<UploadRequest>) => {
-		const uploadRequest = Object.assign(new UploadRequest(), request)
-		console.log('progress update', uploadRequest)
-		// TODO: send serializable objects through IPC
+	const handleProgressUpdate = (serializable: SerializableUploadRequest) => {
+		const request = UploadRequest.fromSerializable(serializable)
+
 		if (request.finishedSuccess) {
-			moveRequestAsFinished(uploadRequest)
+			moveRequestAsFinished(request)
 		} else {
 			setInProgressUploads((previous) =>
-				previous.map((item) => item.id === uploadRequest.id ? uploadRequest : item)
+				previous.map((item) => item.id === request.id ? request : item)
 			)
 		}
 	}
@@ -65,8 +65,10 @@ function App() {
 
 		try {
 			const filePaths = files.map((file) => systemChannels.resolveWebFilePath(file))
-			console.log(filePaths)
+
 			newUploads = await uploadChannels.enqueue(filePaths)
+				.then(requests => requests.map(request => UploadRequest.fromSerializable(request)))
+
 			uploadChannels.onUploadProgress(handleProgressUpdate)
 		} catch (exception) {
 			console.error('unable to upload file', exception)
@@ -80,12 +82,12 @@ function App() {
 	}
 
 	const cancelUpload = (request: UploadRequest) => {
-		request.abort()
+		uploadChannels.abort(request.id)
 		setInProgressUploads(inProgressUploads.filter((item) => item.id !== request.id))
 	}
 
 	const retryUpload = (request: UploadRequest) => {
-		uploadChannels.retry(request)
+		uploadChannels.retry(request.toSerializable())
 		uploadChannels.onUploadProgress(handleProgressUpdate)
 	}
 
@@ -97,7 +99,7 @@ function App() {
 	}
 
 	const deleteUpload = async (id: string) => {
-		//await deleter.delete(id)
+		//await deleter.delete(id) // TODO: implement delete through IPC
 
 		setFinishedUploads((previous) =>
 			previous.filter((item) => item.id !== id)
