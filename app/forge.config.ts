@@ -17,6 +17,7 @@ const config: ForgeConfig = {
 			/eslint\.config\.mjs/
 		],
 		overwrite: true,
+		icon: 'resources/icon/icon'
 	},
 	outDir: 'target',
 	rebuildConfig: {},
@@ -24,7 +25,9 @@ const config: ForgeConfig = {
 		{
 			name: '@electron-forge/maker-squirrel',
 			platforms: ['win32'],
-			config: {},
+			config: {
+				setupIcon: 'resources/icon/icon.ico',
+			},
 		},
 		{
 			name: '@electron-forge/maker-zip',
@@ -34,17 +37,22 @@ const config: ForgeConfig = {
 		{
 			name: '@electron-forge/maker-deb',
 			platforms: ['linux'],
-			config: {},
+			config: {
+				icon: 'resources/icon/icon.png',
+			},
 		},
 		{
 			name: '@electron-forge/maker-rpm',
 			platforms: ['linux'],
-			config: {},
+			config: {
+				icon: 'resources/icon/icon.png',
+			},
 		},
 		{
 			name: '@electron-forge/maker-dmg',
 			platforms: ['darwin'],
 			config: {
+				icon: 'resources/icon/icon.icns',
 				format: 'ULFO'
 			}
 		}
