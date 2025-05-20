@@ -1,7 +1,7 @@
 import {
 	uploadAbortChannel,
 	UploadChannels,
-	uploadChannelsName, uploadCopyLinkChannel,
+	uploadChannelsName, uploadCopyLinkChannel, uploadDeleteChannel,
 	uploadEnqueueChannel,
 	uploadFindAllChannel,
 	uploadOnProgressChannel,
@@ -29,7 +29,7 @@ const uploadChannel: UploadChannels = {
 		ipcRenderer.send(uploadAbortChannel, uploadId)
 	},
 	delete: (uploadId) => {
-		return ipcRenderer.invoke(uploadAbortChannel, uploadId)
+		return ipcRenderer.invoke(uploadDeleteChannel, uploadId)
 	},
 	copyLink: (uploadId) => {
 		ipcRenderer.send(uploadCopyLinkChannel, uploadId)
