@@ -42,6 +42,7 @@ export class UploadChannelsBinder {
 	}
 
 	public retry(_: IpcMainEvent, serializable: SerializableUploadRequest) {
+		console.log('retrying upload', serializable)
 		const request = UploadRequest.fromSerializable(serializable)
 
 		this.uploader.retry(request, (request) => {

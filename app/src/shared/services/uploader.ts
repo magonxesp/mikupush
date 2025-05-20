@@ -5,6 +5,7 @@ import { FileDetails } from '../model/file-details.ts'
 import { UploadRepository } from '../repository/upload-repository.ts'
 import { Notifier } from './notifier.ts'
 import fs from 'fs'
+import { CanceledError } from 'axios'
 
 type OnProgressUpdateCallback = (request: SerializableUploadRequest) => void
 type QueueItem = [UploadRequest, OnProgressUpdateCallback]
@@ -106,8 +107,12 @@ export class Uploader {
 			await this.uploadRepository.save(request.upload)
 			request.finishSuccess()
 		} catch (error) {
-			console.log('upload error', error)
-			request.finishWithError(error)
+			if (error instanceof CanceledError) {
+				console.log('upload canceled')
+			} else {
+				console.log('upload error', error)
+				request.finishWithError(error)
+			}
 		}
 
 		onProgressUpdateCallback(request.toSerializable())

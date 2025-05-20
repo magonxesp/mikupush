@@ -36,7 +36,7 @@ export class UploadProgress {
 	}
 
 	get isInProgress() {
-		return !this.finished && this.progress < 1
+		return !this.finished
 	}
 
 	get finishedSuccess() {
