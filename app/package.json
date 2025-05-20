@@ -15,9 +15,6 @@
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
 		"preview": "vite preview",
-		"package:macos": "electron-packager . --platform=darwin --arch=x64,arm64 --out=target --overwrite --icon=resources/macOS/AppIcon.icns --app-bundle-id=io.mikupush.MikuPush --asar",
-		"package:windows": "electron-packager . --platform=win32 --arch=x64,arm64 --out=target --overwrite --icon=resources/windows/icon.ico --asar",
-		"package:linux": "electron-packager . --platform=linux --arch=x64,arm64 --out=target --overwrite --icon=resources/linux/icon.png --asar",
 		"package": "electron-forge package",
 		"start": "electron-forge start",
 		"make": "electron-forge make"

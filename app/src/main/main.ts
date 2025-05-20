@@ -69,7 +69,7 @@ function ensureAppDataDirectoryIsCreated() {
 }
 
 app.whenReady().then(() => {
-	app.setAppUserModelId('io.mikupush.MikuPush')
+	app.setAppUserModelId('io.mikupush.client')
 	ensureAppDataDirectoryIsCreated()
 
 	const window = createWindow()

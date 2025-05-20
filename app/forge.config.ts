@@ -12,15 +12,21 @@ const config: ForgeConfig = {
 			/tsconfig.*/,
 			/\.env/,
 			/\.md/,
-			/reources/,
+			/resources/,
 			/vite\.config\.ts/,
-			/eslint\.config\.mjs/
+			/eslint\.config\.mjs/,
+			/forge\.config\.ts/,
+			/index\.html/,
+			/\.gitignore/
 		],
 		overwrite: true,
-		icon: 'resources/icon/icon'
+		icon: 'resources/icon/icon',
+		appBundleId: 'io.mikupush.client'
 	},
 	outDir: 'target',
-	rebuildConfig: {},
+	rebuildConfig: {
+		force: true
+	},
 	makers: [
 		{
 			name: '@electron-forge/maker-squirrel',

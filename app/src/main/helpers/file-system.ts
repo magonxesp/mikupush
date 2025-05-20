@@ -8,7 +8,7 @@ export function appDataDirectory() {
 
 	switch (process.platform) {
 	case 'darwin':
-		appDataDir = `${process.env.HOME}/Library/Application Support/io.mikupush.MikuPush`
+		appDataDir = `${process.env.HOME}/Library/Application Support/io.mikupush.client`
 		break
 	case 'win32':
 		appDataDir = `${process.env.APPDATA}\\Miku Push`
