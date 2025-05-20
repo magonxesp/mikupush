@@ -2,7 +2,6 @@ import { useContext } from 'react'
 import FileIcon from '../FileIcon/FileIcon'
 import { UploadsContext } from '../../context/upload'
 import styles from './UploadsFinishedTab.module.css'
-import { serverBaseUrl } from '../../../shared/http/client'
 import { Upload } from '../../../shared/model/upload'
 
 export default function UploadsFinishedTab() {
@@ -61,12 +60,7 @@ function UploadItem({ upload }: UploadItemProps) {
 	const { deleteUpload } = useContext(UploadsContext)
 
 	const handleCopyLink = () => {
-		window.systemChannels.copyToClipboard(`${serverBaseUrl()}/u/${upload.id}`)
-
-		window.systemChannels.showNotification({
-			title: '📎Link copied to clipboard!',
-			body: `The link for ${upload.name} is in the clipboard`
-		})
+		window.uploadChannels.copyLink(upload.id)
 	}
 
 	const handleDelete = () => {

@@ -99,7 +99,7 @@ function App() {
 	}
 
 	const deleteUpload = async (id: string) => {
-		//await deleter.delete(id) // TODO: implement delete through IPC
+		await uploadChannels.delete(id)
 
 		setFinishedUploads((previous) =>
 			previous.filter((item) => item.id !== id)

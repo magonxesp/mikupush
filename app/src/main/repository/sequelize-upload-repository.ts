@@ -26,23 +26,23 @@ export class SequelizeUploadRepository implements UploadRepository {
 		return uploads.map(this.mapUploadModelToUpload)
 	}
 
-	async delete(upload: Upload): Promise<void> {
+	async delete(uploadId: string): Promise<void> {
 		await UploadDao.destroy({
 			where: {
-				id: upload.id
+				id: uploadId
 			}
 		})
 	}
 
 	async save(upload: Upload): Promise<void> {
-		const existing = this.findById(upload.id)
+		const existing = await this.findById(upload.id)
 
 		if (existing != null) {
-			await UploadDao.update(upload.toSerializable(), {
+			await UploadDao.update(upload, {
 				where: { id: upload.id }
 			})
 		} else {
-			await UploadDao.create(upload.toSerializable())
+			await UploadDao.create(upload)
 		}
 	}
 

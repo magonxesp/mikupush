@@ -1,7 +1,5 @@
-import axios from 'axios'
-import { appEnv } from '../helpers/environment.ts'
+import { appEnv } from '../shared/helpers/environment.ts'
 
-export const axiosInstance = axios.create()
 export const serverBaseUrl = () => {
 	if (appEnv() === 'dev') {
 		return 'http://localhost:8080'

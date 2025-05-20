@@ -7,13 +7,17 @@ export interface UploadChannels {
 	findAll(): Promise<SerializableUpload[]>
 	onUploadProgress(callback: (request: SerializableUploadRequest) => void): void
 	abort(uploadId: string): void
+	delete(uploadId: string): Promise<void>
+	copyLink(uploadId: string): void
 }
 
 export const uploadChannelsName = 'uploadChannels'
 export const uploadEnqueueChannel = 'upload-equeue'
 export const uploadRetryChannel = 'upload-retry'
 export const uploadAbortChannel = 'upload-abort'
+export const uploadDeleteChannel = 'upload-delete'
 export const uploadFindAllChannel = 'upload-find-all'
+export const uploadCopyLinkChannel = 'upload-copy-link'
 export const uploadOnProgressChannel = 'upload-on-progress'
 
 declare global {

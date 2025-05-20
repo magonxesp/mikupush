@@ -1,11 +1,10 @@
-import { create } from '../http/create.ts'
-import { upload } from '../http/upload.ts'
 import { SerializableUploadRequest, UploadRequest } from '../model/upload-request'
 import { FileDetails } from '../model/file-details.ts'
 import { UploadRepository } from '../repository/upload-repository.ts'
-import { Notifier } from './notifier.ts'
+import { Notifier } from '../ports/notifier.ts'
 import fs from 'fs'
 import { CanceledError } from 'axios'
+import { UploadClient } from '../client/upload-client.ts'
 
 type OnProgressUpdateCallback = (request: SerializableUploadRequest) => void
 type QueueItem = [UploadRequest, OnProgressUpdateCallback]
@@ -15,11 +14,13 @@ export class Uploader {
 	private inProgressUploads: UploadRequest[] = []
 	private isProcessingQueue = false
 	private readonly uploadRepository: UploadRepository
+	private readonly uploadClient: UploadClient
 	private readonly notifier: Notifier
 
-	constructor(uploadRepository: UploadRepository, notifier: Notifier) {
+	constructor(uploadRepository: UploadRepository, notifier: Notifier, uploadClient: UploadClient) {
 		this.uploadRepository = uploadRepository
 		this.notifier = notifier
+		this.uploadClient = uploadClient
 	}
 
 	public async enqueue(fileDetails: FileDetails, onProgressUpdate: OnProgressUpdateCallback = () => {}) {
@@ -99,7 +100,7 @@ export class Uploader {
 
 		try {
 			await this.postUpload(request)
-			await upload(request, fs.createReadStream(request.file.path), (progress) => {
+			await this.uploadClient.upload(request, fs.createReadStream(request.file.path), (progress) => {
 				request.updateProgress(progress.progress, progress.speed)
 				onProgressUpdateCallback(request.toSerializable())
 			})
@@ -123,12 +124,12 @@ export class Uploader {
 	private async postUpload(request: UploadRequest) {
 		if (request.isRetried) {
 			try {
-				await create(request)
+				await this.uploadClient.create(request)
 			} catch (exception) {
 				console.warn('(retried request) failed create file on server', exception)
 			}
 		} else {
-			await create(request)
+			await this.uploadClient.create(request)
 		}
 	}
 

@@ -1,16 +1,17 @@
-import { deleteUpload as httpDeleteUpload } from '../http/delete'
 import { UploadRepository } from '../repository/upload-repository.ts'
-import { Upload } from '../model/upload.ts'
+import { UploadClient } from '../client/upload-client.ts'
 
 export class UploadDeleter {
 	private readonly uploadRepository: UploadRepository
+	private readonly uploadClient: UploadClient
 
-	constructor(uploadRepository: UploadRepository) {
+	constructor(uploadRepository: UploadRepository, uploadClient: UploadClient) {
 		this.uploadRepository = uploadRepository
+		this.uploadClient = uploadClient
 	}
 
-	async delete(upload: Upload) {
-		await httpDeleteUpload(upload.id)
-		await this.uploadRepository.delete(upload)
+	async delete(uploadId: string) {
+		await this.uploadClient.delete(uploadId)
+		await this.uploadRepository.delete(uploadId)
 	}
 }
