@@ -31,7 +31,7 @@ jobs:
           name: windows-artifacts
           path: |
             app/target/make/zip/win32/*/*.zip
-            app/target/make/*.dmg
+            app/target/make/squirrel.windows/*/*.exe
 
   build-app-macos-intel:
     runs-on: macos-13
@@ -112,8 +112,8 @@ jobs:
           name: linux-artifacts
           path: |
             app/target/make/zip/linux/*/*.zip
-            app/target/make/*.deb
-            app/target/make/*.rpm
+            app/target/make/deb/*/*.deb
+            app/target/make/rpm/*/*.rpm
 
   build-server-binaries:
     runs-on: ubuntu-latest
@@ -175,4 +175,5 @@ jobs:
         with:
           draft: true
           name: ${{ steps.version.outputs.current }}
-          artifacts: 'release-artifacts/*'
+          tag: ${{ steps.version.outputs.current }}
+          artifacts: 'release-artifacts/**/*.zip,release-artifacts/**/*.deb,release-artifacts/**/*.rpm,release-artifacts/**/*.exe,release-artifacts/**/*.dmg'
