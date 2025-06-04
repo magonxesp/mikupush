@@ -145,7 +145,8 @@ jobs:
   create-release:
     needs:
       - build-app-windows
-      - build-app-macos
+      - build-app-macos-intel
+      - build-app-macos-arm64
       - build-app-linux
       - build-server-binaries
     runs-on: ubuntu-latest
