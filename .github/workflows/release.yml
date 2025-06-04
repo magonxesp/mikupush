@@ -153,20 +153,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install required packages
+        run: sudo apt install -y tree
+
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: release-artifacts
+      
+      - name: List downloaded artifacts
+        run: tree release-artifacts
 
       - name: Resolve current version
+        id: version
         run: |
-          export CURRENT_VERSION=$(cat VERSION)
-          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+          export VERSION=$(cat VERSION)
+          echo "current=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: ncipollo/release-action@v1
         with:
-          name: Release ${{ env.CURRENT_VERSION }}
           draft: true
-          prerelease: false
-          files: release-artifacts/*
+          name: ${{ steps.version.outputs.current }}
+          artifacts: 'release-artifacts/*'
