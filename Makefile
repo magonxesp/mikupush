@@ -30,33 +30,15 @@ app/dist-electron: app/node_modules
 
 build-app-macos: app/dist-electron
 	cd app
-	npm run package:macos
-	cd target
-	[[ -f 'Miku Push-darwin-arm64.zip' ]] && rm 'Miku Push-darwin-arm64.zip'
-	[[ -f 'Miku Push-darwin-x64.zip' ]] && rm 'Miku Push-darwin-x64.zip'
-	zip -r 'Miku Push-darwin-arm64.zip' 'Miku Push-darwin-arm64'
-	zip -r 'Miku Push-darwin-x64.zip' 'Miku Push-darwin-x64'
+	npm run make -- --platform=darwin
 
 build-app-windows: app/dist-electron
 	cd app
-	npm run package:windows
-	cd target
-	[[ -f 'Miku Push-win32-arm64.zip' ]] && rm 'Miku Push-win32-arm64.zip'
-	[[ -f 'Miku Push-win32-x64.zip' ]] && rm 'Miku Push-win32-x64.zip'
-	zip -r 'Miku Push-win32-arm64.zip' 'Miku Push-win32-arm64'
-	zip -r 'Miku Push-win32-x64.zip' 'Miku Push-win32-x64'
-	cd ../..
-	docker run --rm -i -v "$$PWD:/work" amake/innosetup app/installer/windows/installer-x64.iss
-	docker run --rm -i -v "$$PWD:/work" amake/innosetup app/installer/windows/installer-arm64.iss
+	npm run make -- --platform=win32
 
 build-app-linux: app/dist-electron
 	cd app
-	npm run package:linux
-	cd target
-	[[ -f 'Miku Push-linux-arm64.zip' ]] && rm 'Miku Push-linux-arm64.zip'
-	[[ -f 'Miku Push-linux-x64.zip' ]] && rm 'Miku Push-linux-x64.zip'
-	zip -r 'Miku Push-linux-arm64.zip' 'Miku Push-linux-arm64'
-	zip -r 'Miku Push-linux-x64.zip' 'Miku Push-linux-x64'
+	npm run make -- --platform=linux
 
 build: \
 	build-server \

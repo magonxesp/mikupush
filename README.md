@@ -10,6 +10,27 @@ You can download the latest version on the releases page.
 
 👉 [Latest version downloads](https://github.com/magonxesp/mikupush/releases/latest)
 
+## Releases
+
+This project uses GitHub Actions to automatically build and publish releases. When a new version is ready:
+
+1. Update the version number in the `VERSION` file
+2. Commit the changes: `git commit -am "Bump version to X.Y.Z"`
+3. Create and push a new tag matching the version: 
+   ```
+   git tag vX.Y.Z
+   git push origin vX.Y.Z
+   ```
+
+The GitHub Actions workflow will automatically:
+- Build the server binaries for all platforms
+- Build the app for Windows, macOS, and Linux
+- Create installers for Windows
+- Create a new GitHub release with all the artifacts
+- Publish the release on the GitHub releases page
+
+You can find the workflow configuration in `.github/workflows/release.yml`.
+
 ## Server
 
 ### Build
