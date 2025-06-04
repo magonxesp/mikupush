@@ -143,6 +143,8 @@ jobs:
           path: server/target/*
 
   create-release:
+    permissions:
+      contents: write
     needs:
       - build-app-windows
       - build-app-macos-intel
@@ -176,4 +178,4 @@ jobs:
           draft: true
           name: ${{ steps.version.outputs.current }}
           tag: ${{ steps.version.outputs.current }}
-          artifacts: 'release-artifacts/**/*.zip,release-artifacts/**/*.deb,release-artifacts/**/*.rpm,release-artifacts/**/*.exe,release-artifacts/**/*.dmg'
+          artifacts: 'release-artifacts/**/*.zip,release-artifacts/**/*.deb,release-artifacts/**/*.rpm,release-artifacts/**/*.exe,release-artifacts/**/*.dmg,release-artifacts/server-artifacts/*'
