@@ -55,7 +55,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         name: Upload Artifacts
         with:
-          name: macos-artifacts
+          name: macos-intel-artifacts
           path: |
             app/target/make/zip/darwin/*/*.zip
             app/target/make/*.dmg
@@ -82,7 +82,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         name: Upload Artifacts
         with:
-          name: macos-artifacts
+          name: macos-arm64-artifacts
           path: |
             app/target/make/zip/darwin/*/*.zip
             app/target/make/*.dmg
