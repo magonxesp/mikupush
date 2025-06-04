@@ -21,7 +21,8 @@ const config: ForgeConfig = {
 		],
 		overwrite: true,
 		icon: 'resources/icon/icon',
-		appBundleId: 'io.mikupush.client'
+		appBundleId: 'io.mikupush.client',
+		executableName: 'mikupush'
 	},
 	outDir: 'target',
 	rebuildConfig: {
