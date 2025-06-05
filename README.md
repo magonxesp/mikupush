@@ -6,30 +6,9 @@ ensuring privacy and ease of use from the very first moment.
 
 ## Download
 
-You can download the latest version on the releases page.
+You can download the latest version on the release page.
 
 👉 [Latest version downloads](https://github.com/magonxesp/mikupush/releases/latest)
-
-## Releases
-
-This project uses GitHub Actions to automatically build and publish releases. When a new version is ready:
-
-1. Update the version number in the `VERSION` file
-2. Commit the changes: `git commit -am "Bump version to X.Y.Z"`
-3. Create and push a new tag matching the version: 
-   ```
-   git tag vX.Y.Z
-   git push origin vX.Y.Z
-   ```
-
-The GitHub Actions workflow will automatically:
-- Build the server binaries for all platforms
-- Build the app for Windows, macOS, and Linux
-- Create installers for Windows
-- Create a new GitHub release with all the artifacts
-- Publish the release on the GitHub releases page
-
-You can find the workflow configuration in `.github/workflows/release.yml`.
 
 ## Server
 
@@ -44,7 +23,7 @@ Go to the `server` directory and build the binary executable.
 go build
 ```
 
-Alternatively you can build the docker image too.
+Alternatively, you can build the docker image too.
 
 ```sh
 docker build . -t mikupush/server:latest
@@ -132,16 +111,13 @@ Go to the `app` directory and install the dependencies.
 npm install
 ```
 
-> ℹ️ You can change the server url editing the `VITE_SERVER_BASE_URL` environment variable 
-> on the `.env` file for the production build or `.env.development` file for the dev build.
-
 Build source code in production mode.
 
 ```sh
 npm run build:prod
 ```
 
-For debugging you can build the dev version.
+Or for debugging you can build the dev version.
 
 ```sh
 npm run build:dev
@@ -150,48 +126,7 @@ npm run build:dev
 Then you can build the application binaries.
 
 ```sh
-npm run package
+npm run make
 ```
 
-You can find the binaries on the `target` directory.
-
-### Build the installer
-
-> ⚠ Cross compilation is working but the app doesn't run because there are native node modules
-> as dependencies, build the app on the target platform for avoid execution issues.
-
-> ℹ️ Remember to build the app before build the installer.
-
-#### Windows
-
-Requirements:
-* [Inno Setup](https://jrsoftware.org/isinfo.php)
-
-Open the `app/installer/windows/installer-x64.iss` for build the x64 installer or the
-`app/installer/windows/installer-arm64.iss` for build for arm64 machines with Inno Setup
-and launch the build.
-
-#### Mac OS
-
-Requirements:
-* [create-dmg](https://github.com/create-dmg/create-dmg)
-
-Go to the `app` directory.
-
-```sh
-cd app
-```
-
-And run the script for build the Apple Silicon installer
-
-```sh
-./installer/macOS/create-installer-arm64.sh
-```
-
-or run the script for build for Intel machines
-
-```sh
-./installer/macOS/create-installer-x64.sh
-```
-
-Then you should find the `.dmg` file in the `target` directory.
+You can find the binaries and installers on the `target` directory.
