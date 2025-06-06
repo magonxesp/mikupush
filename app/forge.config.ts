@@ -2,6 +2,8 @@ import { FusesPlugin } from '@electron-forge/plugin-fuses'
 import type { ForgeConfig } from '@electron-forge/shared-types'
 import { FuseV1Options, FuseVersion } from '@electron/fuses'
 
+const devMode = process.env.BUILD_ENV === 'DEV'
+
 const config: ForgeConfig = {
 	packagerConfig: {
 		asar: true,
@@ -23,8 +25,8 @@ const config: ForgeConfig = {
 		icon: 'resources/icon/icon',
 		appBundleId: 'io.mikupush.client',
 		executableName: 'mikupush',
-		osxSign: {},
-		osxNotarize: {
+		osxSign: devMode ? undefined : {},
+		osxNotarize: devMode ? undefined : {
 			appleId: process.env.APPLE_ID!,
 			appleIdPassword: process.env.APPLE_PASSWORD!,
 			teamId: process.env.APPLE_TEAM_ID!
@@ -39,6 +41,7 @@ const config: ForgeConfig = {
 			name: '@electron-forge/maker-squirrel',
 			platforms: ['win32'],
 			config: {
+				iconUrl: 'https://mikupush.io/favicon.ico',
 				setupIcon: 'resources/icon/icon.ico',
 			},
 		},
@@ -66,6 +69,7 @@ const config: ForgeConfig = {
 			platforms: ['darwin'],
 			config: {
 				icon: 'resources/icon/icon.icns',
+				background: 'resources/dmg/background.png',
 				format: 'ULFO'
 			}
 		}

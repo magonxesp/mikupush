@@ -17,7 +17,8 @@
 		"preview": "vite preview",
 		"package": "electron-forge package",
 		"start": "electron-forge start",
-		"make": "electron-forge make"
+		"make": "electron-forge make",
+		"make:dev": "cross-env BUILD_ENV=DEV electron-forge make"
 	},
 	"dependencies": {
 		"@fortawesome/free-brands-svg-icons": "^6.7.2",
