@@ -1,9 +1,10 @@
 package http
 
 import (
+	"time"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"time"
 )
 
 func SetupHandlers(engine *gin.Engine) {
@@ -12,6 +13,7 @@ func SetupHandlers(engine *gin.Engine) {
 	engine.DELETE("/api/file/:uuid", FileDeleteHandler)
 	engine.GET("/u/:uuid", FileGetContentHandler)
 	engine.GET("/health", HealthGetHandler)
+	engine.GET("/favicon.ico", FaviconGetHandler)
 }
 
 func SetupCORS(engine *gin.Engine) {
