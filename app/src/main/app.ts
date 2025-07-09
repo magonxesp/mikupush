@@ -6,6 +6,7 @@ import { UploadChannelsBinder } from './ipc/upload-binder.ts'
 import { setupTray } from './tray.ts'
 import { appDataDirectory } from './helpers/file-system.ts'
 import fs from 'fs'
+import { appContext } from './app-context.ts'
 
 export class Application {
 	private readonly mainWindow: MainWindow
@@ -34,6 +35,17 @@ export class Application {
 
 	public onAppQuit() {
 		database.close()
+	}
+
+	public onBeforeQuit() {
+		appContext.isQuitting = true
+	}
+
+	public onActivate() {
+		if (!this.mainWindow.isVisible()) {
+			this.mainWindow.show()
+			this.mainWindow.focus()
+		}
 	}
 
 	private setupAppDataDirectory() {
@@ -74,5 +86,7 @@ export class Application {
 		// TODO: catch from contextual menu path to upload
 		// https://www.electronjs.org/docs/latest/api/app#apprequestsingleinstancelockadditionaldata
 		app.on('second-instance', () => application.onAppSecondInstance())
+		app.on('before-quit', () => application.onBeforeQuit())
+		app.on('activate', () => application.onActivate())
 	}
 }
