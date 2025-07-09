@@ -1,5 +1,6 @@
-import { BrowserWindow, nativeImage } from 'electron'
+import { BrowserWindow, nativeImage, Event } from 'electron'
 import { iconPath, isDevMode, isPreviewMode, mainWindowHtmlPath, preloadPath } from './environment.ts'
+import { appContext } from './app-context.ts'
 
 export class MainWindow extends BrowserWindow {
 	constructor() {
@@ -23,7 +24,19 @@ export class MainWindow extends BrowserWindow {
 	}
 
 	public initialize() {
+		this.setupEventsListeners()
 		this.loadHtml()
+	}
+
+	private setupEventsListeners() {
+		this.on('close', (event) => this.onClose(event))
+	}
+
+	private onClose(event: Event) {
+		if (!appContext.isQuitting) {
+			event.preventDefault()
+			this.hide()
+		}
 	}
 
 	private loadHtml() {
