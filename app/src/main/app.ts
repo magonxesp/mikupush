@@ -9,7 +9,7 @@ import fs from 'fs'
 import { appContext } from './app-context.ts'
 
 export class Application {
-	private mainWindow: MainWindow
+	private readonly mainWindow: MainWindow
 
 	constructor() {
 		this.mainWindow = new MainWindow()
@@ -17,13 +17,20 @@ export class Application {
 
 	public onAppReady() {
 		this.setupAppDataDirectory()
-		app.setAppUserModelId('io.mikupush.client')
 
 		this.mainWindow.initialize()
 		this.setupIPCChannels()
 		database.sync()
 
 		setupTray(this.mainWindow)
+	}
+
+	public onAppSecondInstance() {
+		if (this.mainWindow.isMinimized()) {
+			this.mainWindow.restore()
+		}
+
+		this.mainWindow.focus()
 	}
 
 	public onAppQuit() {
@@ -55,6 +62,18 @@ export class Application {
 	}
 
 	public static run() {
+		console.log('Bundle ID:', app.getName())
+		console.log('App Path:', app.getAppPath())
+		console.log('App Version:', app.getVersion())
+
+		const isLockObtained = app.requestSingleInstanceLock()
+
+		if (!isLockObtained) {
+			console.log('app is already running, closing second instance')
+			app.quit()
+			return
+		}
+
 		app.whenReady().then(() => {
 			const application = new Application()
 			application.onAppReady()
@@ -64,6 +83,9 @@ export class Application {
 
 	private static setupEventListeners(application: Application) {
 		app.on('quit', () => application.onAppQuit())
+		// TODO: catch from contextual menu path to upload
+		// https://www.electronjs.org/docs/latest/api/app#apprequestsingleinstancelockadditionaldata
+		app.on('second-instance', () => application.onAppSecondInstance())
 		app.on('before-quit', () => application.onBeforeQuit())
 		app.on('activate', () => application.onActivate())
 	}
