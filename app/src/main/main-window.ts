@@ -1,4 +1,4 @@
-import { BrowserWindow, nativeImage, Event } from 'electron'
+import { BrowserWindow, nativeImage, Event, nativeTheme } from 'electron'
 import { iconPath, isDevMode, isPreviewMode, mainWindowHtmlPath, preloadPath } from './environment.ts'
 import { appContext } from './app-context.ts'
 
@@ -9,11 +9,7 @@ export class MainWindow extends BrowserWindow {
 			height: 600,
 			frame: false, // Oculta la barra de título
 			titleBarStyle: 'hidden',
-			titleBarOverlay: {
-				color: 'rgba(0, 0, 0, 0)',
-				symbolColor: '#ffffff',
-				height: 32
-			},
+			titleBarOverlay: (process.platform !== 'darwin') ? true : {},
 			title: 'Miku Push!',
 			icon: nativeImage.createFromPath(iconPath),
 			webPreferences: {
@@ -24,12 +20,14 @@ export class MainWindow extends BrowserWindow {
 	}
 
 	public initialize() {
+		this.updateTitleBarOverlay()
 		this.setupEventsListeners()
 		this.loadHtml()
 	}
 
 	private setupEventsListeners() {
 		this.on('close', (event) => this.onClose(event))
+		nativeTheme.on('updated', () => this.onNativeThemeUpdated())
 	}
 
 	private onClose(event: Event) {
@@ -37,6 +35,10 @@ export class MainWindow extends BrowserWindow {
 			event.preventDefault()
 			this.hide()
 		}
+	}
+
+	private onNativeThemeUpdated() {
+		this.updateTitleBarOverlay()
 	}
 
 	private loadHtml() {
@@ -47,5 +49,16 @@ export class MainWindow extends BrowserWindow {
 		} else {
 			this.loadFile(mainWindowHtmlPath)
 		}
+	}
+
+	private updateTitleBarOverlay() {
+		if (process.platform === 'darwin') {
+			return
+		}
+
+		this.setTitleBarOverlay({
+			color: nativeTheme.shouldUseDarkColors ? '#1C1B1F' : '#FFFFFF',
+			symbolColor: nativeTheme.shouldUseDarkColors ? '#FFFFFF' : '#000000',
+		})
 	}
 }
